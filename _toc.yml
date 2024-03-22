@@ -1,0 +1,20 @@
+format: jb-book
+root: chapters/index
+parts:
+  - caption: Python Basics
+    numbered: true
+    chapters:
+      - file: chapters/01_getting-started
+      - file: chapters/02_data-analysis-basics
+      - file: chapters/03_numerical-processing
+  - caption: The Vector Space Model
+    numbered: true
+    chapters:
+      - file: chapters/04_vectorization
+      - file: chapters/05_vector-spaces
+  - caption: Large Language Models
+    numbered: true
+    chapters:
+      - file: chapters/06_intro-to-llms
+      - file: chapters/07_bert
+      - file: chapters/08_gpt

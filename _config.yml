@@ -1,0 +1,25 @@
+title: Programming for Large Language Models
+author: Tyler Shoemaker
+only_build_toc_files: true
+
+#repository:
+#  url: ""
+
+parse:
+  myst_enable_extensions:
+    # - amsmath
+    - colon_fence
+    # - deflist
+    - dollarmath
+    # - html_admonition
+    - html_image
+    - linkify
+    # - replacements
+    # - smartquotes
+    - substitution
+
+execute:
+  execute_notebooks: "auto"
+
+html:
+  use_repository_button: false
