@@ -5,16 +5,17 @@ parts:
     numbered: true
     chapters:
       - file: chapters/01_getting-started
-      - file: chapters/02_data-analysis-basics
-      - file: chapters/03_numerical-processing
+      - file: chapters/02_python-basics
+      - file: chapters/03_data-analysis-basics
   - caption: The Vector Space Model
     numbered: true
     chapters:
-      - file: chapters/04_vectorization
-      - file: chapters/05_vector-spaces
+      - file: chapters/04_ngram-models
+      - file: chapters/05_vectorization
+      - file: chapters/06_vector-spaces
   - caption: Large Language Models
     numbered: true
     chapters:
-      - file: chapters/06_intro-to-llms
-      - file: chapters/07_bert
-      - file: chapters/08_gpt
+      - file: chapters/07_intro-to-llms
+      - file: chapters/08_bert
+      - file: chapters/09_gpt
