@@ -1,9 +1,9 @@
-title: Programming for Large Language Models
+title: Introduction to Interpretability for Language Models
 author: Tyler Shoemaker
 only_build_toc_files: true
 
-#repository:
-#  url: ""
+repository:
+  url: "https://github.com/t-shoemaker/2024_dtl_llm-interpretability"
 
 parse:
   myst_enable_extensions:
