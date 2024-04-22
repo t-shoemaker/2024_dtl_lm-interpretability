@@ -254,12 +254,11 @@ $$
 H_{\text{cross}} = -\Sigma_w P_w log(q_w)
 $$
 
-Where, cross-entropy is the sum of true probabilities $P_w$ for tokens $w$
-multiplied by the log of their predicted probabilities $q_w$.
-
-In this small experiment, "predicted" probabilities will just be the average
-probability of a token in the corpus. This acts as a baseline against which we
-can measure the sampling strategies.
+Where cross-entropy is the sum of true probabilities $P_w$ for tokens $w$
+multiplied by the log of their predicted probabilities $q_w$. In this small
+experiment, "predicted" probabilities will just be the average probability of a
+token in the corpus. This acts as a baseline against which we can measure the
+sampling strategies.
 
 
 ### Unigram modeling
@@ -321,16 +320,16 @@ for strategy, sampler in samplers.items():
 ```
 
 Cross-entropy is a common loss function in language modeling, but when it's
-used to report on model performance, you will most often see it transformed
-into **perplexity**, which is cross-entropy's exponentiation:
+used to report on model performance you will most often see it transformed into
+**perplexity**. Perplexity is cross-entropy's exponentiation:
 
 $$
 Perplexity = 2^{H_{\text{cross}}}
 $$
 
-Perplexity is the average number of choices a model has to make to predict the
-next token in a sequence. Below, we calculate perplexity over the average of
-cross-entropy scores from the sampling run above.
+The value this produces is the average number of choices a model has to make to
+predict the next token in a generated sequence. Below, we calculate perplexity
+over the average cross-entropy scores form the sampling run above.
 
 ```{code-cell}
 perplexity = pd.DataFrame(results)
@@ -342,10 +341,10 @@ print(perplexity.mean().sort_values())
 
 When compared against the average probability of tokens in our corpus, our
 weighted sampling strategy has slightly less perplexity than our unweighted
-one. That tells us it is easier to represent our baseline distribution with the
-weighted samples than with the unweighted ones. In other words, the weighted
-samples are a better approximation of the underlying corpus. As a **model** of
-our corpus, weighted samples are better than unweighted ones.
+one. That tells us it is somewhat easier to represent our baseline distribution
+with the weighted samples than with the unweighted ones. In other words, the
+weighted samples are a better approximation of the mean probability of tokens
+in our corpus. 
 
 Cross-entropy and perplexity are two ways to validate such a model, but they
 are not necessarily the final determinants for what makes a good model. Neither
@@ -357,9 +356,9 @@ distribution by so much if those relationships are absent in the data.
 
 ## Bigrams
 
-Given the above, we turn now to bigrams, or sequences of two tokens.
-Representing the corpus as these sequences, as opposed to individual tokens,
-will make for a better model of Dickinson's poetry.
+We now turn to bigrams, or sequences of two tokens. Representing the corpus as
+bigrams will produce a model that encodes sequential information about
+Dickinson's poetry.
 
 As before, we preprocess the corpus, but this time we set `ngram = 2`.
 
@@ -400,7 +399,7 @@ we did for our unigrams. But that wouldn't establish a relationship from the
 first token in the bigram to the second token, it would just produce data about
 the frequency of bigrams in the corpus.
 
-To establish that relationship, we need to calculate the **conditional
+To establish that relationship, we must calculate the **conditional
 probability** of the two tokens in a bigram. That is, given token `w1`, how
 likely is token `w2` to follow?
 
@@ -408,8 +407,8 @@ $$
 p(w2|w1) = \frac{P(w1, w2)}{P(w1)}
 $$
 
-This is easy to do with `pandas`. We divide bigram frequencies by token
-frequencies in our unigram DataFrame:
+This is easy to do with `pandas`: divide bigram frequencies by token
+frequencies in the unigram DataFrame.
 
 ```{code-cell}
 bigram_df["prob"] = bigram_df["n"] / unigram_df["n"]
@@ -443,25 +442,20 @@ plt.show()
 
 ### Generation
 
-With conditional probabilities generated, we can again do some text generation.
-The general procedure is this: given a token, we use the conditional
-probabilities of all other tokens in the corpus as weights for our sampling
-function. With those weights we make our selection, then use that new token as
-the basis for another iteration. This is, in effect, a rudimentary **Markov
-chain**.
+With conditional probabilities generated, it's time for text generation. The
+general procedure is this: given a token, we use the conditional probabilities
+of all other tokens in the corpus as weights for our sampling function. With
+those weights we make our selection, then use that new token as the basis for
+another iteration. This is, in effect, a rudimentary **Markov chain**.
 
-Doing this is easier if we convert our bigram DataFrame into a **wide** format,
-where the rows are `w1` in the bigrams and the columns are `w2`. Each cell in
+Doing this is easier with a **wide** format for the bigram DataFrame. In this
+format, rows are `w1` in the bigrams and the columns are `w2`. Each cell in
 this new DataFrame will represent the conditional probability of moving from
-`w1` to `w2`.
+`w1` to `w2`. The resultant DataFrame will be quite large.
 
 ```{code-cell}
 bigram_probs = bigram_df["prob"].unstack(fill_value = 0)
-```
 
-The resultant DataFrame is quite large:
-
-```{code-cell}
 print("Shape:", bigram_probs.shape)
 ```
 
@@ -510,8 +504,8 @@ def generate(unigram_df, bigram_df, bigram_probs, N = 10):
         sequence.append(seed)
 
         # Get the row in the bigram probabilities that corresponds to our
-        # token, then sample from this token, using the probabilities as
-        # weights.
+        # token, then sample from this token using the probabilities as
+        # weights
         next_token_row = bigram_probs.loc[seed]
         next_token = next_token_row.sample(weights = next_token_row.values)
         next_token = next_token.index.item()
@@ -547,7 +541,7 @@ for _ in range(5):
 ```
 
 Not bad! This reads considerably better than the unigram output. But can we do
-better? Let's look at a few different bigram sampling strategies.
+better? Let's explore a few different bigram sampling strategies to find out.
 
 
 ## Sampling Strategies
@@ -565,8 +559,6 @@ The first should be familiar. It's what we have been using all along. In
 weighted sampling, every token/bigram is assigned a weighted value, which
 corresponds to its probability in the corpus. Higher probabilities mean that
 the token/bigram is sampled more frequently than ones with lower probabilities.
-
-Let's write this out as a function:
 
 ```{code-cell}
 def sample_weighted(weights, idx):
@@ -601,8 +593,8 @@ print(sample)
 
 ### Greedy sampling
 
-In greedy sampling, we always select the most probable token. Here is a
-function that implements this.
+Greedy sampling always selects the most probable token. In a sense, it isn't
+really sampling at all.
 
 ```{code-cell}
 def sample_greedy(weights, idx):
@@ -730,8 +722,7 @@ def generate_from_sampler(
         sequence.append(seed)
 
         # Get the row in the bigram probabilities that corresponds to our
-        # token, then sample from this token, using the probabilities as
-        # weights.
+        # token, then sample from this token using the sampler
         next_token = sampler(bigram_probs, seed)
 
         # Get the probability and information of the resultant bigram
@@ -756,7 +747,7 @@ def generate_from_sampler(
     return sequence, metadata
 ```
 
-We now run this with our different samplers.
+A `for` loop that runs this function over our different samplers is below:
 
 ```{code-cell}
 samplers = {
@@ -798,8 +789,7 @@ for strategy, sampler in samplers.items():
         results[strategy].append(cross_entropy)
 ```
 
-Now we look at the results. As before, we transform the cross-entropy scores to
-perplexity.
+Now we look at the results, which we transform into perplexity scores.
 
 ```{code-cell}
 perplexity = pd.DataFrame(results)

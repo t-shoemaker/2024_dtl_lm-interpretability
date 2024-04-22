@@ -7,7 +7,7 @@ parts:
       - file: chapters/01_getting-started
       - file: chapters/02_python-basics
       - file: chapters/03_data-analysis-basics
-  - caption: The Vector Space Model
+  - caption: Language Models
     numbered: true
     chapters:
       - file: chapters/04_ngram-models
