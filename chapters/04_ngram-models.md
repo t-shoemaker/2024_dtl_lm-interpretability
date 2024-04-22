@@ -174,19 +174,23 @@ Doing this in code is also straightforward:
 unigram_df["info"] = np.log2(1 / unigram_df["prob"])
 ```
 
-If we look at the information values we've created, we will see that they
-increase as tokens become more rare. This should make sense. Information is
-just the normalized surprise of a token, which increases as its probability
-decreases. Note too that the vast majority of tokens in the data have low
-probability.
+If we look at the information values, we will see that most are quite high.
+This should make sense. Information is just the normalized surprise of a token,
+which increases as its probability decreases. Because most tokens have low
+probability, they have high information.
 
 ```{code-cell}
-fig, axes = plt.subplots(1, 2, figsize = (9, 3))
+fig, axes = plt.subplots(1, 2, figsize = (9, 4))
 token_idx = range(len(unigram_df))
 
-for idx, x in zip([0, 1], ["prob", "info"]):
-    sns.lineplot(data = unigram_df, x = x, y = token_idx, ax = axes[idx])
-    axes[idx].set_title(x)
+for idx, measure in zip([0, 1], ["prob", "info"]):
+    sns.kdeplot(
+        unigram_df[measure], fill = True, cumulative = True, ax = axes[idx]
+    )
+    axes[idx].set(
+        title = measure.capitalize(),
+        ylabel = "Density (% tokens)"
+    )
 
 plt.tight_layout()
 plt.show()
@@ -420,33 +424,64 @@ and second words in a bigram with respect to all such relationships in the
 corpus.
 
 ```{code-cell}
-bigram_df["info"] = np.log(1 / bigram_df["prob"])
+bigram_df["info"] = np.log2(1 / bigram_df["prob"])
 ```
 
-We should see a similar pattern in the fall and rise of probability and
-information, respectively:
+Plotting bigram probability and information produces a very different picture
+of the relationship between these two measures than the one we observed with
+unigrams.
 
 ```{code-cell}
-fig, axes = plt.subplots(1, 2, figsize = (9, 3))
+fig, axes = plt.subplots(1, 2, figsize = (9, 4))
 token_idx = range(len(bigram_df))
 
-for idx, x in zip([0, 1], ["prob", "info"]):
-    sorted_bigrams = bigram_df.sort_values(by = x)
-    sns.lineplot(data = sorted_bigrams, x = x, y = token_idx, ax = axes[idx])
-    axes[idx].set_title(x)
+for idx, measure in zip([0, 1], ["prob", "info"]):
+    sns.kdeplot(
+        bigram_df[measure], fill = True, cumulative = True, ax = axes[idx]
+    )
+    axes[idx].set(
+        xlim = (
+            np.floor(bigram_df[measure]).min(),
+            np.ceil(bigram_df[measure]).max()
+        ),
+        title = measure.capitalize(),
+        ylabel = "Density (% tokens)"
+    )
 
 plt.tight_layout()
 plt.show()
 ```
 
+Why is this? Well, take a look at a histogram of the bigram probabilities. It's
+(roughly) a bimodal distribution, with many bigrams clustering around the
+minimum and maximum probability values.
+
+```{code-cell}
+fig, ax = plt.subplots(figsize = (9, 4))
+sns.histplot(bigram_df["prob"], bins = 10, kde = True, ax = ax)
+ax.set(title = "Bigram probabilities")
+plt.show()
+```
+
+Bigrams with $p(w2|w1) \approx 1.0$ contain very little information: the second
+word always follows the first. When there are a lot of these, that boosts the
+information values across the bigrams. Likewise, bigrams with $p(w2|w1) \approx
+0.0$ have a lot of information: the second word follows many words, not just
+the first one. That raises the information value for this particular bigram.
+But the bimodal distribution makes this all a wash. Bigrams at either side of
+the probability mass cancel each other out, creating the slope in information
+scores we see above.
+
+As we move to bigram generation, keep this in mind.
+
 
 ### Generation
 
-With conditional probabilities generated, it's time for text generation. The
-general procedure is this: given a token, we use the conditional probabilities
-of all other tokens in the corpus as weights for our sampling function. With
-those weights we make our selection, then use that new token as the basis for
-another iteration. This is, in effect, a rudimentary **Markov chain**.
+The general procedure for generating bigrams is this: given a token, we use the
+conditional probabilities of all other tokens in the corpus as weights for our
+sampling function. With those weights we make our selection, then use that new
+token as the basis for another iteration. This is, in effect, a rudimentary
+**Markov chain**.
 
 Doing this is easier with a **wide** format for the bigram DataFrame. In this
 format, rows are `w1` in the bigrams and the columns are `w2`. Each cell in
@@ -762,6 +797,10 @@ for strategy, sampler in samplers.items():
         print("+", " ".join(sequence))
     print("\n")
 ```
+
+Remember the earlier point about bigrams with $p(w2|w1) \approx 1.0$? That
+clearly influences the greedy sampling output. The generator gets trapped in a
+loop of bigrams that have exceedingly high probabilities.
 
 
 ### Measuring sampling strategies
