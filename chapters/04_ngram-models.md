@@ -96,12 +96,6 @@ datadir = Path("data/dickinson_poetry-foundation-poems")
 manifest = pd.read_csv(datadir / "manifest.csv")
 ```
 
-Here is a glimpse of the manifest:
-
-```{code-cell}
-manifest.head()
-```
-
 Load the corpus.
 
 ```{code-cell}
@@ -468,8 +462,7 @@ bigram_probs = bigram_df["prob"].unstack(fill_value = 0)
 The resultant DataFrame is quite large:
 
 ```{code-cell}
-num_row, num_col = bigram_probs.shape
-print(f"Shape: {num_row:,} x {num_col:,}")
+print("Shape:", bigram_probs.shape)
 ```
 
 Time to implement the generation function.
