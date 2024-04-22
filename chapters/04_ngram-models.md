@@ -463,16 +463,17 @@ ax.set(title = "Bigram probabilities")
 plt.show()
 ```
 
-Bigrams with $p(w2|w1) \approx 1.0$ contain very little information: the second
-word always follows the first. When there are a lot of these, that boosts the
-information values across the bigrams. Likewise, bigrams with $p(w2|w1) \approx
-0.0$ have a lot of information: the second word follows many words, not just
-the first one. That raises the information value for this particular bigram.
-But the bimodal distribution makes this all a wash. Bigrams at either side of
-the probability mass cancel each other out, creating the slope in information
-scores we see above.
+Bigrams with $p(w2|w1) \approx 1.0$ contain very little information. The second
+word always follows the first, so less information is required to encode this
+relationship. Likewise, bigrams with $p(w2|w1) \approx 0.0$ have a lot of
+information: the second word follows many words, not just the first one, so
+more information is required to encode the possibility of observing this
+particular sequence.
 
-As we move to bigram generation, keep this in mind.
+You likely see where this is going: the bimodal distribution means there is a
+broad range of information values, with values clustered at the two ends of the
+data. This creates a gradually increasing line in the cumulative density plot
+above. As we move to bigram generation, keep this in mind.
 
 
 ### Generation
