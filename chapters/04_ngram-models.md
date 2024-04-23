@@ -269,7 +269,7 @@ measure of how well one distribution approximates the other.
 We express cross-entropy as follows:
 
 $$
-H_{\text{cross}} = -\Sigma_w P_w log(q_w)
+H_{\text{cross}} = -\Sigma_w P_w log_2(q_w)
 $$
 
 Where cross-entropy is the sum of true probabilities $P_w$ for tokens $w$
@@ -309,7 +309,7 @@ def calculate_cross_entropy(Pw, Qw):
     cross_entropy : float
         The cross-entropy
     """
-    Qw = np.log(Qw)
+    Qw = np.log2(Qw)
     Sigma = np.sum(Pw * Qw)
     cross_entropy = -Sigma
     
@@ -885,10 +885,14 @@ for col in perplexity.columns:
 print(perplexity.mean().sort_values())
 ```
 
-It may seem puzzling that greedy sampling performs the best by this metric, but
-consider what it's doing. Since it always picks the most likely token, its
-selection will push toward the center of the probability mass, whereas the
-other two strategies allow tokens from outside that center. Looking at the log
+These are poor---but unsurprising---results. With the bigram probabilities
+skewing to one-to-one relationships or one-to-dozens, there is effectively no
+way to generalize across all types of bigrams in the corpus.
+
+But consider what the results do tell us: greedy sampling performs the best by
+this metric. Since it always picks the most likely token, its selection will
+push toward the center of the probability mass, whereas the other two
+strategies allow tokens from outside that center. Looking at the log
 probabilities---the negative of information---for each sampling strategy should
 bear this out:
 
