@@ -13,12 +13,26 @@ kernelspec:
 ```{code-cell}
 :tags: [remove_cell]
 import os
+from matplotlib.pyplot import rcParams
 
 os.chdir("..")
+rcParams["figure.dpi"] = 150
 ```
 
-Ngram Models
-============
+N-gram Models
+=============
+
+This chapter discusses n-gram models. We will create unigram (single-token) and
+bigram (two-token) sequences from a corpus, about which we compute measures
+like probability, information, entropy, and perplexity. Using these measures as
+weighting for different sampling strategies, we implement a few simple text
+generators.
+
+Our corpus is 59 [Emily Dickinson poems][poems], collected from the Poetry
+Foundation.
+
+[poems]: https://www.poetryfoundation.org/poets/emily-dickinson#tab-poems
+
 
 ## Preliminaries
 
@@ -70,7 +84,7 @@ def preprocess(doc, ngram = 1):
     doc : str
         The document to preprocess
     ngram : int
-        How many ngrams to break the document into
+        How many n-grams to break the document into
     
     Returns
     -------
@@ -470,7 +484,7 @@ information: the second word follows many words, not just the first one, so
 more information is required to encode the possibility of observing this
 particular sequence.
 
-You likely see where this is going: the bimodal distribution means there is a
+You may see where this is going: the bimodal distribution means there is a
 broad range of information values, with values clustered at the two ends of the
 data. This creates a gradually increasing line in the cumulative density plot
 above. As we move to bigram generation, keep this in mind.
@@ -478,11 +492,43 @@ above. As we move to bigram generation, keep this in mind.
 
 ### Generation
 
-The general procedure for generating bigrams is this: given a token, we use the
-conditional probabilities of all other tokens in the corpus as weights for our
-sampling function. With those weights we make our selection, then use that new
-token as the basis for another iteration. This is, in effect, a rudimentary
-**Markov chain**.
+Another way to think about the information weighting between bigrams is to
+consider bigrams as a directed graph, in which a `w1` token branches into
+various `w2` tokens. The graph below shows a few successors from the token
+"the" and the successors of those successors. Arrows indicate the direction of
+a sequence. Edge thickness corresponds to the information of the relationship
+between the two tokens in a bigram.
+
+```{image} ../img/dickinson_bigrams.png
+:alt: Directed subgraph of "the" and some successors
+:align: center
+```
+
+Note the variation in thickness, which is also a proxy for the probability that
+`w2` follows from `w1`. Below is an improbable bigram. It requires a lot of
+information to encode:
+
+```{code-cell}
+bigram_df.loc[(slice(None), "dower"), :]
+```
+
+Now: an extremely probable one. It requires very little information (none at
+all, in fact):
+
+```{code-cell}
+bigram_df.loc[("crows", slice(None)), :]
+```
+
+These two examples sit, respectively, at the maximum and minimum limit of the
+histogram above. Other bigrams in this graph are somewhere in between.
+
+Bigram generation involves traversing this graph. The general procedure is
+this: given a token, we use the conditional probabilities of all other tokens
+in the corpus as weights for our sampling function. Many weights will be zero,
+meaning it isn't possible to move from one particular token to another. But for
+those weights that aren't zero, we make a selection. Then, we use that new
+token as the basis for another selection, and so on. This is, in effect, a
+rudimentary **Markov chain**.
 
 Doing this is easier with a **wide** format for the bigram DataFrame. In this
 format, rows are `w1` in the bigrams and the columns are `w2`. Each cell in
