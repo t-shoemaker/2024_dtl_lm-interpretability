@@ -176,7 +176,8 @@ S(w) = \frac{1}{P(w)}
 $$
 
 We use this to calculate **information**, which is the log normalized surprise
-of a token.
+of a token. Note our use of $log_2$. This is to express information in terms of
+**bits**.
 
 $$
 I(w) = log_2(S(w))
@@ -218,11 +219,16 @@ h(w) = P(w) \cdot I(w)
 $$
 
 The sum of all self-entropy values is the **entropy** $H$, an overall measure
-of uncertainty in our token frequencies.
+of uncertainty in our token frequencies. It is the **weighted average** of the
+number of bits required to encode some data.
 
 $$
 H = \Sigma_{w} P(w) \cdot I(w)
 $$
+
+Why not take the average of $I$? Look at the skew in tokens frequency. Certain
+tokens make disproportionate contributions to the overall distribution of
+values in our data, which a raw average would not reflect.
 
 In code, that looks like the following:
 
