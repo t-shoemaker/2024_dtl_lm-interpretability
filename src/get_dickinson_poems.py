@@ -14,8 +14,11 @@ import pandas as pd
 # Globals for the website
 BASE_URL = "https://www.poetryfoundation.org/poets/emily-dickinson"
 POEM_TAB = "tab-poems"
+POEM_LINKS = "c-invisicard"
 POEM_TITLE = "c-feature-hd"
 POEM_BODY = "c-feature-bd"
+ANNOTATION = "annotation"
+ANNOTATION_NOTE = "o-poem-violator"
 
 
 def get_html_data(url):
@@ -36,6 +39,27 @@ def get_html_data(url):
         print(f"Could not get data from: {url}")
 
     return response.text
+
+
+def drop_annotations(soup):
+    """Drop annotations and hidden text from HTML elements.
+
+    Parameters
+    ----------
+    soup : BeautifulSoup
+        HTML elements
+    """
+    # No annotations
+    for elem in soup.find_all("span", class_=ANNOTATION):
+        elem.decompose()
+
+    for elem in soup.find_all("div", class_=ANNOTATION_NOTE):
+        elem.decompose()
+
+    # And no hidden elements
+    hidden = soup.find_all("span", style=lambda v: v and "display:none" in v)
+    for elem in hidden:
+        elem.decompose()
 
 
 def get_poem(url):
@@ -65,8 +89,11 @@ def get_poem(url):
     poem_number = re.sub(r"\D", "", poem_number)
     poem_number = int(poem_number) if poem_number else None
 
-    # Get the stanzas
+    # Get the stanzas and drop any annotations
     body = poem_page.find("div", class_=POEM_BODY)
+    drop_annotations(body)
+
+    # Then get the text
     body = body.get_text(separator="\n", strip=True)
     body = unicodedata.normalize("NFD", body)
 
@@ -78,7 +105,7 @@ def main(args):
     # Make the initial request to the main page
     main_page = get_html_data(BASE_URL)
     poem_block = BeautifulSoup(main_page, "lxml").find("div", id=POEM_TAB)
-    poem_links = poem_block.find_all("div", class_="c-invisicard")
+    poem_links = poem_block.find_all("div", class_=POEM_LINKS)
 
     # Set up and output directory for the peoms
     poem_dir = args.datadir / "poems"
