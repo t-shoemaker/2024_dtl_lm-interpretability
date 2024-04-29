@@ -28,8 +28,8 @@ like probability, information, entropy, and perplexity. Using these measures as
 weighting for different sampling strategies, we implement a few simple text
 generators.
 
-Our corpus is 59 [Emily Dickinson poems][poems], collected from the Poetry
-Foundation.
++ **Data**: 59 [Emily Dickinson poems][poems] collected from the Poetry
+  Foundation
 
 [poems]: https://www.poetryfoundation.org/poets/emily-dickinson#tab-poems
 
@@ -48,9 +48,11 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 ```
 
-Two helper functions will load the corpus and prepare it for modeling.
+Two helper functions will load the corpus and prepare it for modeling. They
+should be familiar: we defined them in the last chapter.
 
 ```{code-cell}
+:tags: [remove_cell]
 def load_corpus(datadir, files):
     """Load a corpus from file names.
 
@@ -96,24 +98,88 @@ def preprocess(doc, ngram = 1):
 
     # Tokenize the string. Optionally, make 2-gram (or more) sequences from
     # those tokens
-    tokens = nltk.word_tokenize(doc)
+    tokens = nltk.wordpunct_tokenize(doc)
     if ngram > 1:
         tokens = list(nltk.ngrams(tokens, ngram))
     
     return tokens
 ```
 
+````{dropdown} Show helper functions
+```py
+def load_corpus(datadir, files):
+    """Load a corpus from file names.
+
+    Parameters
+    ----------
+    datadir : Path
+        Directory where the files are stored
+    files : Iterable
+        A list of file names
+
+    Returns
+    -------
+    corpus : list
+        The corpus
+    """
+    corpus = []
+    for fname in files:
+        path = datadir / fname
+        with path.open("r") as fin:
+            doc = fin.read()
+            corpus.append(doc)
+
+    return corpus
+
+
+def preprocess(doc, ngram = 1):
+    """Preprocess a document.
+
+    Parameters
+    ----------
+    doc : str
+        The document to preprocess
+    ngram : int
+        How many n-grams to break the document into
+    
+    Returns
+    -------
+    tokens : list
+        Tokenized document
+    """
+    # First, change the case of the words to lowercase
+    doc = doc.lower()
+
+    # Tokenize the string. Optionally, make 2-gram (or more) sequences from
+    # those tokens
+    tokens = nltk.wordpunct_tokenize(doc)
+    if ngram > 1:
+        tokens = list(nltk.ngrams(tokens, ngram))
+    
+    return tokens
+```
+````
+
 Now, set up the data directory and load a file manifest.
 
 ```{code-cell}
 datadir = Path("data/dickinson_poetry-foundation-poems")
-manifest = pd.read_csv(datadir / "manifest.csv")
+metadata = pd.read_csv(datadir / "metadata.csv")
+
+metadata.info()
 ```
 
-Load the corpus.
+We won't be using much of this data, but it helps keep our work aligned. Here's
+a snippet:
 
 ```{code-cell}
-corpus = load_corpus(datadir / "poems", manifest["file"])
+metadata.head()
+```
+
+Now, load the corpus.
+
+```{code-cell}
+corpus = load_corpus(datadir / "poems", metadata["file"])
 ```
 
 And we're ready!
@@ -121,7 +187,8 @@ And we're ready!
 
 ## Unigrams
 
-First: unigrams. Below, we preprocess the corpus into lists of tokens.
+First: unigrams. Below, we preprocess the corpus into lists of tokens. Note
+that, unlike with the obituaries, we are keeping the punctuation.
 
 ```{code-cell}
 unigrams = [preprocess(poem, ngram = 1) for poem in corpus]
@@ -200,7 +267,11 @@ token_idx = range(len(unigram_df))
 
 for idx, measure in zip([0, 1], ["prob", "info"]):
     sns.kdeplot(
-        unigram_df[measure], fill = True, cumulative = True, ax = axes[idx]
+        unigram_df[measure],
+        fill = True,
+        cumulative = True,
+        clip = (0, np.max(unigram_df[measure])),
+        ax = axes[idx]
     )
     axes[idx].set(
         title = measure.capitalize(),
@@ -230,7 +301,7 @@ Why not take the average of $I$? Look at the skew in tokens frequency. Certain
 tokens make disproportionate contributions to the overall distribution of
 values in our data, which a raw average would not reflect.
 
-In code, that looks like the following:
+In code, calculating entropy looks like the following:
 
 ```{code-cell}
 unigram_df["self-entropy"] = unigram_df["prob"] * unigram_df["info"]
@@ -457,13 +528,13 @@ token_idx = range(len(bigram_df))
 
 for idx, measure in zip([0, 1], ["prob", "info"]):
     sns.kdeplot(
-        bigram_df[measure], fill = True, cumulative = True, ax = axes[idx]
+        bigram_df[measure],
+        fill = True,
+        cumulative = True,
+        clip = (0, np.max(bigram_df[measure])),
+        ax = axes[idx]
     )
     axes[idx].set(
-        xlim = (
-            np.floor(bigram_df[measure]).min(),
-            np.ceil(bigram_df[measure]).max()
-        ),
         title = measure.capitalize(),
         ylabel = "Density (% tokens)"
     )
