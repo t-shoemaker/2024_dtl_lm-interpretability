@@ -40,7 +40,7 @@ import matplotlib.pyplot as plt
 Our corpus files are stored in a DataFrame alongside other metadata.
 
 ```{code-cell}
-data = pd.read_parquet("data/nyt_obituaries.parquet")
+data = pd.read_parquet("data/nyt_obituaries/nyt_obituaries.parquet")
 ```
 
 Now, a quick snapshot of the contents. First, years covered:
@@ -80,131 +80,6 @@ dtm = pd.DataFrame(
 )
 ```
 
-```{code-cell}
-def plot_metrics(data, col, title = "", xlabel = ""):
-    """Plot metrics with a histogram.
-
-    Parameters
-    ----------
-    data : pd.DataFrame
-        The data to plot
-    col : str
-        Which column to plot
-    title : str
-        Plot title
-    xlabel : str
-        Label of the X axis
-    """
-    if col not in data.columns:
-        raise ValueError(col, "not in data")
-
-    fig, ax = plt.subplots(figsize = (15, 5))
-    g = sns.histplot(data = data, x = col)
-    g.set(title = title, xlabel = xlabel, ylabel = "Count");
-```
-
-### Document metrics
-
-First, some simple document metrics. Below, we calculate the **number of
-terms** in a document, as expressed in this notation:
-
-$$
-T(i) = \Sigma_{j=1}^{n}D_{ij}
-$$
-
-Where the total terms for each document $i$ in the DTM $D$ is the sum of the
-frequency of each term $j$ for $n$ total terms.
-
-```{code-cell}
-data["num_terms"] = np.sum(dtm, axis = 1).values
-plot_metrics(data, "num_terms", title = "Term counts", xlabel = "Terms")
-```
-
-The **number of types** is the number of unique terms in a document. We
-calculate it with:
-
-$$
-K(i) = \Sigma_{j=1}^{n}1(D_{ij} > 0)
-$$
-
-For every document $i$ in DTM $D$, each term $j$ is counted as $1$ if it is
-above zero, $1(D_{ij} > 0)$. The type frequency is the summation of those
-counts
-
-```{code-cell}
-data["num_types"] = np.count_nonzero(dtm, axis = 1)
-plot_metrics(data, "num_types", title = "Type counts", xlabel = "Types")
-```
-
-The **type-token ratio** is a measure of lexical diversity.
-
-$$
-TTR(i) = \frac{K(i)}{T(i)}
-$$
-
-In other words, for document $i$ it is the number of types $K(i)$ divided by
-the number of terms $T(i)$.
-
-```{code-cell}
-data["ttr"] = data["num_types"] / data["num_terms"]
-plot_metrics(data, "ttr", title = "Type-token ratio", xlabel = "TTR")
-```
-
-Which document has the highest type-token ratio?
-
-```{code-cell}
-data.nlargest(n = 1, columns = "ttr")
-```
-
-
-### Term metrics
-
-On to terms. Term frequency is a summation along the column axis of the DTM:
-
-$$
-TF(j) = \Sigma_{i=1}^{m}D_{ij}
-$$
-
-The term frequency for term $j$ in the DTM $D$ is the sum of its frequency
-in document $i$ for $m$ total documents.
-
-```{code-cell}
-term_freq = pd.DataFrame(dtm.sum(axis = 0), columns = ["count"])
-term_freq.describe()
-```
-
-Terms with the highest frequency:
-
-```{code-cell}
-term_freq.sort_values("count", ascending = False, inplace = True)
-term_freq.head(10)
-```
-
-And the lowest:
-
-```{code-cell}
-term_freq.tail(10)
-```
-
-Though there are in fact many tokens that only occur once in our DTM. We refer
-to them as **hapax legomena** (Greek for "only said once"). How many are in the
-corpus altogether?
-
-```{code-cell}
-hapaxes = term_freq[term_freq["count"] == 1]
-print(f"{len(hapaxes):,} hapaxes ({len(hapaxes) / len(dtm.T) * 100:0.2f}%)")
-```
-
-If we plot token counts, a familiar pattern appears: the distribution is
-Zipfian.
-
-#```{code-cell}
-```
-fig, ax = plt.subplots(figsize = (15, 5))
-g = sns.lineplot(data = term_freq, x = term_freq.index, y = "count", ax = ax)
-g.set(title = "Term counts", xlabel = "Terms", ylabel = "Count", xticks = []);
-```
-
 ### Weighting with tf-idf
 
 
@@ -214,113 +89,186 @@ g.set(title = "Term counts", xlabel = "Terms", ylabel = "Count", xticks = []);
 
 ```{code-cell}
 columns = ["page", "screen"]
-index = ["d1", "d2"]
+index = ["doc1", "doc2"]
 
-ps1 = pd.DataFrame([[14, 7], [4, 12]], columns = columns, index = index)
+ps1 = pd.DataFrame([[4, 1], [2, 3]], columns = columns, index = index)
 ps1
 ```
 
 ```{code-cell}
 :tags: [remove_cell]
-def quiver_plot_2d(dtm, d1, d2, axes_max = 15, figsize = (5, 5)):
-    """Create a quiver plot from a two-dimensional document-term matrix.
+def plot_vectors(vectors, labels = [], colors = [], figsize = (4, 4)):
+    """Plot 2-dimensional vectors.
 
     Parameters
     ----------
-    dtm : pd.DataFrame
-        The document-term matrix
-    d1 : str
-        Dimension 1
-    d2 : str
-        Dimension 2
-    axes_max: int
-        Maximum extent of the axes
+    vectors : np.ndarray
+        Vectors to plot
+    labels : list
+        Labels for the vectors
+    colors : list
+        Vector colors (string names like "black", "red", etc)
     figsize : tuple
         Figure size
     """
-    # Define an origin point
-    origin = [[0, 0], [0, 0]]
+    n_vector, n_dim = vectors.shape
+    if n_dim != 2:
+        raise ValueError("We can only plot 2-dimensional vectors")
 
-    # Create a figure and plot values in each dimension with respect to the
-    # origin
+    # Populate colors
+    if not colors:
+        colors = ["black"] * n_vector
+
+    # Create a (0, 0) origin point for each vector
+    origin = np.zeros((2, n_vector))
+
+    # Then plot each vector
     fig, ax = plt.subplots(figsize = figsize)
-    ax.quiver(*origin, dtm[d1], dtm[d2], scale = 1, units = "xy")
-    ax.set(
-        xlim = (0, axes_max), ylim = (0, axes_max),
-        xticks = range(0, axes_max + 1), yticks = range(0, axes_max + 1),
-        xlabel = d1, ylabel = d2
-    )
-
-    # Label the quivers
-    for doc in dtm.index:
-        ax.text(
-            dtm.loc[doc, d1], dtm.loc[doc, d2] + 0.5, doc,
-            va = "top", ha = "center"
+    for idx, vector in enumerate(vectors):
+        color = colors[idx]
+        ax.quiver(
+            *origin[:, idx],
+            vector[0],
+            vector[1],
+            color = color,
+            scale = 1,
+            units = "xy",
+            label = labels[idx] if labels else None
         )
 
+    # Set plot limits
+    limit = np.max(np.abs(vectors)) + 1
+    ax.set_xlim([-limit, limit])
+    ax.set_ylim([-limit, limit])
+
+    # Set ticks
+    ax.set_xticks(np.arange(-limit, limit + 1, 1))
+    ax.set_yticks(np.arange(-limit, limit + 1, 1))
+    ax.set_aspect("equal")
+
+    # Set axes to be in the center of the plot
+    ax.axhline(y = 0, color = "k", linewidth = 0.8)
+    ax.axvline(x = 0, color = "k", linewidth = 0.8)
+
+    # Add a label legend, if applicable
+    if labels:
+        ax.legend()
+
+    # Show the plot
     plt.show()
 ```
 
-````{dropdown} Show quiver plot code
+````{dropdown} Show vector plot code
 ```py
-def quiver_plot_2d(dtm, d1, d2, axes_max = 14, figsize = (5, 5)):
-    """Create a quiver plot from a two-dimensional document-term matrix.
+def plot_vectors(vectors, labels = [], colors = [], figsize = (4, 4)):
+    """Plot 2-dimensional vectors.
 
     Parameters
     ----------
-    dtm : pd.DataFrame
-        The document-term matrix
-    d1 : str
-        Dimension 1
-    d2 : str
-        Dimension 2
-    axes_max: int
-        Maximum extent of the axes
+    vectors : np.ndarray
+        Vectors to plot
+    labels : list
+        Labels for the vectors
+    colors : list
+        Vector colors (string names like "black", "red", etc)
     figsize : tuple
         Figure size
     """
-    # Define an origin point
-    origin = [[0, 0], [0, 0]]
+    n_vector, n_dim = vectors.shape
+    if n_dim != 2:
+        raise ValueError("We can only plot 2-dimensional vectors")
 
-    # Create a figure and plot values in each dimension with respect to the
-    # origin
+    # Populate colors
+    if not colors:
+        colors = ["black"] * n_vector
+
+    # Create a (0, 0) origin point for each vector
+    origin = np.zeros((2, n_vector))
+
+    # Then plot each vector
     fig, ax = plt.subplots(figsize = figsize)
-    ax.quiver(*origin, dtm[d1], dtm[d2], scale = 1, units = "xy")
-    ax.set(
-        xlim = (0, axes_max), ylim = (0, axes_max),
-        xticks = range(0, axes_max + 1), yticks = range(0, axes_max + 1),
-        xlabel = d1, ylabel = d2
-    )
-
-    # Label the quivers
-    for doc in dtm.index:
-        ax.text(
-            dtm.loc[doc, d1], dtm.loc[doc, d2] + 0.5, doc,
-            va = "top", ha = "center"
+    for idx, vector in enumerate(vectors):
+        color = colors[idx]
+        ax.quiver(
+            *origin[:, idx],
+            vector[0],
+            vector[1],
+            color = color,
+            scale = 1,
+            units = "xy",
+            label = labels[idx] if labels else None
         )
 
+    # Set plot limits
+    limit = np.max(np.abs(vectors)) + 1
+    ax.set_xlim([-limit, limit])
+    ax.set_ylim([-limit, limit])
+
+    # Set ticks
+    ax.set_xticks(np.arange(-limit, limit + 1, 1))
+    ax.set_yticks(np.arange(-limit, limit + 1, 1))
+    ax.set_aspect("equal")
+
+    # Set axes to be in the center of the plot
+    ax.axhline(y = 0, color = "k", linewidth = 0.8)
+    ax.axvline(x = 0, color = "k", linewidth = 0.8)
+
+    # Add a label legend, if applicable
+    if labels:
+        ax.legend()
+
+    # Show the plot
     plt.show()
 ```
 ````
 
 ```{code-cell}
-quiver_plot_2d(ps1, "page", "screen")
+plot_vectors(ps1.values, labels = list(ps1.index), colors = ["red", "blue"])
 ```
 
 ```{code-cell}
-ps2 = pd.DataFrame([[8, 14], [4, 12]], columns = columns, index = index)
+ps2 = pd.DataFrame([[1, 4], [2, 3]], columns = columns, index = index)
 ps2
 ```
 
 ```{code-cell}
-quiver_plot_2d(ps2, "page", "screen")
+plot_vectors(ps2.values, labels = list(ps2.index), colors = ["red", "blue"])
 ```
 
 ### Vector operations
 
 ```{code-cell}
-A = np.array([2, 4, 6])
-B = np.array([3, 5, 7])
+A = ps1.loc["doc1"].values
+B = ps1.loc["doc2"].values
+```
+
+A vector has a **magnitude** and a **direction**.
+
+**Magnitude**
++ Description: The length of a vector from its origin to its end point. This is
+  calculated as the square root of the sum of squares of its components
++ Notation: $||A|| = \sqrt{a_1^2 + a_2^2 + \dots + a_n^2}$
++ Result: Single value (scalar)
+
+```{code-cell}
+manual = np.sqrt(np.sum(np.square(A)))
+shorthand = np.linalg.norm(A)
+
+assert manual == shorthand, "Magnitudes don't match!"
+print(shorthand)
+```
+
+**Direction**
++ Description: The orientation of a vector in space. In Cartesian coordinates,
+  it is the angles a vector forms across its axes. But direction can also be
+  represented as a second **unit vector**, a vector of magnitude 1 that points
+  in the same direction as the first. Most vector operations in NLP use the
+  latter
++ Notation: $\hat{A} = \frac{A}{||A||}$
++ Result: Vector of length $n$
+
+```{code-cell}
+A / np.linalg.norm(A)
 ```
 
 **Summation**
@@ -329,7 +277,8 @@ B = np.array([3, 5, 7])
 + Result: Vector of length $n$
 
 ```{code-cell}
-A + B
+C = A + B
+plot_vectors(np.array([A, B, C]), colors = ["red", "blue", "green"])
 ```
 
 **Subtraction**
@@ -338,7 +287,8 @@ A + B
 + Result: Vector of length $n$
 
 ```{code-cell}
-A - B
+C = A - B
+plot_vectors(np.array([A, B, C]), colors = ["red", "blue", "green"])
 ```
 
 **Multiplication, element-wise**
@@ -347,21 +297,90 @@ A - B
 + Result: Vector of length $n$
 
 ```{code-cell}
-A * B
+C = A * B
+plot_vectors(np.array([A, B, C]), colors = ["red", "blue", "green"])
 ```
 
 **Multiplication, dot product**
 + Description: The sum of the products
 + Notation: $A \cdot B = \Sigma_{i=1}^{n} a_i \cdot b_i$
 + Result: Single value (scalar)
-+ NumPy: `A @ B`
 
 ```{code-cell}
 A @ B
 ```
 
-## Cosine Similarity
+The dot product is one of the most important operations in modern machine
+learning. It measures the extent to which two vectors point in the same
+direction. If the dot product is positive, the angle between two vectors is
+under 90 degrees. This means they point somewhat in the same direction. If it
+is negative, they point in opposite directions. And when the dot product is
+zero, the vectors are perpendicular.
 
 
+### Vector comparisons
+
+Dot product enables a variety of comparisons across vectors.
+
+### Projection
+
+```{code-cell}
+def project_vector(A, B):
+    """Project vector A onto vector B.
+
+    Parameters
+    ----------
+    A : np.ndarray
+        Vector to project
+    B : np.ndarray
+        Vector on which to project A
+
+    Returns
+    -------
+    projection : np.ndarray
+        The component of A that lies in the direction of B
+    """
+    # Compute the dot product of the two vectors
+    dot = A @ B
+    
+    # Normalization: the magnitude (length) of squared B. Applying normalization
+    # strips out difference in magnitude between two vectors so their directions
+    # are comparable
+    normalization = B @ B
+    
+    # Apply normalization. This adjusts the length of B to match that part of A
+    # that lies in the same direction
+    scale_factor = dot / normalization
+
+    # Scale B
+    projection = scale_factor * B
+
+    return projection
+```
+
+### Cosine Similarity
+
+```{code-cell}
+def calculate_cosine_similarity(A, B):
+    """Calculate cosine similarity between two vectors.
+
+    Parameters
+    ----------
+    A : np.ndarray
+        First vector
+    B : np.ndarray
+        Second vector
+
+    Returns
+    -------
+    cos_sim : float
+        Cosine similarity of A and B
+    """
+    dot = A @ B
+    norm_by = np.linalg.norm(A) * np.linalg.norm(B)
+    cos_sim = dot / norm_by
+
+    return cos_sim
+```
 
 ## Clustering with Cosine Similarity
