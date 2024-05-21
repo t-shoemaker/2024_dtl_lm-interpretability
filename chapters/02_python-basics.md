@@ -31,7 +31,7 @@ from collections import Counter
 
 ## Loading Data
 
-Loading a file into your Python environment involves writing a path to the
+Loading a file into your Python environment requires writing a path to the
 file's location. Below, we assign a path to Mary Shelley's _Frankenstein_,
 which currently sits in `data/`, a subdirectory of our current working
 directory.
@@ -42,7 +42,7 @@ path = "data/shelley_frankenstein.txt"
 
 Use `open` to open a connection to the file. This function requires you to
 specify a value to the `mode` argument. We use `r` because are working with
-**plain text** data; `rb` is for **binary** data.
+**plain text** data; `rb` would for **binary** data.
 
 ```{code-cell}
 fin = open(path, mode = "r") 
@@ -85,7 +85,7 @@ Python is counting characters, not words.
 
 ## Data Structures
 
-Usually, however, we'll want to work with words. This requires us to change how
+Usually, however, we want to work with words. This requires us to change how
 Python represents our text data. And, because there is no inherent concept of
 what a word is in the language, it falls on us to define how to make words out
 of characters. This process is called **tokenization**. Tokenizing a text means
@@ -104,11 +104,11 @@ tokens = frankenstein.split()
 
 ### Lists
 
-The result is a **list**, a general-purpose container for storing data. Lists
-are probably the most common data structure in Python. They make very little
-assumptions about the kind of data they store, and they store this data in an
-ordered manner. That is, lists have a first element, a second element, and so
-on up until the full length of the list.
+The result of `.split()` is a **list**, a general-purpose, one-dimensional
+container for storing data. Lists are probably the most common data structure
+in Python. They make very little assumptions about the kind of data they store,
+and they store this data in an ordered manner. That is, lists have a first
+element, a second element, and so on up until the full length of the list.
 
 ```{code-cell}
 len(tokens)
@@ -179,25 +179,25 @@ You can also use `[]` to create a list manually. Here's an empty list:
 []
 ```
 
-And here is one with inhomogeneous data. That is, it contains all kinds of data
-types---and another lists! Lists can contain lists.
+And here is one with all kinds of data types---and another list! Lists can
+contain lists.
 
 ```{code-cell}
-li = [8, "x", False, ["a", "b", "c"]]
+l = [8, "x", False, ["a", "b", "c"]]
 ```
 
 To index an element in this sublist, you'll need to select the index position
 of the sublist, then select the one for the element you want.
 
 ```{code-cell}
-li[3][1]
+l[3][1]
 ```
 
 You can set the element of a list by assigning a value at that index:
 
 ```{code-cell}
-li[2] = True
-li
+l[2] = True
+l
 ```
 
 Assigning elements of a container is not without complication. Below, we use
@@ -208,6 +208,7 @@ create a new variable, `y`, from `x`.
 ```{code-cell}
 x = list("abc")
 y = x
+y
 ```
 
 Assigning a new value to an index position in `x` will propagate the change to
@@ -233,13 +234,14 @@ x[2] = "d"
 print(x, y)
 ```
 
+
 ### Tuples
 
 References can be confusing. If you know that the elements of a container
 shouldn't change, you can also avoid the problem above by creating a **tuple**.
-Like a list, a tuple is a one-dimensional container. The key difference is that
-tuples are **immutable**: once you create a tuple, you are neither able to
-alter it or its elements.
+Like a list, a tuple is a one-dimensional container for general data storage.
+The key difference is that tuples are **immutable**: once you create a tuple,
+you are neither able to alter it nor its elements.
 
 Make a tuple by enclosing comma-separated values in parentheses `()`.
 
@@ -267,7 +269,8 @@ x[2] = "d"
 ### Sets
 
 Unlike lists and tuples, **sets** cannot contain multiple instances of the same
-element. Create them using curly brackets `{}` or the `set` keyword.
+element. They only have unique elements. Create them using curly brackets `{}`
+or the `set` keyword.
 
 ```{code-cell}
 set_a = {"a", "b", "c"}
@@ -295,27 +298,28 @@ a = "I am surrounded by mountains of ice which admit of no escape and threaten e
 b = "This ice is not made of such stuff as your hearts may be; it is mutable and cannot withstand you if you say that it shall not." 
 ```
 
-We convert both to sets:
+We split them into tokens and convert both to sets:
 
 ```{code-cell}
 a = set(a.split())
 b = set(b.split())
 ```
 
-We can find their **intersection**. This is where the two sentences'
+Now, we find their **intersection**. This is where the two sentences'
 vocabularies overlap:
 
 ```{code-cell}
 a.intersection(b)
 ```
 
-We can also find their **difference**:
+We can also find their **difference**, or the set of tokens that do not
+overlap:
 
 ```{code-cell}
 a.difference(b)
 ```
 
-Finally, we can build a new set that combines the two:
+Finally, we can build a new set that combines our two sets:
 
 ```{code-cell}
 :tags: [output_scroll]
@@ -335,11 +339,11 @@ c[5]
 ### Dictionaries
 
 Finally, there are **dictionaries**. Like sets, dictionaries store unique
-elements, but they associate those elements with a particular value (these can
-be individual values, like numbers, or containers). Every element in a
-dictionary is therefore a **key--value pair**. This makes them powerful data
-structures for associating values in your data with metadata of one kind or
-another.
+elements, but they associate those elements with a particular value. These can
+be individual values, like numbers, or containers, like lists, tuples, and so
+on. Every element in a dictionary is therefore a **key--value pair**. This
+makes dictionaries powerful data structures for associating values in your data
+with metadata of one kind or another.
 
 Create a dictionary with curly brackets `{}` and colons `:` that separate the
 key--value pairs.
@@ -379,14 +383,21 @@ counts["w"] = 7
 counts
 ```
 
-Use the `.keys()` method to get all keys in a dictionary (this is functionally
-a set):
+Using `.pop()` removes a key--value pair.
+
+```{code-cell}
+counts.pop("w")
+counts
+```
+
+The `.keys()` method returns all keys in a dictionary. Functionally, this is a
+set.
 
 ```{code-cell}
 counts.keys()
 ```
 
-And use the `.values()` method to get values:
+Alternatively the `.values()` method returns a dictionary's values.
 
 ```{code-cell}
 counts.values()
@@ -396,7 +407,7 @@ At the beginning of the chapter we imported a `Counter` object. This is a
 special kind of dictionary. It counts its input and stores the results as
 key--value pairs.
 
-A `Counter` works on characters:
+A `Counter` can work on characters:
 
 ```{code-cell}
 :tags: [output_scroll]
@@ -426,7 +437,8 @@ this frequently: data structures wrapping other data structures. But while we
 could work with this list as we could any list, indexing it to retrieve tuples,
 which we could then index again, that would be inefficient for many operations.
 More, it might require us to know in advance which elements are at what index
-positions.
+positions. This information is not always easily available, especially when
+writing general-purpose code.
 
 It would be better to work with our data in a more programmatic fashion. We can
 do this with the above containers because they are all **iterables**: that is,
@@ -436,11 +448,11 @@ code. This is called **iterating** through our data; each step is one
 **iteration**.
 
 
-### `for` loops
+### For-loops
 
-The standard method for advancing through an iterable is a `for` loop. Even if
+The standard method for advancing through an iterable is a for-loop. Even if
 you've never written a line of code before, you've probably heard of them. A
-`for` loop begins with the `for` keyword, followed by:
+for-loop begins with the `for` keyword, followed by:
 
 + A placeholder variable, which will be automatically assigned to an element at
   the beginning of each iteration
@@ -448,9 +460,11 @@ you've never written a line of code before, you've probably heard of them. A
 + An object with elements
 + A colon `:`
 
-Code in the body of the loop must be indented by 4 spaces.
+Code in the body of the loop must be indented. An equivalent of four spaces for
+indentation is standard.
 
-Below, we iterate through each tuple in `top_ten`:
+Below, we iterate through each tuple in `top_ten`. At the start of the
+iteration, a tuple is assigned to `tup`; we then print this tuple.
 
 ```{code-cell}
 :tags: [output_scroll]
@@ -458,7 +472,22 @@ for tup in top_ten:
     print(tup)
 ```
 
-Within the indented portion of the `for` loop, you can perform checks and
+For-loops can be nested inside of for-loops. Let's re-implement the above with
+two for-loops.
+
+```{code-cell}
+:tags: [output_scroll]
+for tup in top_ten:
+    for part in tup:
+        print(part)
+    print("\n")
+```
+
+See how the outer `print` statement only triggers once the inner for-loop has
+finished? Every iteration of the first for-loop kicks off the second for-loop
+anew.
+
+Within the indented portion of a for-loop you can perform checks and
 computations. In every iteration below, we assign the token in the tuple to a
 variable `tok` and its value to `val`. Then, we check whether `val` is even. If
 it is, we print `tok` and `val`.
@@ -466,8 +495,7 @@ it is, we print `tok` and `val`.
 ```{code-cell}
 :tags: [output_scroll]
 for tup in top_ten:
-    tok = tup[0]
-    val = tup[1]
+    tok, val = tup[0], tup[1]
     if val % 2 == 0:
         print(tok, val)
 ```
@@ -485,8 +513,363 @@ for tup in top_ten:
 print(is_even)
 ```
 
+Other data structures are iterable in Python. In addition to lists, you'll find
+yourself iterating through dictionaries with some frequency. Use `.keys()` or
+`.values()` to iterate, respectively, through the keys and values of a
+dictionary. Or, use `.items()` to iterate through both at the same time. Note
+that `.items()` requires using two placeholder variables separated by a comma
+`,`.
 
-### `while` loops
+```{code-cell}
+for key, value in counts.items():
+    print(key, "->", value)
+```
+
+Below, we divide every count in `token_freq` by the total number of tokens in
+_Frankenstein_ to express counts as percentages, using a new `Counter` to store
+our results.
+
+```{code-cell}
+num_tokens = token_freq.total()
+percentages = Counter()
+
+for token, count in token_freq.items():
+    percent = count / num_tokens
+    percentages[token] = percent
+```
+
+Here is the equivalent of `top_ten`, but with percentages:
+
+```{code-cell}
+:tags: [output_scroll]
+percentages.most_common(10)
+```
 
 
 ### Comprehensions
+
+**Comprehensions** are idiomatic to Python. They allow you to perform
+operations across an iterable without needing to pre-allocate an empty copy to
+store the results. This makes them both concise and efficient. You will most
+frequently see comprehensions used in the context of lists (i.e. "list
+comprehensions"), but you can also use them for dictionaries and sets. 
+
+The syntax for comprehension includes the keywords `for` and `in`, just like a
+for-loop. The difference is that in the list comprehension, the repeated code
+comes _before_ the `for` keyword rather than after it, and the entire
+expression is enclosed in square brackets `[ ]`.
+
+Below, we use the `.istitle()` method to find capitalized tokens in
+_Frankenstein_. This method returns a Boolean value, so the resultant list will
+contain `True` and `False` values that specify capitalization at a certain
+index.
+
+```{code-cell}
+is_title = [token.istitle() for token in tokens]
+is_title[:10]
+```
+
+That should be straightforward enough, but we don't know which tokens these
+values reference. With comprehensions, an easy way around this is to use an
+`if` statement embedded in the comprehension. Put that statement and a
+conditional check at the end of the comprehension to filter a list.
+
+```{code-cell}
+is_title = [token for token in tokens if token.istitle()]
+is_title[:10]
+```
+
+Comprehensions become particularly powerful when you use them to manipulate
+each element in an iterable. Below, we change all tokens to their lowercase
+variants using `.lower()`.
+
+```{code-cell}
+lowercase = [token.lower() for token in tokens]
+lowercase[:10]
+```
+
+
+### While-loops
+
+While-loops continue iterating until a condition is met. Whereas a for-loop
+only iterates through your data once, a while-loop iterates indefinitely. That
+means you need to specify an **exit condition** to break out of your
+while-loop, otherwise your code will get trapped and eventually your computer
+will kill the process.
+
+The syntax for a while-loop is quite simple: start it with `while` and a
+condition. Below, we increment a counter to print the first ten tokens in
+_Frankenstein_.
+
+```{code-cell}
+current_index = 0
+while current_index < 10:
+    print(tokens[current_index])
+
+    current_index += 1
+```
+
+Note that we must specify, and then manually increment, the counter. If we
+didn't, the loop would have no reference telling it when it should break.
+
+Here is a more open-ended loop. We set the condition to `True`, keeping the
+loop running until we reach an exit condition. Then, for each iteration, we
+index our list of tokens and check whether the token at that index matches the
+one we're looking for. If it does, the code prints that index position and
+stops the iteration with a `break` statement. If it doesn't, we increment the
+counter and try again.
+
+```{code-cell}
+find_first = "Frankenstein"
+current_index = 0
+while True:
+    token = tokens[current_index]
+    if token == find_first:
+        print("The first occurrence of", find_first, "is at", current_index)
+        break
+
+    current_index += 1
+```
+
+
+## Regular Expressions
+
+You have likely noticed by now that our tokenization strategy has created some
+strange tokens. Most notably, punctuation sticks to words because there was no
+whitespace to separate them. This means that, for our `Counter`, the following
+two tokens are counted separately, even though they're the same word:
+
+```{code-cell}
+variants = ["ship,", "ship."]
+for tok in variants:
+    print(tok, "->", token_freq[tok])
+```
+
+We can handle this in a number of ways. Many rely on writing out **regular
+expressions**, or regexes. Regexes are special sequences of characters that
+represent patterns for matching in text; these sequences are comprised of
+regular old characters in text, or **literals**, and **metacharacters**,
+special characters that stand for whole classes of literals. Regexes work as a
+search mechanism, and they become highly useful in text processing for their
+ability to find variants like the tokens above.
+
+
+### Literals
+
+The following regex will match on the string "ship":
+
+```{code-cell}
+ship = r"ship"
+```
+
+Note how we prepend our string with `r`. That tells Python to treat the string
+as a regex sequence. Using `findall()` from the `re` module will return a list
+of all matches on this regex:
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(ship, frankenstein)
+```
+
+When you use literals like this, Python will match only on the exact sequence.
+But that's a problem for us, because there's no way to know whether the above
+output refers to "ship" and any following punctuation, or if our regex has also
+matched on words that contain "ship," like "relationship" and "shipment."
+
+The latter will most certainly be the case. We'll see this if we search with
+`finditer()`. It finds all matches and also returns where they start and end in
+the character sequence (the object returned is a `Match`). Below, we use those
+start/end positions to glimpse the context of matches.
+
+```{code-cell}
+:tags: [output_scroll]
+found = re.finditer(ship, frankenstein)
+for match in found:
+    # Get the match text
+    span = match.group()
+
+    # Get its start and end, then offset both
+    start = match.start() - 2
+    end = match.end() + 2
+
+    # Ensure our expanded start/end locations don't overshoot the string
+    if start < 0:
+        start = 0
+    if end > len(frankenstein):
+        end = len(frankenstein)
+
+    print(span, "->", frankenstein[start:end])
+```
+
+
+### Metacharacters
+
+Controlling for cases where our regex returns more than what we want requires
+metacharacters.
+
+The `.` metacharacter stands for any character except a newline `\n`.
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"ship.", frankenstein)
+```
+
+If you want the literal period `.`, you need to use an **escape character**
+`\`.
+
+```{code-cell}
+re.findall(r"ship\.", frankenstein)
+```
+
+Note that this won't work:
+
+```{code-cell}
+:tags: [raises-exception]
+re.findall(r"\", frankenstein)
+```
+
+Instead, escape the escape character:
+
+```{code-cell}
+re.findall(r"\\", frankenstein)
+```
+
+No such characters in this text, however.
+
+Use `+` as a repetition operator to find instances where the preceding
+character is repeated at least once, but with no limit up to a newline
+character. If we use it with `.`, it returns strings up to the ends of lines.
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"ship.+", frankenstein)
+```
+
+Related to `+` is `?` and `*`. The first means "match zero or one", while the
+second means "match zero or more". An example of `*` is below. Note we change
+our regex slightly to demonstrate the zero matching.
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"ship*", frankenstein)
+```
+
+Use curly brackets `{ }` in conjunction with numbers to specify a limit for how
+many repetitions you want. Here is "match three to five":
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"ship.{3,5}", frankenstein)
+```
+
+Want to constrain your search to particular characters? Parentheses `( )`
+specify groups of characters, including metacharacters. Use them in conjunction
+with the "or" operator `|` to get two (or more) variants of a string.
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"(ship\.|ship,)", frankenstein)
+```
+
+Or, use square brackets `[ ]` to specify literals following an "or" logic, e.g.
+"character X or character Y or...".
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"ship[.,]", frankenstein)
+```
+
+Note that literals are case-sensitive.
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"[Ss]everal", frankenstein)
+```
+
+Including a space character is valid here:
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"ship[., ]", frankenstein)
+```
+
+But you can also use `\s`. This specifies a **character class**: whole types of
+characters (in this case, spaces).
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"ship[.,\s]", frankenstein)
+````
+
+Below, we find all spaces (and multiple space sequences) in the novel:
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"\s+", frankenstein)
+```
+
+There are also character classes for digits `\d` and alphanumeric characters
+`\w`. Here is an example with digits, which you could use to find chapter
+breaks:
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"Chapter \d+", frankenstein)
+```
+
+Using `\w`, the pattern below specifies alphanumeric characters followed by a
+newline.
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"\w+\n", frankenstein)
+```
+
+The start-of-text anchor operator `^` is useful for filtering out characters.
+It checks whether a sequence begins with the characters that follow it. Below,
+we select characters that are neither alphanumeric nor spaces.
+
+```{code-cell}
+:tags: [output_scroll]
+re.findall(r"[^\w\s]+", frankenstein)
+```
+
+The `sub()` function will substitute regex matches with another sequence. If we
+use the same pattern above, we can remove all punctuation. Note that we also
+need to tack on the extra underscore character, as it is technically counted in
+the character class. 
+
+```{code-cell}
+cleaned = re.sub(r"[^\w\s]+|_", " ", frankenstein)
+```
+
+This is one way of getting around those variants from above.
+
+```{code-cell}
+token_freq = Counter(cleaned.split())
+
+variants = ["ship,", "ship.", "ship"]
+for tok in variants:
+    print(tok, "->", token_freq.get(tok, None))
+```
+
+We actually scooped up even more tokens from this substitution pattern. An even
+better picture of our counts would emerge if we changed our text to lowercase
+so that the `Counter` can count case variants together.
+
+```{code-cell}
+cleaned = cleaned.lower()
+token_freq = Counter(cleaned.split())
+
+print("Unique tokens after substitution and case change:", len(token_freq))
+```
+
+We'll leave off on text preprocessing for now but will pick it up in the next
+chapter. We've covered most of the main regexes, though there are a few more
+that you may find useful. See this [cheatsheet][cheatsheet] for an extensive
+overview.
+
+[cheatsheet]: https://www.pythoncheatsheet.org/cheatsheet/regular-expressions
+
+
+## Functions
