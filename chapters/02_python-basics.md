@@ -977,18 +977,16 @@ that function. Typically, variables inside the function or its arguments are
 not the same as the ones you set elsewhere in your code, even if the names of
 those variables match. 
 
-Here is a simple example with a negative number check:
+For instance, `starts_with()` creates a new variable, `first_char`. If we have
+another variable with the same name outside this function, it won't be
+overwritten when we call `starts_with()`.
 
 ```{code-cell}
-def is_negative(x):
-    return x < 0
-```
+first_char = "5"
 
-Now call it:
-
-```{code-cell}
-x = -4
-is_negative(5)
+print("Value of first_char:", first_char)
+starts_with("Book", "B")
+print("Value of first_char:", first_char)
 ```
 
 You'll often find yourself transforming code you've already written into a
