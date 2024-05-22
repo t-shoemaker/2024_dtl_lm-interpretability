@@ -21,11 +21,37 @@ os.chdir("..")
 Python Basics
 =============
 
+This chapter overviews key functionality and concepts in Python. We will learn
+how to load files into Python, store data in various data structures, and
+iterate through that data. Additionally, we will discuss regular expressions
+for string matching and write our own functions.
+
++ **Data**: a plain text version of Mary Shelley's _Frankenstein_
+
+
 ## Preliminaries
+
+To do our work, we will import an entire module and a single object from
+another module. 
 
 ```{code-cell}
 import re
 from collections import Counter
+```
+
+Recall from the last chapter that importing an entire module gives us access to
+all of its functionality. We specify which part of that module we want to use
+with dot `.` notation.
+
+```{code-cell}
+re.findall
+```
+
+To use the object we imported, initialize it by assigning it to a variable:
+
+```{code-cell}
+c = Counter()
+c
 ```
 
 
@@ -358,6 +384,19 @@ stored at a particular key.
 
 ```{code-cell}
 counts["y"]
+```
+
+The `.get()` method also works.
+
+```{code-cell}
+counts.get("y")
+```
+
+You can set a default value to control for cases when the dictionary doesn't
+have a requested key.
+
+```{code-cell}
+counts.get("a", None)
 ```
 
 Assign a new value to a key to update it.
@@ -866,10 +905,261 @@ print("Unique tokens after substitution and case change:", len(token_freq))
 
 We'll leave off on text preprocessing for now but will pick it up in the next
 chapter. We've covered most of the main regexes, though there are a few more
-that you may find useful. See this [cheatsheet][cheatsheet] for an extensive
-overview.
+advanced ones that you may find useful. See this [cheatsheet][cheatsheet] for
+an extensive overview.
 
 [cheatsheet]: https://www.pythoncheatsheet.org/cheatsheet/regular-expressions
 
 
 ## Functions
+
+So far we have relied on external functions, but we can also write our own.
+Writing functions greatly reduces redundancy in code, because you can reuse
+them as many times as you want, in whatever contexts you want. More, functions
+can keep your code organized. In complex processes, it often helps to break
+your code up into individual steps and associate each with a function. That
+also makes rewriting code much easier later on.
+
+Before we write a function, here is a review of vocabulary associated with
+them:
+
++ The placeholder variables for inputs are **parameters**
++ **Arguments** are the values assigned to parameters during a call
++ To **call** a function means using it to compute something
++ The **body** is the code inside a function
++ A function's **scope** is the local context in which it runs code
++ The **return value** is the output of a function
+
+In Python, a function begins with the `def` keyword, followed by:
+
++ The name of the function
++ A list of parameters surrounded by parentheses
++ A colon `:`
+
+There is no practical limit to the number of parameters. Code in the body of
+the function should be indented according to the same conventions for loops and
+conditionals (four spaces). To return a result from the function, use the
+`return` keyword.
+
+Here is a very simple function that returns `True`/`False` depending on whether
+`text` starts with `character`.
+
+```{code-cell}
+def starts_with(text, character):
+    first_char = text[0]
+    return first_char == character
+```
+
+Call the function by writing out its name and supplying it with arguments.
+
+```{code-cell}
+starts_with("Book", "B")
+```
+
+Here are some more examples:
+
+```{code-cell}
+starts_with("natural language processing", "w")
+```
+
+```{code-cell}
+to_test = [("token", "t"), ("Character", "c")]
+for testing_pair in to_test:
+    text = testing_pair[0]
+    character = testing_pair[1]
+    text_starts_with_char = starts_with(text, character)
+
+    print(text, "starts with", character, "is", text_starts_with_char)
+```
+
+When we speak of a function's scope, we are talking about the local context for
+that function. Typically, variables inside the function or its arguments are
+not the same as the ones you set elsewhere in your code, even if the names of
+those variables match. 
+
+Here is a simple example with a negative number check:
+
+```{code-cell}
+def is_negative(x):
+    return x < 0
+```
+
+Now call it:
+
+```{code-cell}
+x = -4
+is_negative(5)
+```
+
+You'll often find yourself transforming code you've already written into a
+function. The function below re-implements the for-loop we wrote above to print
+regex matches and their context. It has three parameters:
+
+1. The regex match is `match`
+2. The text where we found the match is `string`
+3. Our `offset` is the number of characters to extract on either side of the
+   match
+
+```{code-cell}
+def show_match_context(match, string, offset):
+    # Get the match text
+    span = match.group()
+
+    # Get its start and end, then offset both
+    start = match.start() - offset
+    end = match.end() + offset
+
+    # Ensure our expanded start/end locations don't overshoot the string
+    if start < 0:
+        start = 0
+    if end > len(string):
+        end = len(string)
+
+    # Print the results
+    print(span, "->", string[start:end])
+```
+
+With our function defined, we can call it once.
+
+```{code-cell}
+match = re.search(r"lightning", frankenstein)
+show_match_context(match, frankenstein, 5)
+```
+
+Or as many times as we please.
+
+```{code-cell}
+:tags: [output_scroll]
+found = re.finditer(r"lightning", frankenstein)
+for match in found:
+    show_match_context(match, frankenstein, 5)
+```
+
+It's somewhat annoying to have to write out the offset every time we call the
+function. To circumvent this, you can specify a default value for a parameter.
+Your function will use that if you do not supply an argument for that
+parameter.
+
+```{code-cell}
+def show_match_context(match, string, offset = 5):
+    # Get the match text
+    span = match.group()
+
+    # Get its start and end, then offset both
+    start = match.start() - offset
+    end = match.end() + offset
+
+    # Ensure our expanded start/end locations don't overshoot the string
+    if start < 0:
+        start = 0
+    if end > len(string):
+        end = len(string)
+
+    # Print the results
+    print(span, "->", string[start:end])
+```
+
+With no argument supplied:
+
+```{code-cell}
+match = re.search(r"lightning", frankenstein)
+show_match_context(match, frankenstein)
+```
+
+Supplying an argument:
+
+```{code-cell}
+match = re.search(r"lightning", frankenstein)
+show_match_context(match, frankenstein, 15)
+```
+
+Recall that the output of `finditer()` is a special `Match` object, which has
+properties that extend beyond typical strings. If you forget this and try to
+call your function on an object it doesn't expect, you'll run into an error:
+
+```{code-cell}
+:tags: [raises-exception]
+show_match_context("lightning", frankenstein)
+```
+
+The more code you write, the harder it is to keep this sort of thing in your
+mind. That's why it's helpful to document your function with a **docstring**.
+Docstrings are descriptions of what your function does and what kinds of
+parameters it expects. They go on the first line of your function's body and
+are surrounded by triple quotes `"""`.
+
+```{code-cell}
+def starts_with(text, character):
+    """Determine whether a string starts with a character."""
+    first_char = text[0]
+    return first_char == character
+```
+
+Once you've written a docstring, you can use `help` in a Python console or `?`
+in a Jupyter Notebook to display this information.
+
+```{code-cell}
+help(starts_with)
+```
+
+There are several styles for writing docstrings, but the NumPy
+[conventions][style] are good ones. They specify docstrings like so:
+
+```py
+def func(x, y):
+    """A short summary description of a function ending with a period.
+    
+    A longer description if necessary.
+
+    Parameters
+    ----------
+    x : x's datatype
+        A description of what x is
+    y : y's datatype
+        A description of what y is
+
+    Returns
+    -------
+    value : value's datatype
+        A description of what value is (only supply if the function returns a
+        value)
+    """
+```
+
+Let's document `show_match_context` with a docstring.
+
+```{code-cell}
+def show_match_context(match, string, offset = 5):
+    """Print a regex match's surrounding characters.
+
+    Parameters
+    ----------
+    match : re.Match
+        A regex match from re.search() or re.finditer()
+    string : str
+        The string in which the match was found
+    offset : int
+        The number of surrounding characters to the left/right of match
+    """
+    # Get the match text
+    span = match.group()
+
+    # Get its start and end, then offset both
+    start = match.start() - offset
+    end = match.end() + offset
+
+    # Ensure our expanded start/end locations don't overshoot the string
+    if start < 0:
+        start = 0
+    if end > len(string):
+        end = len(string)
+
+    # Print the results
+    print(span, "->", string[start:end])
+```
+
+Now our function is fully documented and ready for later use.
+
+```{code-cell}
+help(show_match_context)
+```
