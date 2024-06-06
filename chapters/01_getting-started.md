@@ -81,11 +81,11 @@ information about your computer:
   keep in mind that this is where you should look to get your bearings
 + Finally, we see `%`. It is an indicator that the CLI is is waiting for input
 
-```{tip}
+:::{tip}
 In the following sections, we will display CLI commands by prepending them with
 an indicator character, `$`. You do not need to type this character yourself,
 it's just to signal that a cell shows a command.
-```
+:::
 
 
 ### Input and interactions
@@ -96,23 +96,29 @@ the prompt and pressing `Return`/`Enter`.
 For example, `echo` will print back to screen any text that you supply the
 command:
 
-```
+```sh
 $ echo "Hello world!"
+```
+```
 Hello world!
 ```
 
 You can see what files and folders are in your current location with `ls`
 ("list"):
 
-```
+```sh
 $ ls
+```
+```
 _build      _config.yml _toc.yml    chapters    data        img         src
 ```
 
 Send `ls` the name of a subfolder to show its contents:
 
-```
+```sh
 $ ls chapters
+```
+```
 01_getting-started.md      04_ngram-models.md         07_intro-to-llms.md        index.md
 02_python-basics.md        05_vectorization.md        08_bert.md
 03_data-analysis-basics.md 06_vector-spaces.md        09_gpt.md
@@ -124,8 +130,10 @@ a combination of letters, directly after the dash. Below, we send `ls` flags to
 have it show all contents (`a`) with long-formatted output (`l`) in a
 human-readable fashion (`h`):
 
-```
+```sh
 $ ls -alh
+```
+```
 drwxr-xr-x  13 <username>  staff   416B May 25 01:46 .
 drwxr-xr-x   5 <username>  staff   160B May  8 12:58 ..
 drwxr-xr-x  14 <username>  staff   448B May 25 01:35 .git
@@ -164,7 +172,7 @@ use a space to delimit their different components, and flags are called with
 `-` to modify those commands. When put together, we can generalize these
 components to a command-line **syntax**:
 
-```
+```sh
 $ <command> <optional flags> <file/data on which to run the command>
 ```
 
@@ -174,13 +182,13 @@ names with `\`.
 
 This will throw an error:
 
-```
+```sh
 $ <command> file name.txt
 ```
 
 But this will not:
 
-```
+```sh
 $ <command> file\ name.txt
 ```
 
@@ -189,16 +197,20 @@ mute, it will do its best to show you what you did wrong when an error arises.
 Below, for example, the shell explains that it cannot find a command, which
 actually stems from a typing error:
 
-```
+```sh
 $ lschapters
+```
+```
 zsh: command not found: lschapters
 ```
 
 Likewise, here, `ls` cannot find the requested folder because it does not
 exist:
 
-```
+```sh
 $ ls storage
+```
+```
 ls: storage: No such file or directory
 ```
 
@@ -221,8 +233,10 @@ You can also use `man` ("manual"). This opens the **manual page** for another
 command. Here you will find usage information, including what flags a command
 accepts. 
 
-```
+```sh
 $ man ls
+```
+```
 LS(1)                                            General Commands Manual                                            LS(1)
 
 NAME
@@ -270,17 +284,17 @@ need to specify paths yourself.
 
 In a Unix environment, we do this with the following syntax:
 
-```
+```sh
 /this/is/a/path/to/your/file.txt
 ```
 
 This is called a **file path**. It threads through multiple directories to
 point at your desired file, `file.txt`.
 
-````{note}
+:::{note}
 Non-Unix environments, like Windows DOS, use `\` instead of `/`:
 
-```
+```sh
 C:\this\is\a\path\to\your\file.txt
 ```
 
@@ -288,7 +302,7 @@ This is why Windows users had to download Git Bash. It emulates Unix-style
 functionality on those machines. Generally speaking, the Unix command line is
 far more pervasive than DOS, so you'll find yourself using Unix-style
 commands/syntax more frequently.
-````
+:::
 
 
 ### Path hierarchies
@@ -301,8 +315,10 @@ directory levels.
 Use `pwd` ("print working directory") to display your current location using
 the same format:
 
-```
+```sh
 $ pwd
+```
+```
 /Users/tyler/2024_dtl_llm-interpretability
 ```
 
@@ -353,11 +369,11 @@ data
 
 See all the branching paths?
 
-```{note}
+:::{note}
 DOS again diverges from Unix in its representation of the root. For the former,
 the root is usually called `C:` or `D:`, which designates the actual device on
 which your data is stored.
-```
+:::
 
 
 ### Absolute vs. relative paths
@@ -365,8 +381,10 @@ which your data is stored.
 No matter the operating system, there are two different ways to specify a file
 path on the command line. Recall our `pwd` output above:
 
-```
+```sh
 $ pwd
+```
+```
 /Users/tyler/2024_dtl_llm-interpretability
 ```
 
@@ -389,6 +407,18 @@ This is useful if you're a ways off from root, or if, for a coding project, you
 are using files that rely on a specific directory structure, which could be
 ported to someone else's computer.
 
+Besides `.` and `..`, there is also `~`, which we saw in the CLI prompt
+earlier. This denotes your **home directory**, which your computer uses to
+store data and configurations that are specific to you. Use `cd` ("change
+directory") in combination with `~` to return to home, no matter where you are
+in your computer's directory structure.
+
+```sh
+$ cd ~
+```
+
+Take a look at your prompt: it should list out `~` in the location position.
+
 
 ### Navigating with a CLI
 
@@ -406,9 +436,9 @@ Here's an example of absolute and relative paths. Say you are here:
                        ^^^^^^^
 ```
 
-You could use an absolute path. Use `cd` ("change directory") to do so:
+You could use an absolute path:
 
-```
+```sh
 $ cd /here/is/where/you/are/located
 ```
 
@@ -429,7 +459,7 @@ root
 
 Alternatively, you could use a relative path:
 
-```
+```sh
 $ cd ../../../
 ```
 
@@ -460,20 +490,22 @@ making.
 Finally, we can move data and directories around on our computers using paths.
 To move a file, use `mv` ("move"), which works like so:
 
-```
+```sh
 $ mv <location/of/file> <location/where/you/want/to/move/the/file>
 ```
 
 If we're in a directory that looks like this:
 
-```
+```sh
 $ ls
+```
+```
 file.txt  subdirectory
 ```
 
 ...and we'd like to move `file.txt` into `subdirectory`, we use:
 
-```
+```sh
 $ mv file.txt subdirectory
 ```
 
@@ -481,19 +513,19 @@ Or, maybe we want to make a new directory inside `subdirectory`. Use `mkdir`
 ("make directory") to make a new directory, `new`, which will sit under
 `subdirectory`.
 
-```
+```sh
 $ mkdir subdirectory/new
 ```
 
 Now, from our current location, we move `file.txt` into `new`.
 
-```
+```sh
 $ mv subdirectory/file.txt subdirectory/new/file.txt
 ```
 
 This is what the directory structure looks like now:
 
-```
+```sh
 current_location
 └── subdirectory
     └── new
@@ -503,10 +535,258 @@ current_location
 
 ## Environment Setup
 
+Processes---applications, background tasks, code, etc.---run on your computer
+in a **computer environment**. These environments are collections of hardware,
+software, and various configurations, and the latter two are portable between
+computers (ideally). This portability is great for when you get a new computer
+and want to recreate your current environment, whether by replicating certain
+settings or installing external software; but the real power of porting
+environments stems from the ability to freeze them and share them with others.
+
+You'll often have to do this when writing code, because some people may not
+have certain pieces of software that you have on your computer. And, as we'll
+discuss a little later on, writing code often relies on specific versions of
+programming language packages, which can conflict with one another---and cause
+massive headaches. Using an **environment manager** to encapsulate your setup
+will help you circumvent such problems and let others run your code as you
+intended.
 
 
 ### Micromamba
 
+We will use [`micromamba`][micro] to manage environments for the work that lies
+ahead. It allows us to create new **virtual environments** and install software
+into them, including different versions of Python and associated packages.
+`micromamba` is based on [`mamba`][mamba], which is in turn based on
+[`conda`][conda]; the three are drop-in replacements for each another, so when
+you see discussions about one, know that the topic will likely port over to the
+others.
+
+[micro]: https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html
+[mamba]: https://mamba.readthedocs.io/en/latest/user_guide/mamba.html
+[conda]: https://docs.conda.io/en/latest/
+
+The `micromamba` documentation (linked above) will always feature the most
+recent version of installation instructions. As of this writing (summer 2024),
+installing via the script option in a CLI works like so:
+
+```sh
+$ "${SHELL}" <(curl -L micro.mamba.pm/install.sh)
+```
+
+Running this command will download and install a script. During installation,
+you'll be asked a series of questions:
+
++ `Micromamba binary folder? [~/.local/bin]`: Where do you want to install the
+  program? Select the default by pressing `Enter`/`Return`
++ `Init shell (bash)? [Y/n]`: Configure your shell for `micromamba`? Enter `Y`
++ `Configure conda-forge? [Y/n]`: Default to the `conda-forge` repository when
+  searching for packages to install? Enter `Y`
++ `Prefix location? [~/micromamba]`: Where would you like to install
+  environments? The default is under your home directory, which is fine. Press
+  `Enter`/`Return`
+
+With these options set, reload your shell to initialize `micromamba`:
+
+::::{tab-set}
+:::{tab-item} zsh
+```sh
+$ source ~/.zshrc
+```
+:::
+:::{tab-item} bash
+```sh
+$ source ~/.bashrc
+```
+:::
+::::
+
+:::{tip}
+You don't need to run `source` to initialize `micromamba` every time you open
+your CLI. Your CLI actually runs this command when on start up---we just have
+the program running already.
+:::
+
+Now check the version of `micromamba`:
+
+```sh
+$ micromamba --version
+```
+```
+1.5.8
+```
+
+If you see output like the above, you're set!
+
+Time to create a new environment. Generally, it's a good idea to make a new
+environment for every project. Below, we make one called `practice`.
+
+```sh
+$ micromamba create --name practice
+```
+```
+Empty environment created at prefix: <path/to/practice>
+```
+
+Use the `env list` subcommand to list out all environments:
+
+```sh
+$ micromamba env list
+```
+```
+  Name      Active  Path
+──────────────────────────────────────────────────────────
+  practice          <path/to/micromamba/envs/practice>
+```
+
+Activate an environment with the `activate <enviroment>` subcommand.
+
+```sh
+$ micromamba activate practice
+```
+
+Note your prompt. It will update to reflect that you're in a `micromamba`
+environment:
+
+```sh
+(practice) you@your_computer ~$
+```
+
+Let's install some software. Below, we install [`ripgrep`][rg], which enables
+you to search text files in a directory:
+
+```sh
+$ micromamba install ripgrep
+```
+
+[rg]: https://github.com/BurntSushi/ripgrep
+
+When prompted, enter `Y` to confirm that you'd like to install the program.
+
+Now, use `ripgrep` to search for "NLP" in `chapters`:
+
+```sh
+$ rg -i "NLP" chapters
+```
+```
+chapters/05_vectorization.md
+648:  in the same direction as the first. Most vector operations in NLP use the
+
+chapters/02_python-basics.md
+309:all repeated tokens. The result will be a set of in NLP are called **types**:
+
+chapters/01_getting-started.md
+664:Now, use `ripgrep` to search for "NLP" in `chapters`:
+667:$ rg -i "NLP" chapters
+```
+
+See how it picked up the very text you're reading now?
+
+Use the `deactivate` subcommand to deactivate an environment.
+
+```sh
+$ micromamba deactivate
+```
+
+Now, if you try to use `ripgrep`, you'll get an error:
+
+```sh
+$ rg -i "NLP" chapters
+```
+```
+zsh: command not found: rg
+```
+
+Why the error? You've installed `ripgrep` into a separate environment managed
+by `micromamba`, which is sealed off from the rest of your computer. 
+
+To see all packages installed in an environment, use `list`:
+
+```sh
+$ micromamba activate practice
+$ micromamba list
+```
+```
+List of packages in environment: "<path/to/micromamba/envs/practice>"
+
+  Name           Version  Build        Channel
+────────────────────────────────────────────────────
+  _libgcc_mutex  0.1      conda_forge  conda-forge
+  _openmp_mutex  4.5      2_gnu        conda-forge
+  libgcc-ng      13.2.0   h77fa898_7   conda-forge
+  libgomp        13.2.0   h77fa898_7   conda-forge
+  ripgrep        14.1.0   he8a937b_0   conda-forge
+```
+
+Export your environment with the `env export` subcommand:
+
+```sh
+$ micromamba env export
+```
+```
+name: practice
+channels:
+- conda-forge
+dependencies:
+- _libgcc_mutex=0.1=conda_forge
+- _openmp_mutex=4.5=2_gnu
+- libgcc-ng=13.2.0=h77fa898_7
+- libgomp=13.2.0=h77fa898_7
+- ripgrep=14.1.0=he8a937b_0
+```
+
+Those letter and number combinations after each package are specific versions,
+which another person could use to recreate your current environment. That said,
+sometimes operating system differences complicate versioning, so set the
+`--from-history` flag to get the package names only:
+
+```sh
+$ micromamba env export --from-history
+name: practice
+channels:
+- conda-forge
+dependencies:
+- ripgrep
+```
+
+:::{note}
+If you installed a package with a specific version, e.g.:
+
+```sh
+$ micromamba install ripgrep=12.1
+```
+
+...the `--from-history` flag will preserve this:
+
+```sh
+$ micromamba env export --from-history
+```
+```
+name: practice
+channels:
+- conda-forge
+dependencies:
+- ripgrep=12.1
+```
+:::
+
+Redirect the output of your environment export to a YAML file:
+
+```sh
+$ micromamba env export --from-history > practice.yml
+```
+
+And that way someone can install it on their own computer, using:
+
+```sh
+$ micromamba env create --file practice.yml
+```
+
+Finally, to remove an environment, deactivate it and run the following:
+
+```sh
+$ micromamba env remove --name practice
+```
 
 
 ### Jupyter Lab
