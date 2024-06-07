@@ -141,7 +141,7 @@ len(tokens)
 ```
 
 To select an element, or a group of elements, from a list, you **index** the
-list. The square brackets `[]` are Python's index operator. Use them in
+list. The square brackets `[ ]` are Python's index operator. Use them in
 conjunction with the **index position** of the element(s) you want to select.
 The index position is simply a number that corresponds to where in the list an
 element is located.
@@ -199,7 +199,7 @@ whole list:
 tokens[::1000]
 ```
 
-You can also use `[]` to create a list manually. Here's an empty list:
+You can also use `[ ]` to create a list manually. Here's an empty list:
 
 ```{code-cell}
 []
@@ -227,9 +227,9 @@ l
 ```
 
 Assigning elements of a container is not without complication. Below, we use
-the `list` keyword---another method of creating a list---to break a character
-string into individual pieces. We assign the output of this to `x`. Then, we
-create a new variable, `y`, from `x`.
+`list()`---another method of creating a list---to break a character string into
+individual pieces. We assign the output of this to `x`. Then, we create a new
+variable, `y`, from `x`.
 
 ```{code-cell}
 x = list("abc")
@@ -269,14 +269,14 @@ Like a list, a tuple is a one-dimensional container for general data storage.
 The key difference is that tuples are **immutable**: once you create a tuple,
 you are neither able to alter it nor its elements.
 
-Make a tuple by enclosing comma-separated values in parentheses `()`.
+Make a tuple by enclosing comma-separated values in parentheses `( )`.
 
 ```{code-cell}
 tup = (1, 2, 3)
 tup
 ```
 
-Alternatively, convert a list to a tuple using `tuple`.
+Alternatively, convert a list to a tuple using `tuple()`.
 
 ```{code-cell}
 x = list("abc")
@@ -295,8 +295,8 @@ x[2] = "d"
 ### Sets
 
 Unlike lists and tuples, **sets** cannot contain multiple instances of the same
-element. They only have unique elements. Create them using curly brackets `{}`
-or the `set` keyword.
+element. They only have unique elements. Create them using curly brackets `{ }`
+or `set()`.
 
 ```{code-cell}
 set_a = {"a", "b", "c"}
@@ -371,11 +371,18 @@ on. Every element in a dictionary is therefore a **key--value pair**. This
 makes dictionaries powerful data structures for associating values in your data
 with metadata of one kind or another.
 
-Create a dictionary with curly brackets `{}` and colons `:` that separate the
+Create a dictionary with curly brackets `{ }` and colons `:` that separate the
 key--value pairs.
 
 ```{code-cell}
 counts = {"x": 4, "y": 1, "z": 6}
+counts
+```
+
+Alternatively, use `dict()`:
+
+```{code-cell}
+counts = dict(x = 4, y = 1, z = 6)
 counts
 ```
 
@@ -636,8 +643,8 @@ means you need to specify an **exit condition** to break out of your
 while-loop, otherwise your code will get trapped and eventually your computer
 will kill the process.
 
-The syntax for a while-loop is quite simple: start it with `while` and a
-condition. Below, we increment a counter to print the first ten tokens in
+The syntax for a while-loop is quite simple: start it with the `while` keyword
+and a condition. Below, we increment a counter to print the first ten tokens in
 _Frankenstein_.
 
 ```{code-cell}
@@ -1093,8 +1100,8 @@ def starts_with(text, character):
     return first_char == character
 ```
 
-Once you've written a docstring, you can use `help` in a Python console or `?`
-in a Jupyter Notebook to display this information.
+Once you've written a docstring, you can use `help()` in a Python console or
+`?` in a Jupyter Notebook to display this information.
 
 ```{code-cell}
 help(starts_with)
@@ -1102,6 +1109,8 @@ help(starts_with)
 
 There are several styles for writing docstrings, but the NumPy
 [conventions][style] are good ones. They specify docstrings like so:
+
+[style]: https://numpydoc.readthedocs.io/en/latest/format.html
 
 ```py
 def func(x, y):
@@ -1124,7 +1133,7 @@ def func(x, y):
     """
 ```
 
-Let's document `show_match_context` with a docstring.
+Let's document `show_match_context()` with a docstring.
 
 ```{code-cell}
 def show_match_context(match, string, offset = 5):
