@@ -502,7 +502,7 @@ is selected as the label for a document.
 The formula for our classifier is as follows:
 
 $$
-P(C_k|\boldsymbol{x}) \propto P(C_k) \sum_{i=1}^n P(x_i|C_k)
+P(C_k|\boldsymbol{x}) \propto P(C_k) \prod_{i=1}^n P(x_i|C_k)
 $$
 
 Where:

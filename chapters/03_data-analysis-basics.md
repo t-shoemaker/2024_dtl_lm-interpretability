@@ -501,7 +501,7 @@ First, some simple document metrics. Below, we calculate the **number of
 tokens** in a document, as expressed in this notation:
 
 $$
-T(i) = \Sigma_{j=1}^{m_i}1
+T(i) = \sum_{j=1}^{m_i}1
 $$
 
 Where:
@@ -521,7 +521,7 @@ The **number of types** is the number of unique tokens in a document. We
 calculate it with:
 
 $$
-K(i) = \Sigma_{j \in J}1
+K(i) = \sum_{j \in J}1
 $$
 
 Where:
