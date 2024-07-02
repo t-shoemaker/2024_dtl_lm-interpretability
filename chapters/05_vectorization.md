@@ -436,7 +436,7 @@ that could make the result slightly different than your own calculations.
 Fitting `TfidfVectorizer` works with the same use pattern.
 
 ```{code-cell}
-tfidf_vectorizer = TfidfVectorizer(**cv_parameters, norm = None)
+tfidf_vectorizer = TfidfVectorizer(**cv_parameters)
 tfidf_vectorizer.fit(corpus["masked"])
 tfidf = tfidf_vectorizer.transform(corpus["masked"])
 ```
@@ -530,7 +530,7 @@ print(f"Train set size: {len(X_train)}\nTest set size: {len(X_test)}")
 Train the model using the same initialization/fitting pattern from before.
 
 ```{code-cell}
-classifier = MultinomialNB()
+classifier = MultinomialNB(alpha = 0.005)
 classifier.fit(X_train, y_train)
 ```
 
@@ -682,24 +682,9 @@ notes][notes] if you'd like to see how this process works in detail.
 
 [notes]: https://courses.grainger.illinois.edu/cs440/fa2019/Lectures/lect38.html
 
-To reduce our data with PCA, we first need to normalize it. This will scale the
-data uniformly and reduce the influence of document length on TF--IDF scores.
-With that done, we can send it on to the PCA process. We manage all of this
-with a `Pipeline` in `scikit-learn`.
-
 ```{code-cell}
-pipeline = make_pipeline(
-    Normalizer(), PCA(0.95, random_state = 357)
-)
-pipeline.fit(tfidf)
-```
-
-The value for the first argument in `PCA` indicates how much of the total
-variance we want explained by PCA. Let's look at the components for a moment.
-First, access `Pipeline` parts with the `.named_steps` attribute.
-
-```{code-cell}
-pipeline.named_steps
+pca = PCA(0.95, random_state = 357)
+pca.fit(tfidf)
 ```
 
 The PCA reducer's `.explained_variance_ratio_` attribute contains the
@@ -707,7 +692,6 @@ proportion of the total variance captured by each principal component. Their
 sum should equal the number we set above.
 
 ```{code-cell}
-pca = pipeline.named_steps["pca"]
 exp_variance = np.sum(pca.explained_variance_ratio_)
 print(f"Explained variance: {exp_variance:.2f}%")
 ```
@@ -738,7 +722,7 @@ To plot, transform the TF--IDF scores and format the reduced data as a
 DataFrame.
 
 ```{code-cell}
-reduced = pipeline.transform(tfidf)
+reduced = pca.transform(tfidf)
 vis_data = pd.DataFrame(reduced[:, 0:2], columns = ["x", "y"])
 vis_data["label_idx"] = corpus["hoover"].copy()
 vis_data["label"] = vis_data["label_idx"].map(lambda x: periods[x])
@@ -797,9 +781,10 @@ g.set(title = "James chapters", xlabel = "Dim. 1", ylabel = "Dim. 2")
 plt.show()
 ```
 
-Only in one instance of the two mis-classified documents. This isn't uncommon.
-Visual distortions are often the effect of dimensionality reduction, and it's
-important to keep this in mind when inspecting data.
+It does indeed seem to be the case that mis-classified documents sit right
+along the border of two classes. Though keep in mind that dimensionality
+reduction often results in visual distortions, so looking at data might
+sometimes be misleading.
 
 Finally, which documents are these?
 
