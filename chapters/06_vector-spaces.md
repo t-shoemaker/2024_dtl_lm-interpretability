@@ -20,14 +20,19 @@ rcParams["figure.dpi"] = 150
 ```
 
 
-Vector Spaces
-=============
+Vector Space Semantics
+======================
 
 ## Preliminaries
+
+We need the following libraries:
 
 ```{code-cell}
 import numpy as np
 import pandas as pd
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import Normalizer
+from sklearn.decomposition import PCA
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.neighbors import NearestNeighbors
 from sklearn.model_selection import train_test_split
@@ -38,167 +43,114 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 ```
 
-
-## Vector Operations
+Our documents have already been vectorized into a document-term matrix (DTM).
+The only consideration is that the tokens have been **lemmatized**, that is,
+reduced to their uninflected forms.
 
 ```{code-cell}
-columns = ["page", "screen"]
-index = ["doc1", "doc2"]
-
-ps1 = pd.DataFrame([[4, 1], [2, 3]], columns = columns, index = index)
-ps1
+dtm = pd.read_parquet("data/nyt_obituaries/nyt_obituaries_dtm.parquet")
+dtm.info()
 ```
 
+
+## Vector Space
+
+In the last chapter we plotted Henry James chapters in a two-dimensional
+scatter plot. We can do the same with our DTM using the function below.
+
 ```{code-cell}
-:tags: [remove_cell]
-def plot_vectors(vectors, labels = [], colors = [], figsize = (4, 4)):
-    """Plot 2-dimensional vectors.
+def scatter_2d(matrix, norm = True, highlight = None, figsize = (5, 5)):
+    """Plot a matrix in 2D vector space.
 
     Parameters
     ----------
-    vectors : np.ndarray
-        Vectors to plot
-    labels : list
-        Labels for the vectors
-    colors : list
-        Vector colors (string names like "black", "red", etc)
+    matrix : np.ndarray
+        Matrix to plot
+    norm : bool
+        Whether to normalize the matrix values
+    highlight : None or list
+        List of indices to highlight
     figsize : tuple
         Figure size
     """
-    n_vector, n_dim = vectors.shape
-    if n_dim != 2:
-        raise ValueError("We can only plot 2-dimensional vectors")
+    # Find a way to reduce the matrix to two dimensions with PCA, adding
+    # optional normalization along the way
+    parts = (Normalizer(), PCA(2)) if norm else (PCA(2), )
+    pipeline = make_pipeline(*parts)
+    reduced = pipeline.fit_transform(matrix)
+    vis_data = pd.DataFrame(reduced, columns = ["x", "y"])
 
-    # Populate colors
-    if not colors:
-        colors = ["black"] * n_vector
-
-    # Create a (0, 0) origin point for each vector
-    origin = np.zeros((2, n_vector))
-
-    # Then plot each vector
+    # Plot
     fig, ax = plt.subplots(figsize = figsize)
-    for idx, vector in enumerate(vectors):
-        color = colors[idx]
-        ax.quiver(
-            *origin[:, idx],
-            vector[0],
-            vector[1],
-            color = color,
-            scale = 1,
-            units = "xy",
-            label = labels[idx] if labels else None
+    g = sns.scatterplot(
+        x = "x", y = "y", alpha = 0.8, data = vis_data, ax = ax
+    )
+
+    # Highlight markers, if applicable
+    if highlight:
+        selected = vis_data.iloc[highlight]
+        sns.scatterplot(
+            x = "x", y = "y", color = "red", data = selected, ax = ax
         )
 
-    # Set plot limits
-    limit = np.max(np.abs(vectors)) + 1
-    ax.set_xlim([-limit, limit])
-    ax.set_ylim([-limit, limit])
-
-    # Set ticks
-    ax.set_xticks(np.arange(-limit, limit + 1, 1))
-    ax.set_yticks(np.arange(-limit, limit + 1, 1))
-    ax.set_aspect("equal")
-
-    # Set axes to be in the center of the plot
-    ax.axhline(y = 0, color = "k", linewidth = 0.8)
-    ax.axvline(x = 0, color = "k", linewidth = 0.8)
-
-    # Add a label legend, if applicable
-    if labels:
-        ax.legend()
-
-    # Show the plot
+    g.set(xlabel = "Dim. 1", ylabel = "Dim. 2")
     plt.show()
 ```
 
-````{dropdown} Show vector plot code
-```py
-def plot_vectors(vectors, labels = [], colors = [], figsize = (4, 4)):
-    """Plot 2-dimensional vectors.
-
-    Parameters
-    ----------
-    vectors : np.ndarray
-        Vectors to plot
-    labels : list
-        Labels for the vectors
-    colors : list
-        Vector colors (string names like "black", "red", etc)
-    figsize : tuple
-        Figure size
-    """
-    n_vector, n_dim = vectors.shape
-    if n_dim != 2:
-        raise ValueError("We can only plot 2-dimensional vectors")
-
-    # Populate colors
-    if not colors:
-        colors = ["black"] * n_vector
-
-    # Create a (0, 0) origin point for each vector
-    origin = np.zeros((2, n_vector))
-
-    # Then plot each vector
-    fig, ax = plt.subplots(figsize = figsize)
-    for idx, vector in enumerate(vectors):
-        color = colors[idx]
-        ax.quiver(
-            *origin[:, idx],
-            vector[0],
-            vector[1],
-            color = color,
-            scale = 1,
-            units = "xy",
-            label = labels[idx] if labels else None
-        )
-
-    # Set plot limits
-    limit = np.max(np.abs(vectors)) + 1
-    ax.set_xlim([-limit, limit])
-    ax.set_ylim([-limit, limit])
-
-    # Set ticks
-    ax.set_xticks(np.arange(-limit, limit + 1, 1))
-    ax.set_yticks(np.arange(-limit, limit + 1, 1))
-    ax.set_aspect("equal")
-
-    # Set axes to be in the center of the plot
-    ax.axhline(y = 0, color = "k", linewidth = 0.8)
-    ax.axvline(x = 0, color = "k", linewidth = 0.8)
-
-    # Add a label legend, if applicable
-    if labels:
-        ax.legend()
-
-    # Show the plot
-    plt.show()
-```
-````
+Below, we plot the DTM.
 
 ```{code-cell}
-plot_vectors(ps1.values, labels = list(ps1.index), colors = ["red", "blue"])
+scatter_2d(dtm)
 ```
+
+Doing so projects our matrix into a two-dimensional **vector space**. In the
+reigning metaphor of NLP, a space of this sort is a stand-in for meaning: the
+closer two points are in the scatter plot, the more similar they are in
+meaning. 
+
+Selecting the names of two related people in the obituaries will make this
+clear.
 
 ```{code-cell}
-ps2 = pd.DataFrame([[1, 4], [2, 3]], columns = columns, index = index)
-ps2
+names = ["Bela Bartok", "Maurice Ravel"]
+highlight = [dtm.index.get_loc(name) for name in names]
+scatter_2d(dtm, highlight = highlight)
 ```
+
+Let's add in a third that we'd expect to be less similar.
 
 ```{code-cell}
-plot_vectors(ps2.values, labels = list(ps2.index), colors = ["red", "blue"])
+names = ["Bela Bartok", "Maurice Ravel", "FDR"]
+highlight = [dtm.index.get_loc(name) for name in names]
+scatter_2d(dtm, highlight = highlight)
 ```
 
-### Vector operations
+While we can only visualize these similarities in two- or three-dimensional
+spaces, which are called **Euclidean spaces** (i.e., they conform to physical
+space), the same idea---and importantly, the math---holds for similarity in
+high-dimensional spaces. But before we turn to what similarity means in vector
+space, we'll overview how vectors work generally.
+
+Our two example vectors will be the following:
 
 ```{code-cell}
-A = ps1.loc["doc1"].values
-B = ps1.loc["doc2"].values
+A, B = dtm.loc["Lucille Ball"], dtm.loc["Carl Sagan"]
 ```
+
+And we will limit ourselves to only two dimensions:
+
+```{code-cell}
+terms = ["television", "star"]
+A, B = A[terms], B[terms]
+```
+
+
+### Vector components
 
 A vector has a **magnitude** and a **direction**.
 
 **Magnitude**
+
 + Description: The length of a vector from its origin to its end point. This is
   calculated as the square root of the sum of squares of its components
 + Notation: $||A|| = \sqrt{a_1^2 + a_2^2 + \dots + a_n^2}$
@@ -206,13 +158,14 @@ A vector has a **magnitude** and a **direction**.
 
 ```{code-cell}
 manual = np.sqrt(np.sum(np.square(A)))
-shorthand = np.linalg.norm(A)
+numpy = np.linalg.norm(A)
 
-assert manual == shorthand, "Magnitudes don't match!"
-print(shorthand)
+assert manual == numpy, "Magnitudes don't match!"
+print(numpy)
 ```
 
 **Direction**
+
 + Description: The orientation of a vector in space. In Cartesian coordinates,
   it is the angles a vector forms across its axes. But direction can also be
   represented as a second **unit vector**, a vector of magnitude 1 that points
@@ -225,37 +178,267 @@ print(shorthand)
 A / np.linalg.norm(A)
 ```
 
+Let's plot our two vectors to show their magnitude and orientation.
+
+```{code-cell}
+:tags: [remove_cell]
+def plot_vectors(
+    *vectors,
+    vector_labels = [],
+    axis_labels = [],
+    colors = [],
+    figsize = (3, 3)
+):
+    """Plot 2-dimensional vectors.
+
+    Parameters
+    ----------
+    vectors : nd.ndarray
+        Vectors to plot
+    vector_labels : list
+        Labels for the vectors
+    axis_labels : list
+        Labels for the axes in (x, y) order
+    colors : list
+        Vector colors (string names like "black", "red", etc.)
+    figsize : tuple
+        Figure size
+    """
+    # Wrap vectors into a single array
+    vectors = np.array(vectors)
+    n_vector, n_dim = vectors.shape
+    if n_dim != 2:
+        raise ValueError("We can only plot 2-dimensional vectors")
+
+    # Populate colors
+    if not colors:
+        colors = ["black"] * n_vector
+
+    # Create a (0, 0) origin point for each vector
+    origin = np.zeros((2, n_vector))
+
+    # Then plot each vector
+    fig, ax = plt.subplots(figsize = figsize)
+    for idx, vector in enumerate(vectors):
+        color = colors[idx]
+        ax.quiver(
+            *origin[:, idx],
+            vector[0],
+            vector[1],
+            color = color,
+            scale = 1,
+            units = "xy",
+            label = vector_labels[idx] if vector_labels else None
+        )
+
+    # Set plot limits
+    limit = np.max(np.abs(vectors))
+    ax.set_xlim([-limit, limit])
+    ax.set_ylim([-limit, limit])
+
+    # Set axes to be in the center of the plot
+    ax.axhline(y = 0, color = "k", linewidth = 0.8)
+    ax.axvline(x = 0, color = "k", linewidth = 0.8)
+
+    # Remove the outer box
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+    # Add axis labels, if applicable
+    if axis_labels:
+        xlab, ylab = axis_labels
+        ax.set_xlabel(xlab)
+        ax.set_ylabel(ylab)
+
+    # Add a label legend, if applicable
+    if vector_labels:
+        ax.legend(loc = "upper left", bbox_to_anchor = (1, 1))
+
+    # Show the plot
+    plt.show()
+```
+
+````{dropdown} Show vector plot code
+```py
+def plot_vectors(
+    *vectors,
+    vector_labels = [],
+    axis_labels = [],
+    colors = [],
+    figsize = (3, 3)
+):
+    """Plot 2-dimensional vectors.
+
+    Parameters
+    ----------
+    vectors : nd.ndarray
+        Vectors to plot
+    vector_labels : list
+        Labels for the vectors
+    axis_labels : list
+        Labels for the axes in (x, y) order
+    colors : list
+        Vector colors (string names like "black", "red", etc.)
+    figsize : tuple
+        Figure size
+    """
+    # Wrap vectors into a single array
+    vectors = np.array(vectors)
+    n_vector, n_dim = vectors.shape
+    if n_dim != 2:
+        raise ValueError("We can only plot 2-dimensional vectors")
+
+    # Populate colors
+    if not colors:
+        colors = ["black"] * n_vector
+
+    # Create a (0, 0) origin point for each vector
+    origin = np.zeros((2, n_vector))
+
+    # Then plot each vector
+    fig, ax = plt.subplots(figsize = figsize)
+    for idx, vector in enumerate(vectors):
+        color = colors[idx]
+        ax.quiver(
+            *origin[:, idx],
+            vector[0],
+            vector[1],
+            color = color,
+            scale = 1,
+            units = "xy",
+            label = vector_labels[idx] if vector_labels else None
+        )
+
+    # Set plot limits
+    limit = np.max(np.abs(vectors))
+    ax.set_xlim([-limit, limit])
+    ax.set_ylim([-limit, limit])
+
+    # Set axes to be in the center of the plot
+    ax.axhline(y = 0, color = "k", linewidth = 0.8)
+    ax.axvline(x = 0, color = "k", linewidth = 0.8)
+
+    # Remove the outer box
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+    # Add axis labels, if applicable
+    if axis_labels:
+        xlab, ylab = axis_labels
+        ax.set_xlabel(xlab)
+        ax.set_ylabel(ylab)
+
+    # Add a label legend, if applicable
+    if vector_labels:
+        ax.legend(loc = "upper left", bbox_to_anchor = (1, 1))
+
+    # Show the plot
+    plt.show()
+```
+````
+
+```{code-cell}
+vector_labels = ["L. Ball", "C. Sagan"]
+colors = ["red", "blue"]
+plot_vectors(
+    A, B, vector_labels = vector_labels, axis_labels = terms, colors = colors
+)
+```
+
+We can normalize our vectors by their direction. This will make the magnitude
+of each vector equal to 1. You'll see this operation called **L2
+normalization**. (In `scatter_2d` above, this is what the `Normalizer` object
+does.)
+
+```{code-cell}
+def l2_norm(vector):
+    """Perform L2 normalization.
+
+    Parameters
+    ----------
+    vector : np.ndarray
+        Vector to normalize
+
+    Returns
+    -------
+    vector : np.ndarray
+        Normed vector
+    """
+    norm_by = np.linalg.norm(vector)
+    return vector / norm_by
+```
+
+```{code-cell}
+plot_vectors(
+    l2_norm(A),
+    l2_norm(B),
+    vector_labels = vector_labels, 
+    axis_labels = terms,
+    colors = colors
+)
+```
+
+
+### Vector operations
+
+We turn now to basic operations you can perform on/with vectors.
+
 **Summation**
+
 + Description: Element-wise sums
 + Notation: $A + B = (a_1 + b_1, a_2 + b_2, \dots, a_n + b_n)$
 + Result: Vector of length $n$
 
 ```{code-cell}
 C = A + B
-plot_vectors(np.array([A, B, C]), colors = ["red", "blue", "green"])
+plot_vectors(
+    l2_norm(A),
+    l2_norm(B),
+    l2_norm(C),
+    vector_labels = vector_labels + ["Result"], 
+    axis_labels = terms,
+    colors = colors + ["green"]
+)
 ```
 
 **Subtraction**
+
 + Description: Element-wise differences
 + Notation: $A - B = (a_1 - b_1, a_2 - b_2, \dots, a_n - b_n)$
 + Result: Vector of length $n$
 
 ```{code-cell}
 C = A - B
-plot_vectors(np.array([A, B, C]), colors = ["red", "blue", "green"])
+plot_vectors(
+    l2_norm(A),
+    l2_norm(B),
+    l2_norm(C),
+    vector_labels = vector_labels + ["Result"], 
+    axis_labels = terms,
+    colors = colors + ["green"]
+)
 ```
 
 **Multiplication, element-wise**
+
 + Description: Element-wise products
 + Notation: $A \circ B = (a_1 \cdot b_1, a_2 \cdot b_2, \dots, a_n \cdot b_n)$
 + Result: Vector of length $n$
 
 ```{code-cell}
 C = A * B
-plot_vectors(np.array([A, B, C]), colors = ["red", "blue", "green"])
+plot_vectors(
+    l2_norm(A),
+    l2_norm(B),
+    l2_norm(C),
+    vector_labels = vector_labels + ["Result"], 
+    axis_labels = terms,
+    colors = colors + ["green"]
+)
 ```
 
 **Multiplication, dot product**
+
 + Description: The sum of the products
 + Notation: $A \cdot B = \Sigma_{i=1}^{n} a_i \cdot b_i$
 + Result: Single value (scalar)
@@ -272,50 +455,31 @@ is negative, they point in opposite directions. And when the dot product is
 zero, the vectors are perpendicular.
 
 
-### Vector comparisons
+## Cosine Similarity
 
-Dot product enables a variety of comparisons across vectors.
+Recall that, initially, we wanted to understand how similar two vectors are. We
+can do so with the dot product. The dot product allows us to derive a measure
+of how similar two vectors are in their orientation in vector space by
+considering the angle formed between them. This measure is called **cosine
+similarity**, and it is a quintessential method for working in semantic space.
 
-### Projection
+We express it as follows:
 
-```{code-cell}
-def project_vector(A, B):
-    """Project vector A onto vector B.
+$$
+cos \theta = \frac{A \cdot B}{||A||||B||}
+$$
 
-    Parameters
-    ----------
-    A : np.ndarray
-        Vector to project
-    B : np.ndarray
-        Vector on which to project A
+Where:
 
-    Returns
-    -------
-    projection : np.ndarray
-        The component of A that lies in the direction of B
-    """
-    # Compute the dot product of the two vectors
-    dot = A @ B
-    
-    # Normalization: the magnitude (length) of squared B. Applying normalization
-    # strips out difference in magnitude between two vectors so their directions
-    # are comparable
-    normalization = B @ B
-    
-    # Apply normalization. This adjusts the length of B to match that part of A
-    # that lies in the same direction
-    scale_factor = dot / normalization
++ $cos \theta$: cosine of the angle $\theta$
++ $A \cdot B$: dot product of A and B
++ $||A||||B||$: the product of A and B's magnitudes
 
-    # Scale B
-    projection = scale_factor * B
+The denominator is a normalization operation, similar in nature to L2
+normalization. It helps control for magnitude variance between vectors, which
+is important when documents are very different in length.
 
-    return projection
-```
-
-### Cosine Similarity
-
-<!-- Note: TfidfVectorizer applies l2 normalization, meaning cosine similarity
-adds a redundant layer of normalization. Use dot product instead. -->
+The function below derives a cosine similarity score for two vectors.
 
 ```{code-cell}
 def calculate_cosine_similarity(A, B):
@@ -337,14 +501,112 @@ def calculate_cosine_similarity(A, B):
     norm_by = np.linalg.norm(A) * np.linalg.norm(B)
     cos_sim = dot / norm_by
 
-    return cos_sim
+    return np.round(cos_sim, 8)
+```
+
+Scores are between $[-1, 1]$, where:
+
++ $1$: same orientation; perfect similarity
++ $0$: orthogonal vectors; vectors have nothing in common
++ $-1$: opposite orientation; vectors are the opposite of one another
+
+Here's A and A:
+
+```{code-cell}
+calculate_cosine_similarity(A, A)
+```
+
+A and B:
+
+```{code-cell}
+calculate_cosine_similarity(A, B)
+```
+
+And A and its opposite:
+
+```{code-cell}
+calculate_cosine_similarity(A, -A)
 ```
 
 
-## Document Similarity
+### Document similarity
+
+Typically, however, you'd just use the `scikit-learn` implementation. It
+returns a square matrix comparing each vector with every other vector in the
+input. Below, we run it across our DTM.
+
+```{code-cell}
+doc_sim = cosine_similarity(dtm)
+doc_sim = pd.DataFrame(doc_sim, columns = dtm.index, index = dtm.index)
+doc_sim.head()
+```
+
+Let's look at some examples. Below, we query for a document's **nearest
+neighbors**. That is, we look for which documents are closest to that document
+in the vector space.
+
+```{code-cell}
+:tags: [output_scroll]
+for name in ("Miles Davis", "Eleanor Roosevelt", "Willa Cather"):
+    print(doc_sim[name].nlargest(10), end = "\n\n")
+```
+
+Does this conform to what we see in the scatter plot of documents?
+
+```{code-cell}
+names = doc_sim["Miles Davis"].nlargest(10).index
+highlight = [dtm.index.get_loc(name) for name in names]
+scatter_2d(dtm, highlight = highlight)
+```
 
 
-## Word2Vec
+### Token similarity
+
+All of the above applies to tokens as well. Transpose the DTM and you can
+derive cosine similarity scores between tokens.
+
+```{code-cell}
+token_sim = cosine_similarity(dtm.T)
+token_sim = pd.DataFrame(token_sim, columns = dtm.columns, index = dtm.columns)
+token_sim.sample(5)
+```
+
+Similar token listings:
+
+```{code-cell}
+:tags: [output_scroll]
+for token in ("music", "politics", "country", "royal"):
+    print(token_sim[token].nlargest(10), end = "\n\n")
+```
+
+We can also project these vectors into a two-dimensional space. The code below
+extracts the top-10 nearest tokens for a query token, samples the cosine
+similarities, adds the two together into a single DataFrame, and plots them.
+Note that we turn off normalization; cosine similarity is already normed.
+
+```{code-cell}
+# Get the subset, then sample
+subset = token_sim["royal"].nlargest(10).index
+sample = token_sim.sample(500)
+sample = sample[~sample.index.isin(subset)]
+
+# Make the DataFrame for plotting
+to_plot = pd.concat([token_sim.loc[subset], sample])
+highlight = [to_plot.index.get_loc(name) for name in subset]
+
+# Plot
+scatter_2d(to_plot, norm = False, highlight = highlight)
+```
+
+Technically, one could call these vectors definitions of each token. But they
+aren't very good definitions---for a number of reasons, the first of which is
+that the only data we have to create these vectors comes from a small corpus of
+obituaries. We'd need a much larger corpus to generalize our token
+representations to a point where these vectors might reflect semantics as we
+understand it.
+
+
+## Word Embeddings
 
 ```{code-cell}
 class WordEmbeddings:
@@ -498,7 +760,7 @@ Now split the data into train/test sets. Our labels are the POS tags.
 X = wordnet.values
 y = wordnet.index.get_level_values(1)
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size = 0.05, random_state = 357
+    X, y, test_size = 0.1, random_state = 357
 )
 ```
 
@@ -705,13 +967,13 @@ does it do so? With simple addition: we add the coefficients for our desired
 POS tag to the vector in question.
 
 ```{code-cell}
-def shift_vector(token, coef, glove = glove, k = 25):
+def shift_vector(vector, coef, glove = glove, k = 25):
     """Shift the direction of a vector by combining it with a coefficient.
 
     Parameters
     ----------
-    token : str
-        Token of the vector to shift
+    vector : nd.ndarray
+        The vector to shift
     coef : np.ndarray
         Coefficient vector
     glove : WordEmbeddings
@@ -725,8 +987,7 @@ def shift_vector(token, coef, glove = glove, k = 25):
         A DataFrame containing k-nearest neighbors for the original and shifted
         vectors
     """
-    # Get the vector and find its k-nearest neighbors
-    vector = glove[token]
+    # Find the vector's k-nearest neighbors
     vector_knn = glove.most_similar(vector, k)
 
     # Now shift it by adding the coefficient. Then find the k-nearest neighbors
@@ -739,6 +1000,7 @@ def shift_vector(token, coef, glove = glove, k = 25):
         (tok1, tok2) for (tok1, _), (tok2, _) in zip(vector_knn, shifted_knn)
     ]
     output = pd.DataFrame(output, columns = ["original", "shifted"])
+    output.index.name = "k-th_neighbor"
 
     return output
 ```
@@ -748,21 +1010,21 @@ adjective.
 
 ```{code-cell}
 :tags: [output_scroll]
-shift_vector("dessert", coef["adj"])
+shift_vector(glove["dessert"], coef["adj"])
 ```
 
 How about "desert"?
 
 ```{code-cell}
 :tags: [output_scroll]
-shift_vector("desert", coef["adj"])
+shift_vector(glove["desert"], coef["adj"])
 ```
 
 Now make "language" more like a verb.
 
 ```{code-cell}
 :tags: [output_scroll]
-shift_vector("language", coef["verb"])
+shift_vector(glove["language"], coef["verb"])
 ```
 
 The modifications here are subtle, but they do exist: while the top-most
@@ -772,5 +1034,5 @@ see with the POS's valences.
 
 ```{code-cell}
 :tags: [output_scroll]
-shift_vector("drive", coef["noun"])
+shift_vector(glove["drive"], coef["noun"])
 ```
