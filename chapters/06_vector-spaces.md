@@ -23,6 +23,20 @@ rcParams["figure.dpi"] = 150
 Vector Space Semantics
 ======================
 
+This chapter overviews vector space semantics. It introduces core operations on
+vectors and vector spaces and demonstrates how to use these operations to
+define a measure of of semantic similarity. We then turn to static word
+embeddings to discuss concept modeling as well as embedding analogies; a final
+experiment demonstrates how to disambiguate parts-of-speech in embeddings.
+
++ **Data**: a document-term matrix representation of Melanie Walsh’s
+  [corpus][corpus] of ~380 obituaries from the _New York Times_ and tagged
+  [WordNet][wn] embeddings
+
+[corpus]: https://melaniewalsh.github.io/Intro-Cultural-Analytics/00-Datasets/00-Datasets.html#politics-history
+[wn]: https://wordnet.princeton.edu/
+
+
 ## Preliminaries
 
 We need the following libraries:
@@ -39,6 +53,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
 from sklearn.feature_selection import SelectFromModel
+from tabulate import tabulate
 import matplotlib.pyplot as plt
 import seaborn as sns
 ```
@@ -541,14 +556,41 @@ doc_sim = pd.DataFrame(doc_sim, columns = dtm.index, index = dtm.index)
 doc_sim.head()
 ```
 
-Let's look at some examples. Below, we query for a document's **nearest
-neighbors**. That is, we look for which documents are closest to that document
-in the vector space.
+Let's look at some examples. Below, we define a function to query for a
+document's **nearest neighbors**. That is, we look for which documents are
+closest to that document in the vector space.
+
+```{code-cell}:
+def k_nearest_neighbors(query, similarities, k = 10):
+    """Find the k-nearest neighbors for a query.
+
+    Parameters
+    ----------
+    query : str
+        Index name for the query vector
+    similarities : pd.DataFrame
+        Cosine similarities to query
+    k : int
+        Number of neighbors to return
+
+    Returns
+    -------
+    output : list[tuple]
+        Neighbors and their scores
+    """
+    neighbors = similarities[query].nlargest(k)
+    neighbors, scores = neighbors.index, np.round(neighbors.values, 3)
+    output = [(neighbor, score) for neighbor, score in zip(neighbors, scores)]
+
+    return output
+```
 
 ```{code-cell}
-:tags: [output_scroll]
+k = 5
 for name in ("Miles Davis", "Eleanor Roosevelt", "Willa Cather"):
-    print(doc_sim[name].nlargest(10), end = "\n\n")
+    neighbors = k_nearest_neighbors(name, doc_sim, k = k)
+    table = tabulate(neighbors, headers = ["Name", "Score"])
+    print(table, end = "\n\n")
 ```
 
 Does this conform to what we see in the scatter plot of documents?
@@ -574,9 +616,11 @@ token_sim.sample(5)
 Similar token listings:
 
 ```{code-cell}
-:tags: [output_scroll]
+k = 5
 for token in ("music", "politics", "country", "royal"):
-    print(token_sim[token].nlargest(10), end = "\n\n")
+    neighbors = k_nearest_neighbors(token, token_sim, k = k)
+    table = tabulate(neighbors, headers = ["Token", "Score"])
+    print(table, end = "\n\n")
 ```
 
 We can also project these vectors into a two-dimensional space. The code below
@@ -608,6 +652,31 @@ understand it.
 
 ## Word Embeddings
 
+Whence word embeddings. These vectors are the result of single-layer neural
+network training on millions, or even billions, of tokens. Networks will differ
+slightly in their architectures, but all are trained on co-occurrence
+tabulations, that is, the number of times a token appears alongside a set of
+tokens. The result: every token in the training data is **embedded** in a
+continuous vector space of many dimensions.
+
+The two most common word embedding methods are **Word2Vec** and **GloVe**. The
+former uses a smaller **window size** of co-occurrences for a token, while the
+latter uses global co-occurrence values. Take a look at Jay Alammar's
+[Illustrated Word2Vec][illustrated] for a detailed walk-through of how these
+models are trained.
+
+[illustrated]: https://jalammar.github.io/illustrated-word2vec/
+
+Below, we will use a 200-dimension version of [GloVe][glove], which continues
+to be made available by the Stanford NLP group. It has been trained on a 2014
+dump of Wikipedia and [Gigaword 5][giga]. We define a custom class,
+`WordEmbeddings`, to work with these vectors. Why do this? Word embeddings of
+this kind have fallen out of favor by researchers and developers, and the
+libraries that used to support embeddings have gone into maintenance-only mode.
+
+[glove]: https://nlp.stanford.edu/projects/glove/
+[giga]: https://catalog.ldc.upenn.edu/LDC2011T07
+
 ```{code-cell}
 class WordEmbeddings:
     """A minimal wrapper for Word2Vec-style embeddings.
@@ -629,9 +698,13 @@ class WordEmbeddings:
 
         # Fit a nearest neighbors graph using cosine similarity
         self.neighbors = NearestNeighbors(
-            metric = "cosine", n_neighbors = self.vocab_size, n_jobs = -1
+            metric = "cosine", n_neighbors = len(self), n_jobs = -1
         )
         self.neighbors.fit(self.embeddings)
+
+    def __len__(self):
+        """Define a length for the embeddings."""
+        return self.vocab_size
 
     def __getitem__(self, key):
         """Index the embeddings to retrieve a vector.
@@ -651,6 +724,36 @@ class WordEmbeddings:
 
         return np.array(self.embeddings.loc[key])
 
+    def similarity(self, source, target):
+        """Find the similarity between two tokens.
+
+        Parameters
+        ----------
+        source : str
+            Source token
+        target : str
+            Target token
+
+        Returns
+        -------
+        score : float
+            Similarity score
+        """
+        # Query the neighbors graph to find the distances between it and all
+        # other vectors
+        query = self[source]
+        distances = self.neighbors.kneighbors_graph([query], mode = "distance")
+        distances = distances.toarray().squeeze(0)
+
+        # Shift the distances to similarities
+        similarities = 1 - distances
+
+        # Return the target token's similarity using by indexing the
+        # similarities
+        idx = self.vocab.index(target)
+
+        return similarities[idx]
+
     def most_similar(self, query, k = 1):
         """Find the k-most similar tokens to a query vector.
 
@@ -666,16 +769,14 @@ class WordEmbeddings:
         output : list[tuple]
             Nearest tokens and their similarity scores
         """
-        # If passed a string, get the vector. Reshape this vector for the
-        # nearest neighbor graph
+        # If passed a string, get the vector
         if isinstance(query, str):
             query = self[query]
-        vector = np.array(query).reshape(1, -1)
 
         # Query the nearest neighbor graph. This returns the index positions
         # for the top-k most similar tokens and the distance values for each of
         # those tokens 
-        distances, knn = self.neighbors.kneighbors(vector, n_neighbors = k)
+        distances, knn = self.neighbors.kneighbors([query], n_neighbors = k)
 
         # Convert distances to similarities and squeeze out the extra
         # dimension. Then retrieve tokens (and squeeze out that dimension, too)
@@ -693,11 +794,11 @@ class WordEmbeddings:
         Parameters
         ----------
         this : str
-            First term of analogy's source
+            Analogy's source
         to_that : str
-            Second term of analogy's source
+            Source's complement
         as_this : str
-            First term of analogy's target
+            Analogy's target
         k : int
             Number of neighbors to return
 
@@ -709,29 +810,201 @@ class WordEmbeddings:
         # Get the vectors for input terms
         this, to_that, as_this = self[this], self[to_that], self[as_this]
 
-        # Subtract the first term of the analogy's source from the analogy's
-        # target term to capture the relationship between the two (that is,
-        # their difference). Then, apply this relationship to the second term
-        # of the analogy's source by adding it
+        # Subtract the analogy's source from the analogy's target to capture
+        # the relationship between the two (that is, their difference). Then,
+        # apply this relationship to the source's complement via addition
         is_to_what = (as_this - this) + to_that
 
         # Get the most similar tokens to this new vector
         return self.most_similar(is_to_what, k)
 ```
 
+With the wrapper defined, we load the embeddings.
+
 ```{code-cell}
 glove = WordEmbeddings("data/glove/glove.6B.200d.parquet")
-_, n_dim = glove.embeddings.shape
-print(f"Embeddings shape: {n_dim}")
+n_vocab, n_dim = glove.embeddings.shape
+print(f"Embeddings size and shape: {n_vocab:,}, {n_dim}")
+```
+
+And here's an example embedding:
+
+```{code-cell}
+:tags: [output_scroll]
+glove["book"]
 ```
 
 
-## Part-of-Speech Classification
+### Token similarity (redux)
+
+With the embeddings loaded, we query the same set of tokens from above to find
+their nearest neighbors.
+
+```{code-cell}
+k = 5
+for token in ("music", "politics", "country", "royal"):
+    neighbors = glove.most_similar(token, k = k)
+    table = tabulate(neighbors, headers = ["Token", "Score"])
+    print(table, end = "\n\n")
+```
+
+Some listings, like the one for "music," are fairly comparable, but listings
+for "country" and "royal" are more general.
+
+To get the least similar token, query for all tokens and then select the last
+element. You may think this would be something like the opposite of a token.
+
+```{code-cell}
+glove.most_similar("good", k = len(glove))[-1]
+```
+
+Here, semantics and vector spaces diverge. The vector for the above token is in
+the opposite direction of the one for "good," but that doesn't line up with
+semantic opposition. In fact, the token we'd likely expect, "evil," is
+relatively similar to "good."
+
+```{code-cell}
+glove.similarity("good", "evil")
+```
+
+Why is this? Since word embeddings are trained on co-occurrence data, tokens
+that appear in similar contexts will be more similar in a mathematical sense.
+We often speak of "good" and "evil" in interchangeable ways.
+
+It's important to keep this in mind for considerations of bias. Because
+embeddings reflect the interchangeability of tokens, they can reinforce
+negative, even harmful patterns in their training data.
+
+```{code-cell}
+k = 10
+for token in ("doctor", "nurse"):
+    neighbors = glove.most_similar(token, k = k)
+    table = tabulate(neighbors, headers = ["Token", "Score"])
+    print(table, end = "\n\n")
+```
+
+
+### Concept modeling
+
+Recall the vector operations we discussed above. We can perform these
+operations on word embeddings (since embeddings are vectors), and doing so
+provides a way to explore semantic space. One way to think about modeling
+concepts, for example, is by adding two vectors together. We'd expect the
+nearest neighbors of the resultant vector to reflect the concept we've tried to
+build.
+
+The dictionary below has keys for concepts. Is tuples are the two vectors we'll
+add together to create that concept.
+
+```{code-cell}
+concepts = {
+    "beach": ("sand", "ocean"),
+    "hotel": ("vacation", "room"),
+    "airplane": ("air", "car")
+}
+```
+
+Let's iterate through the concepts.
+
+```
+k = 10
+for concept in concepts:
+    # Build the concept by adding the two component vectors
+    A, B = concepts[concept]
+    vector = glove[A] + glove[B]
+
+    # Query the embeddings
+    neighbors = glove.most_similar(vector, k = k)
+    table = tabulate(neighbors, headers = ["Token", "Score"])
+    print(table, end = "\n\n")
+```
+
+The expected concepts aren't the top-most tokens for each result, but they're
+in the top 10.
+
+
+### Analogies
+
+Most famously, word embeddings enable quasi-logical reasoning. Whereas
+synonym/antonym pairs do not map to vector operations, certain analogies
+do---or, sometimes they do. To construct these analogies, we define a
+relationship between a source and a target word by subtracting the vector for
+the former from the latter. Then, we add the source's complement to the result.
+As above, the nearest neighbors for this new vector should reflect analogical
+reasoning.
+
+Below: "Strong is to stronger what clear is to X?".
+
+```{code-cell}
+k = 10
+similarities = glove.analogize(
+    this = "strong", to_that = "stronger", as_this = "clear", k = k
+)
+table = tabulate(similarities, headers = ["Token", "Score"])
+print(table)
+```
+
+"Paris is to France what Berlin is to X?"
+
+```{code-cell}
+k = 10
+similarities = glove.analogize(
+    this = "paris", to_that = "france", as_this = "berlin", k = k
+)
+table = tabulate(similarities, headers = ["Token", "Score"])
+print(table)
+```
+
+Let's plot the above example in two dimensions to demonstrate this.
+
+```{code-cell}
+# Get the embeddings
+paris, france = glove["paris"], glove["france"]
+berlin, germany = glove["berlin"], glove["germany"]
+
+# Create a target and stack the five vectors
+target = (berlin - paris) + france
+stacked = np.vstack([paris, france, berlin, germany, target])
+
+# Plot
+scatter_2d(stacked, norm = False, highlight = [4], figsize = (3, 3))
+```
+
+See how the target (in red) forms a perfect square with the other terms of the
+analogy? And its nearest neighbor is the vector we'd expect to find. That said:
+note that the latter does _not_ form a perfect square. Analogizing in this
+manner fudges things.
+
+Consider the following: "Arm is to hand what leg is to X?"
+
+```{code-cell}
+k = 10
+similarities = glove.analogize(
+    this = "arm", to_that = "hand", as_this = "leg", k = k
+)
+table = tabulate(similarities, headers = ["Token", "Score"])
+print(table)
+```
+
+We'd expect "foot" but no such luck.
+
+
+## Part-of-Speech Disambiguation
+
+Clearly these embeddings pick up at least some information about semantics. But
+it's challenging to identify where this information lies in the embeddings:
+sequences of positive and negative numbers don't tell us much on their own.
+Let's see if we can design an experiment to make these numbers more
+interpretable.
+
+The following constructs a method for determining the part-of-speech (POS) of a
+vector. Using embeddings for POS-tagged WordNet lemmas, we train a classifier
+to make this determination.
 
 
 ### Data preparation
 
-<!-- Data: Embeddings for POS tagged WordNet lemmas --->
+First, we load the embeddings for our WordNet tokens.
 
 ```{code-cell}
 wordnet = pd.read_parquet("data/glove/wordnet_embeddings.parquet")
@@ -783,9 +1056,55 @@ class_weight
 ```
 
 
-### Model training
+### Fitting a logistic regression model
 
-Now initialize the model and fit it.
+We use a **logistic regression** model for this experiment. It models the
+probability that input data belongs to a specific class. In our case, input and
+classes are vectors and POS tags, respectively. For every dimension, or
+**feature**, in these vectors the model has a corresponding weight, or
+**coefficient**. Coefficients represent the change in the **log-odds** of the
+outcome for a one-unit change in the corresponding feature. Log-odds, or
+logits, are the logarithm of the odds of an event occurring (which is in turn
+the ratio of the probability of an event occurring to the probability of that
+event not occurring).
+
+When training on data, the model multiplies features by their coefficients and
+sums them up to compute the log-odds of the outcome. This sum is used to obtain
+a probability for each class. The model adjusts its coefficients to increase
+the likelihood that the vector of features will be categorized with the correct
+label. At each step in the training process, a **loss function** (typically log
+loss) measures the difference between the predicted probabilities and the
+actual labels. The model uses this loss to update its coefficients in a way
+that reduces error.
+
+Coefficients are represented as:
+
+$$
+z = \beta_0 + \beta_1x_1 + \beta_2x_2 + ... + \beta_nx_n
+$$
+
+Where:
+
++ $z$ is a vector of coefficients corresponding to each feature in the input $x$
++ $\beta_0$ is the intercept, or bias term
++ $\beta_nx_n$ is the product of the coefficient $\beta_n$ for the $n$-th
+  feature in the input $x$
+
+Transforming $z$ into a probability for each class uses the logistic, or
+**sigmoid**, function:
+
+$$
+\hat{y} = \sigma(z) = \frac{1}{1 + e^{-z}}
+$$
+
+Where:
+
++ $\hat{y}$ is the predicted probability
++ Which is the result of the sigmoid function $\sigma(z)$
++ $\frac{1}{1 + e^{-z}}$ is sigmoid function formula
+
+As with Naive Bayes, there's no need to implement this ourselves when
+`scikit-learn` can do it.
 
 ```{code-cell}
 model = LogisticRegression(
@@ -802,9 +1121,7 @@ Let's look at a classification report.
 
 ```{code-cell}
 preds = model.predict(X_test)
-report = classification_report(
-    y_test, preds, target_names = ["adj", "noun", "verb"]
-)
+report = classification_report(y_test, preds, target_names = model.classes_)
 print(report)
 ```
 
@@ -827,7 +1144,7 @@ what the model expects for a certain class.
   to the class decreases
 
 ```{code-cell}
-coef = pd.DataFrame(model.coef_.T, columns = ["adj", "noun", "verb"])
+coef = pd.DataFrame(model.coef_.T, columns = model.classes_)
 coef.head()
 ```
 
@@ -849,7 +1166,7 @@ Time to plot.
 
 ```{code-cell}
 fig, axes = plt.subplots(3, 1, figsize = (15, 5), sharex = True, sharey = True)
-for idx, pos in enumerate(["adj", "noun", "verb"]):
+for idx, pos in enumerate(model.classes_):
     subplot_data = coef_plot[coef_plot["POS"] == pos]
     g = sns.barplot(
         x = "dimension",
@@ -907,7 +1224,7 @@ ground the above graphs in specific tokens.
 ```{code-cell}
 associations = np.dot(wordnet, coef)
 associations = pd.DataFrame(
-    associations, index = wordnet.index, columns = ["adj", "noun", "verb"]
+    associations, index = wordnet.index, columns = model.classes_
 )
 associations.sample(5)
 ```
@@ -938,12 +1255,11 @@ That said, getting class probabilities tells a slightly more encouraging story.
 
 ```{code-cell}
 for token in inspect:
-    # Reshape and squeeze when making single vector predictions
-    vector = glove[token].reshape(1, -1)
-    probs = model.predict_proba(vector).squeeze(0)
+    vector = glove[token]
+    probs = model.predict_proba([vector]).squeeze(0)
 
     print(f"Predictions for '{token}':")
-    for idx, label in enumerate(["adj", "noun", "verb"]):
+    for idx, label in enumerate(model.classes_):
         print(f"  {label}: {probs[idx]:.2f}%")
 ```
 
@@ -983,9 +1299,8 @@ def shift_vector(vector, coef, glove = glove, k = 25):
 
     Returns
     -------
-    output : pd.DataFrame
-        A DataFrame containing k-nearest neighbors for the original and shifted
-        vectors
+    neighbors : list[tuple]
+        The k-nearest neighbors for the original and shifted vectors
     """
     # Find the vector's k-nearest neighbors
     vector_knn = glove.most_similar(vector, k)
@@ -996,35 +1311,37 @@ def shift_vector(vector, coef, glove = glove, k = 25):
     shifted_knn = glove.most_similar(shifted, k)
 
     # Extract the tokens and put them into a DataFrame
-    output = [
+    neighbors = [
         (tok1, tok2) for (tok1, _), (tok2, _) in zip(vector_knn, shifted_knn)
     ]
-    output = pd.DataFrame(output, columns = ["original", "shifted"])
-    output.index.name = "k-th_neighbor"
 
-    return output
+    return neighbors
 ```
 
 Let's try this with a few tokens. Below, we make "dessert" more like an
 adjective.
 
 ```{code-cell}
-:tags: [output_scroll]
-shift_vector(glove["dessert"], coef["adj"])
+shifted = shift_vector(glove["dessert"], coef["A"])
+table = tabulate(shifted, headers = ["Original", "Shifted"])
+print(table)
 ```
 
 How about "desert"?
 
 ```{code-cell}
-:tags: [output_scroll]
-shift_vector(glove["desert"], coef["adj"])
+shifted = shift_vector(glove["desert"], coef["A"])
+table = tabulate(shifted, headers = ["Original", "Shifted"])
+print(table)
+
 ```
 
 Now make "language" more like a verb.
 
 ```{code-cell}
-:tags: [output_scroll]
-shift_vector(glove["language"], coef["verb"])
+shifted = shift_vector(glove["language"], coef["V"])
+table = tabulate(shifted, headers = ["Original", "Shifted"])
+print(table)
 ```
 
 The modifications here are subtle, but they do exist: while the top-most
@@ -1033,6 +1350,7 @@ their ordering moves around, often in ways that conform to what you'd expect to
 see with the POS's valences.
 
 ```{code-cell}
-:tags: [output_scroll]
-shift_vector(glove["drive"], coef["noun"])
+shifted = shift_vector(glove["drive"], coef["N"])
+table = tabulate(shifted, headers = ["Original", "Shifted"])
+print(table)
 ```
