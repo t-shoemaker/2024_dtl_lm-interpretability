@@ -27,7 +27,7 @@ This chapter overviews vector space semantics. It introduces core operations on
 vectors and vector spaces and demonstrates how to use these operations to
 define a measure of of semantic similarity. We then turn to static word
 embeddings to discuss concept modeling as well as embedding analogies; a final
-experiment demonstrates how to disambiguate parts-of-speech in embeddings.
+experiment demonstrates how to disambiguate part-of-speech tags in embeddings.
 
 + **Data**: a document-term matrix representation of Melanie Walsh’s
   [corpus][corpus] of ~380 obituaries from the _New York Times_ and tagged
@@ -852,7 +852,7 @@ Some listings, like the one for "music," are fairly comparable, but listings
 for "country" and "royal" are more general.
 
 To get the least similar token, query for all tokens and then select the last
-element. You may think this would be something like the opposite of a token.
+element. You may think this would be a token's antonym.
 
 ```{code-cell}
 glove.most_similar("good", k = len(glove))[-1]
@@ -893,8 +893,8 @@ concepts, for example, is by adding two vectors together. We'd expect the
 nearest neighbors of the resultant vector to reflect the concept we've tried to
 build.
 
-The dictionary below has keys for concepts. Is tuples are the two vectors we'll
-add together to create that concept.
+The dictionary below has keys for concepts. Its tuples are the two vectors
+we'll add together to create that concept.
 
 ```{code-cell}
 concepts = {
