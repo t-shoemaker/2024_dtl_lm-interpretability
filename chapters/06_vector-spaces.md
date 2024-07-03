@@ -1183,11 +1183,11 @@ plt.show()
 
 No one single dimension stands out as the indicator for a POS tag; rather,
 groups of dimensions determine POS tags. This is in part what we mean by a
-distributed representation. We can use recursive feature elimination to extract
-dimensions that are particular important. This process fits our model on the
-embedding features and then evaluates the importance of each feature. Important
-features are those with high coefficients (absolute values). It then prunes out
-the least important features, refits the model, re-evaluates feature
+distributed representation. We can use **recursive feature elimination** to
+extract dimensions that are particularly important. This process fits our model
+on the embedding features and then evaluates the importance of each feature.
+Important features are those with high coefficients (absolute values). It then
+prunes out the least important features, refits the model, re-evaluates feature
 importance, and so on.
 
 Use `n_features_to_select` to set the number of features you want. Supplying an
