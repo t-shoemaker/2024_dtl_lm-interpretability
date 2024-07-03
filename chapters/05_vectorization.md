@@ -502,15 +502,14 @@ is selected as the label for a document.
 The formula for our classifier is as follows:
 
 $$
-P(C_k|\boldsymbol{x}) \propto P(C_k) \prod_{i=1}^n P(x_i|C_k)
+P(C_k|x) \propto P(C_k) \prod_{i=1}^n P(x_i|C_k)
 $$
 
 Where:
 
 + $P(C_k)$: prior probability of class $C_k$
 + $P(x_i|C_k)$: posterior probability of feature $x_i$ given class $C_k$
-+ $P(C_k|\boldsymbol{x})$: probability of feature vector $\boldsymbol{x}$ being
-  class $C_k$ 
++ $P(C_k|x)$: probability of feature vector $x$ being class $C_k$ 
 
 
 ### Training a classifier
