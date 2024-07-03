@@ -52,7 +52,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
-from sklearn.feature_selection import SelectFromModel
+from sklearn.feature_selection import RFE
 from tabulate import tabulate
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -1183,19 +1183,24 @@ plt.show()
 
 No one single dimension stands out as the indicator for a POS tag; rather,
 groups of dimensions determine POS tags. This is in part what we mean by a
-distributed representation. We can use a `SelectFromModel` object to extract
-dimensions that are particularly important. Use `threshold` to set a cutoff
-value below which features are considered unimportant (the threshold assumes
-absolute values).
+distributed representation. We can use recursive feature elimination to extract
+dimensions that are particular important. This process fits our model on the
+embedding features and then evaluates the importance of each feature. Important
+features are those with high coefficients (absolute values). It then prunes out
+the least important features, refits the model, re-evaluates feature
+importance, and so on.
+
+Use `n_features_to_select` to set the number of features you want. Supplying an
+argument to `step` will determine how many features are pruned out at every
+step.
 
 ```{code-cell}
-selector = SelectFromModel(
-    model, threshold = 1e-5, prefit = True, max_features = 10
-)
-selector.fit(wordnet)
+selector = RFE(model, n_features_to_select = 10, step = 5)
+selector.fit(X_train, y_train)
 ```
 
-Collect the dimension names from the feature selector and plot.
+Collect the dimension names from the feature selector and plot the
+corresponding coefficients.
 
 ```{code-cell}
 important_features = selector.get_support(indices = True)
