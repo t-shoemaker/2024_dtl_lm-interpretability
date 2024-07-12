@@ -22,7 +22,21 @@ rcParams["figure.dpi"] = 150
 Large Language Models: An Introduction
 ======================================
 
+This chapter introduces large language models (LLMs). We will discuss
+tokenization strategies, model architecture, the attention mechanism, and
+dynamic embeddings. Using an example model, we end by dynamically embedding
+documents to examine how each layer in the model changes documents'
+representations.
+
++ **Data**: 59 [Emily Dickinson poems][poems] collected from the Poetry
+  Foundation
+
+[poems]: https://www.poetryfoundation.org/poets/emily-dickinson#tab-poems
+
+
 ## Preliminaries
+
+We need the following libraries:
 
 ```{code-cell}
 :tags: [remove-output]
@@ -36,16 +50,33 @@ import seaborn as sns
 ```
 
 
-## Using a Pretrained Model
+### Using a pretrained model
 
+Training LLMs requires vast amounts of data and computational resources. While
+these resources are expensive, the very scale of these models contributes to
+their ability to generalize. Practitioners will therefore use the same model
+for a variety of tasks. They do this by **pretraining** a general model to
+perform a foundational task, usually next-token prediction. Then, once that
+model is trained, practitioners **fine-tune** that model for other tasks. The
+fine-tuned variants benefit from the generalized language representations
+learned during pretraining, but they adapt those representations to more
+specific contexts and tasks.
 
-### Hugging Face
+The best place to find these pretrained models is [Hugging Face][hf]. The
+company hosts thousands of them on its platform, and it also develops various
+machine learning tools for working with these models. Hugging Face also
+features fine-tuned models for various tasks, which may work out of the box for
+your needs. Take a look at the [model listing][mlist] to see all models on the
+platform. At the left, you'll see categories for model types, task types, and
+more.
 
+[hf]: https://huggingface.co/
+[mlist]: https://huggingface.co/models
 
 ### Loading a model
 
-To load a model from Hugging Face, first specify the checkpoint you'd like to
-use. Typically this is just the name of the model
+To load a model from Hugging Face, first specify the **checkpoint** you'd like
+to use. Typically this is just the name of the model.
 
 ```{code-cell}
 checkpoint = "google-bert/bert-base-uncased"
@@ -492,8 +523,6 @@ There are several components in this output:
 outputs
 ```
 
-**Last hidden state**
-
 The `last_hidden_state` tensor contains the hidden states for each token after
 the final layer of the model. Every vector is a contextualized representation
 of a token. The shape of this tensor is (batch size, sequence length, hidden
@@ -581,12 +610,13 @@ one of the reasons `[CLS]` is customary is because this token is in every input
 sequence. The same cannot always be said of other tokens.
 
 
-## Exercise: Examining Context
+## Examining Context
+
+Let's look at an example of how dynamic embeddings different from static ones.
+We'll use the Emily Dickinson poems from the first language modeling chapter.
 
 ```{code-cell}
-poems = pd.read_parquet(
-    "data/dickinson_poetry-foundation-poems/dickinson_poems.parquet"
-)
+poems = pd.read_parquet("data/datasets/dickinson_poems.parquet")
 ```
 
 First, tokenize:
@@ -607,6 +637,9 @@ Send the inputs to the model:
 with torch.no_grad():
     outputs = bert(**tokenized, output_hidden_states = True)
 ```
+
+
+### Comparing `[CLS]` tokens
 
 With this done, we extract the original embeddings from the model for each
 `[CLS]` token. The indexing logic of the second line is as follows: for all
@@ -649,17 +682,79 @@ scores.describe()
 ```
 
 What about the poems as a whole? Let's look at how our embeddings change for
-every layer in the network. In the `for` loop below, we step through each
-layer, then derive the cosine similarity between the mean static embeddings for
-a poem and the layer's mean poem embeddings. Note that we start at index `1`
-because the first layer in the hidden states is the original embeddings matrix.
+every layer in the network.
+
+
+### Defining a pooler
+
+Before we do that, however, we'll define a pooler, which will produce
+document-level embeddings for each poem. The pooler below takes the mean of all
+tokens in a document. Importantly, it also removes `[PAD]` token embeddings
+from the model outputs. While the model didn't use these tokens to compute
+attention, it still produces embeddings for them.
+
+```{code-cell}
+def mean_pool(layer, attention_mask):
+    """Perform mean pooling across an embedding layer.
+
+    This is based on the mean pooling implementation in SBERT.
+        SBERT: https://github.com/UKPLab/sentence-transformers
+
+    Parameters
+    ----------
+    layer : torch.Tensor
+        Embeddings layer with the shape (batch_size, num_tokens, num_dim)
+    attention_mask : torch.Tensor
+        Attention mask for the tokens with the shape (batch_size, num_tokens)
+
+    Returns
+    -------
+    pooled : torch.Tensor
+        Pooled embeddings with the shape (batch_size, num_dim)
+    """
+    # Expand the attention mask to have the same size as the embeddings layer
+    mask = attention_mask.unsqueeze(-1).expand(layer.size()).float()
+    
+    # Sum the embeddings multiplied by the mask. `[PAD]` tokens are 0s in
+    # mask, so multiplication will remove those tokens' values in the
+    # embeddings
+    sum_layer = torch.sum(layer * mask, 1)
+
+    # Sum the mask and clamp it to avoid floating point errors in division
+    sum_mask = mask.sum(1)
+    sum_mask = torch.clamp(sum_mask, min = 1e-9)
+
+    # Take the mean
+    pooled = sum_layer / sum_mask
+
+    return pooled
+```
+
+Let's pool our original word embeddings matrix and look at the resultant shape.
+
+```{code-cell}
+attention_mask = tokenized["attention_mask"]
+original_embeddings = mean_pool(outputs.hidden_states[0], attention_mask)
+original_embeddings.shape
+```
+
+
+### Comparing document embeddings
+
+In the `for` loop below, we step through each layer, then derive the cosine
+similarity between the mean static embeddings for a poem and the layer's mean
+poem embeddings. Note that we start at index `1` because the first layer in the
+hidden states is the original embeddings matrix.
 
 ```{code-cell}
 emb2layer = []
 for idx, layer in enumerate(outputs.hidden_states[1:]):
+    # Pool the layer
+    layer = mean_pool(layer, attention_mask)
+
     layer_scores = []
     for static, dynamic in zip(original_embeddings, layer):
-        static, dynamic = static.mean(axis = 0), dynamic.mean(axis = 0)
+        # Compute cosine similarity
         similarities = cosine_similarity([static, dynamic])
 
         # `similarities` is a (2, 2) square matrix. We get the lower left value
@@ -683,8 +778,8 @@ emb2layer = (
 Now we plot the document-level cosine similarity scores for each layer.
 
 ```{code-cell}
-fig, ax = plt.subplots(figsize = (15, 5))
-g = sns.stripplot(
+fig, ax = plt.subplots(figsize = (9, 6))
+g = sns.violinplot(
     data = emb2layer,
     x = "layer",
     y = "cosine_similarity",
@@ -701,14 +796,11 @@ g.set(
 plt.show()
 ```
 
-This plot shows how, at every subsequent layer in our model, the poem
-embeddings diverge further and further from the original embeddings furnished
-by the model. This continues until the cosine similarity scores effectively
-zero-out. That doesn't mean the embeddings are dissimilar, or opposites of one
-another (as in the case of negative cosine similarity scores). Rather, they
-simply have no relation. One way to interpret this zeroing-out is via context:
-at every layer, the model further specifies context for the inputs, until the
-link between context-less embeddings and contextual ones is mostly severed.
+This plot shows how, at every subsequent layer in our model, poem embeddings
+further diverge from the original embeddings furnished by the model. One way to
+interpret this progression is via context: at every layer, the model further
+specifies context for the inputs, until the link between the context-less
+embeddings and the contextual ones becomes quite weak.
 
 Slightly modifying the above procedure will show this layer-by-layer change.
 Below, we make our comparisons from one layer to the next.
@@ -717,16 +809,20 @@ Below, we make our comparisons from one layer to the next.
 layer2layer = []
 previous = original_embeddings
 for idx, layer in enumerate(outputs.hidden_states[1:]):
+    # Pool the layer
+    layer = mean_pool(layer, attention_mask)
+
     layer_scores = []
     for static, dynamic in zip(previous, layer):
-        static, dynamic = static.mean(axis = 0), dynamic.mean(axis = 0)
+        # Compute cosine similarity
         similarities = cosine_similarity([static, dynamic])
 
         # `similarities` is a (2, 2) square matrix. We get the lower left value
         score = similarities[np.tril_indices(2, k = -1)].item()
         layer_scores.append(score)
 
-    step = f"{idx + 1} to {idx + 2}"
+    # Track step
+    step = f"({idx + 1}, {idx + 2})"
     layer2layer.append({"step": step, "cosine_similarity": layer_scores})
 
     # Set the current layer to `previous`
@@ -747,8 +843,8 @@ layer2layer = (
 And plot.
 
 ```{code-cell}
-fig, ax = plt.subplots(figsize = (15, 5))
-g = sns.stripplot(
+fig, ax = plt.subplots(figsize = (9, 6))
+g = sns.violinplot(
     data = layer2layer,
     x = "step",
     y = "cosine_similarity",

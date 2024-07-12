@@ -59,7 +59,7 @@ import matplotlib.pyplot as plt
 Corpus documents are stored in a DataFrame alongside other metadata.
 
 ```{code-cell}
-corpus = pd.read_parquet("data/james_corpus/james_chapters.parquet")
+corpus = pd.read_parquet("data/datasets/james_chapters.parquet")
 print(corpus.info())
 ```
 

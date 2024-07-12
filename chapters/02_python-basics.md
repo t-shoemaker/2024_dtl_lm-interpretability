@@ -63,7 +63,7 @@ which currently sits in `data/`, a subdirectory of our current working
 directory.
 
 ```{code-cell}
-path = "data/shelley_frankenstein.txt"
+path = "data/texts/shelley_frankenstein.txt"
 ```
 
 Use `open` to open a connection to the file. This function requires you to

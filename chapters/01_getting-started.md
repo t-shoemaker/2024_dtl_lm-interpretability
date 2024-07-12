@@ -333,41 +333,18 @@ For example, here is the structure of this reader's `data` directory:
 
 ```
 data
-├── bert_blurb_classifier
-│   └── final
-├── dickinson_poetry-foundation-poems
-│   └── poems
-├── james_corpus
-│   ├── chapterize
-│   │   └── chapterize
-│   ├── chapterized
-│   │   ├── 1871-watch-and-ward
-│   │   ├── 1875-roderick-hudson
-│   │   ├── 1877-the-american
-│   │   ├── 1878-the-europeans
-│   │   ├── 1879-confidence
-│   │   ├── 1880-washington-square
-│   │   ├── 1881-portrait-of-a-lady
-│   │   ├── 1886-bostonians
-│   │   ├── 1886-princess-casamassima
-│   │   ├── 1888-reverberator
-│   │   ├── 1890-tragic-muse
-│   │   ├── 1897-spoils-poynton
-│   │   ├── 1897-what-maisie-knew
-│   │   ├── 1899-awkward-age
-│   │   ├── 1901-sacred-found
-│   │   ├── 1902-wings-of-the-dove
-│   │   ├── 1903-ambassadors
-│   │   ├── 1904-golden-bowl
-│   │   ├── 1911-outcry
-│   │   └── 1917-ivory-tower
-│   └── raw
-├── nyt_obituaries
-│   └── texts
-└── saussure
+├── datasets
+├── models
+│   └── bert_blurb_classifier
+│       └── final
+└── texts
+    ├── dickinson
+    │   └── poems
+    └── nyt
+        └── obituaries
 ```
 
-See all the branching paths?
+See the branching paths?
 
 :::{note}
 DOS again diverges from Unix in its representation of the root. For the former,

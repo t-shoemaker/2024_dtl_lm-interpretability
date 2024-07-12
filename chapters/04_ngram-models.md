@@ -163,7 +163,7 @@ def preprocess(doc, ngram = 1):
 Now, set up the data directory and load a file manifest.
 
 ```{code-cell}
-datadir = Path("data/dickinson_poetry-foundation-poems")
+datadir = Path("data/texts/dickinson")
 metadata = pd.read_csv(datadir / "metadata.csv")
 
 metadata.info()

@@ -36,12 +36,18 @@ from transformers import DataCollatorWithPadding
 from transformers import TrainingArguments, Trainer, EarlyStoppingCallback
 from transformers import pipeline
 import evaluate
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+import shap
+import nltk
+from nltk.corpus import stopwords
 ```
 
 Load data
 
 ```{code-cell}
-blurbs = pd.read_parquet("data/blurbs.parquet")
+blurbs = pd.read_parquet("data/datasets/ltg_book_blurbs.parquet")
 ```
 
 Currently the labels for this data are string representations of genres.
@@ -81,11 +87,11 @@ What is the distribution of labels like?
 blurbs.value_counts("label")
 ```
 
-With model-ready labels made, we create a Dataset. These objects work directly
-with the Hugging Face training pipeline to handle batching processing and other
-such optimizations in an automatic fashion. They also allow you to interface
-directly with Hugging Face's cloud-hosted data, though we will only use local
-data for this fine-tuning run.
+With model-ready labels made, we create a `Dataset`. These objects work
+directly with the Hugging Face training pipeline to handle batch processing and
+other such optimizations in an automatic fashion. They also allow you to
+interface directly with Hugging Face's cloud-hosted data, though we will only
+use local data for this fine-tuning run.
 
 We only need two columns from our original DataFrame: the text and its label.
 
@@ -174,9 +180,9 @@ there may be cases where an entire batch of texts is substantially padded
 because all those texts are short. It would be a waste of time and computing
 resources to process them with all that padding.
 
-This is where a data collator comes in. During training it will dynamically pad
-batches to the maximum feature size for a batch. This improves the efficiency
-of the training process.
+This is where the `DataCollatorWithPadding` comes in. During training it will
+dynamically pad batches to the maximum feature size for a given batch. This
+improves the efficiency of the training process.
 
 ```{code-cell}
 data_collator = DataCollatorWithPadding(tokenizer = tokenizer)
@@ -244,11 +250,9 @@ There are a large number of hyperparameters to set when training a model. Some
 of them are very general, some extremely granular. This section walks through
 some of the most common ones you will find yourself adjusting.
 
-First, general hyperparameters.
-
-The number of **epochs** refers to the number of times a model passes over the
-entire dataset. Big models train for dozens, even hundreds of epochs, but ours
-is small enough that we only need a few
+First: epochs. The number of **epochs** refers to the number of times a model
+passes over the entire dataset. Big models train for dozens, even hundreds of
+epochs, but ours is small enough that we only need a few
 
 ```{code-cell}
 num_train_epochs = 15
@@ -379,7 +383,7 @@ Instead, it will load a separately trained model for evaluation.
 But before that, we show how to save the final model:
 
 ```py
-trainer.save_model("data/bert_blurb_classifier/final")
+trainer.save_model("data/models/bert_blurb_classifier/final")
 ```
 
 Saving the model will save all the pieces you need when using it later.
@@ -387,16 +391,27 @@ Saving the model will save all the pieces you need when using it later.
 
 ## Model Evaluation
 
-We evaluate the model in two ways, first by looking at classification accuracy,
-then token influence. We don't need access to interal pieces for the first
-approach, so we use a `pipeline` to take care of things like batching,
-tokenization, and passing data to the model. All we need to do is specify what
-kind of task our model has been trained to do and where the model has been
-saved.
+We will evaluate the model in two ways, first by looking at classification
+accuracy, then token influence. To do this, let's re-load our model and
+tokenizer. This time we specify the path to our local model.
 
 ```{code-cell}
-model_path = "data/bert_blurb_classifier/final"
-pipe = pipeline("text-classification", model = model_path)
+fine_tuned = "data/models/bert_blurb_classifier/final"
+tokenizer = AutoTokenizer.from_pretrained(fine_tuned)
+model = AutoModelForSequenceClassification.from_pretrained(fine_tuned)
+```
+
+
+### Using a pipeline
+
+While we could separately tokenize texts and feed them through the model, a
+`pipeline` will take care of all this. All we need to do is specify what kind
+of task our model has been trained to do.
+
+```{code-cell}
+classifier = pipeline(
+    "text-classification", model = model, tokenizer = tokenizer
+)
 ```
 
 Below, we put a single text through the pipeline. It will return the model's
@@ -404,7 +419,7 @@ prediction and a confidence score.
 
 ```{code-cell}
 sample = blurbs.sample(1)
-result ,= pipe(sample["text"].item())
+result ,= classifier(sample["text"].item())
 ```
 
 What does the model think this text is?
@@ -417,4 +432,131 @@ What is the actual label?
 
 ```{code-cell}
 print("Actual label:", sample["d1"].item())
+```
+
+Here are the top three labels for this text:
+
+```{code-cell}
+classifier(sample["text"].item(), top_k = 3)
+```
+
+Set `top_k` to `None` to return all scores.
+
+```{code-cell}
+classifier(sample["text"].item(), top_k = None)
+```
+
+
+### Classification accuracy
+
+Let's look at a broader sample of texts and appraise the model's performance.
+Below, we take 250 blurbs and send them through the pipeline. A more fastidious
+version of this entire training setup would have spliced off this set of blurbs
+before doing the train/test split. That would have kept the model from ever
+seeing them until the moment we appraise performance to render a completely
+unbiased view of model performance. But for the purposes of demonstration, it's
+okay to sample from our data generally.
+
+```{code-cell}
+sample = blurbs.sample(250)
+predicted = classifier(sample["text"].tolist(), truncation = True)
+```
+
+Now, we access the predicted labels and compare them against the true labels
+with `classification_report()`.
+
+```{code-cell}
+y_true = sample["d1"].tolist()
+y_pred = [prediction["label"] for prediction in predicted]
+report = classification_report(y_true, y_pred, zero_division = 0.0)
+print(report)
+```
+
+Overall, these are pretty nice results. The F1 scores are fairly well balanced.
+Though it looks like the model struggles with classifying Biography \& Memoir
+and Literary Fiction. But other genres, like Cooking and Romance, are just
+fine. We can use a **confusion matrix** to see which of these genres the model
+confuses with others.
+
+```{code-cell}
+confusion = confusion_matrix(y_true, y_pred)
+confusion = pd.DataFrame(
+    confusion, columns = label2id.keys(), index = label2id.keys()
+)
+```
+
+Plot the matrix as a heatmap:
+
+```{code-cell}
+fig, ax = plt.subplots(figsize = (5, 5))
+g = sns.heatmap(confusion, annot = True, cmap = "Blues", ax = ax);
+ax.set(ylabel = "True label", xlabel = "Predicted label")
+plt.show()
+```
+
+For this testing set, it looks like the model sometimes mis-classifies
+Biography \& Memoir as Religion \& Philosophy. Likewise, it sometimes assigns
+Politics to Biography \& Memoir. Finally, there appears to be a little
+confusion between Literary Fiction and Romance.
+
+
+### Feature analysis: SHAP values
+
+```py
+pipe = pipeline(
+    "text-classification",
+    model = model,
+    tokenizer = tokenizer,
+    top_k = None,
+    truncation = True
+)
+# RED: positive impact, BLUE: negative impact
+explainer = shap.Explainer(pipe)
+```
+
+```{code-cell}
+shap_values = pd.read_parquet("data/datasets/ltg_book_blurbs_1k-shap.parquet")
+shap_values.head()
+```
+
+```{code-cell}
+drop_tokens = stopwords.words("english")
+drop_tokens += '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~“”’—–…'.split()
+
+mask = shap_values.index.get_level_values(2).str.lower().isin(drop_tokens)
+shap_values = shap_values[~mask]
+```
+
+```{code-cell}
+# Initialize a DataFrame to store token-genre counts
+counts = pd.DataFrame(
+    0,
+    index = shap_values.index.get_level_values(2).unique(),
+    columns = shap_values.columns
+)
+
+# For every genre label...
+for col in shap_values.columns:
+    # Get the token with the highest SHAP value in each document
+    max_tokens = shap_values[col].groupby(level = ["document_id"]).idxmax()
+
+    # Format to a Series and count the number of times each token appears
+    max_tokens = max_tokens.apply(pd.Series)
+    max_tokens.columns = ["document_id", "token_id", "text"]
+    token_counts = max_tokens.value_counts("text")
+
+    # Index our counts DataFrame and assign the token counts
+    counts.loc[token_counts.index, col] = token_counts.values
+```
+
+```{code-cell}
+k = 25
+topk = pd.DataFrame("", index = range(k), columns = shap_values.columns)
+for col in shap_values.columns:
+    tokens = counts[col].nlargest(k).index.tolist()
+    topk.loc[:, col] = tokens
+```
+
+```{code-cell}
+topk
 ```

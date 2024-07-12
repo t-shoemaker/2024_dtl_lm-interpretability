@@ -58,7 +58,7 @@ We wrap this file path in a `Path` object to make interacting with our
 computers' file systems more streamlined.
 
 ```{code-cell}
-datadir = Path("data/nyt_obituaries/texts")
+datadir = Path("data/texts/nyt/obituaries")
 ```
 
 Use a **glob** pattern to retrieve paths to `.txt` files. The output of the
@@ -152,7 +152,7 @@ amount of functionality for working with its contents.
 Below, we load our metadata.
 
 ```{code-cell}
-manifest = pd.read_csv("data/nyt_obituaries/metadata.csv")
+manifest = pd.read_csv("data/texts/nyt/metadata.csv")
 ```
 
 Here is a high-level overview of the metadata. It shows the columns and their

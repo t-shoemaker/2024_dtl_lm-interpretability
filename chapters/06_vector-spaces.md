@@ -63,7 +63,7 @@ The only consideration is that the tokens have been **lemmatized**, that is,
 reduced to their uninflected forms.
 
 ```{code-cell}
-dtm = pd.read_parquet("data/nyt_obituaries/nyt_obituaries_dtm.parquet")
+dtm = pd.read_parquet("data/datasets/nyt_obituaries_dtm.parquet")
 dtm.info()
 ```
 
@@ -822,7 +822,7 @@ class WordEmbeddings:
 With the wrapper defined, we load the embeddings.
 
 ```{code-cell}
-glove = WordEmbeddings("data/glove/glove.6B.200d.parquet")
+glove = WordEmbeddings("data/models/glove.6B.200d.parquet")
 n_vocab, n_dim = glove.embeddings.shape
 print(f"Embeddings size and shape: {n_vocab:,}, {n_dim}")
 ```
@@ -1007,7 +1007,9 @@ to make this determination.
 First, we load the embeddings for our WordNet tokens.
 
 ```{code-cell}
-wordnet = pd.read_parquet("data/glove/wordnet_embeddings.parquet")
+wordnet = pd.read_parquet(
+    "data/datasets/wordnet_embeddings_glove.6B.200d.parquet"
+)
 ```
 
 Words can have more than one POS tag.
