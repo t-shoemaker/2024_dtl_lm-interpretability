@@ -1,7 +1,14 @@
 Overview
 ========
 
-Outline of the course
+**Introduction to Interpretability for Language Models** is a three-week crash
+course on interpretability and language modeling. The course starts with an
+introduction to Python, moves on to language models in natural language
+processing, and ends with a week on large language models like BERT and the GPT
+series.
+
+
+## Syllabus
 
 | Day | Title                   | Topics                                                          |
 |-----|-------------------------|-----------------------------------------------------------------|
@@ -14,3 +21,13 @@ Outline of the course
 |  7  | Introduction to LLMs    | subwords, model architectures, dynamic embeddings               |
 |  8  | BERT                    | fine tuning, model evaluation, SHAP values                      |
 |  9  | GPT                     | next token prediction, reverse engineering, activation patching |
+
+
+## Data
+
+As of this writing (July 2024), a zipped data directory for the course,
+`dtl_2024.zip`, may be found at [tylershoemaker.info/data][data]. Download this
+file, move it to the location on your computer where you'll be working from,
+and unzip it.
+
+[data]: https://tylershoemaker.info/data
