@@ -28,10 +28,13 @@ dynamic embeddings. Using an example model, we end by dynamically embedding
 documents to examine how each layer in the model changes documents'
 representations.
 
-+ **Data**: 59 [Emily Dickinson poems][poems] collected from the Poetry
++ **Data:** 59 [Emily Dickinson poems][poems] collected from the Poetry
   Foundation
++ **Credits:** Portions of this chapter are adapted from the UC Davis DataLab's
+  [Natural Language Processing for Data Science][nlp]
 
 [poems]: https://www.poetryfoundation.org/poets/emily-dickinson#tab-poems
+[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
 
 
 ## Preliminaries

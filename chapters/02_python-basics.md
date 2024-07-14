@@ -26,7 +26,11 @@ how to load files into Python, store data in various data structures, and
 iterate through that data. Additionally, we will discuss regular expressions
 for string matching and write our own functions.
 
-+ **Data**: a plain text version of Mary Shelley's _Frankenstein_
++ **Data:** A plain text version of Mary Shelley's _Frankenstein_
++ **Credits:** Portions of this chapter are adapted from the UC Davis DataLab's
+  [Python Basics][python]
+
+[python]: https://ucdavisdatalab.github.io/workshop_python_basics
 
 
 ## Preliminaries

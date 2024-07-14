@@ -29,12 +29,15 @@ define a measure of of semantic similarity. We then turn to static word
 embeddings to discuss concept modeling as well as embedding analogies; a final
 experiment demonstrates how to disambiguate part-of-speech tags in embeddings.
 
-+ **Data**: a document-term matrix representation of Melanie Walsh’s
++ **Data:** A document-term matrix representation of Melanie Walsh’s
   [corpus][corpus] of ~380 obituaries from the _New York Times_ and tagged
   [WordNet][wn] embeddings
++ **Credits:** Portions of this chapter are adapted from the UC Davis DataLab's
+  [Natural Language Processing for Data Science][nlp]
 
 [corpus]: https://melaniewalsh.github.io/Intro-Cultural-Analytics/00-Datasets/00-Datasets.html#politics-history
 [wn]: https://wordnet.princeton.edu/
+[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
 
 
 ## Preliminaries

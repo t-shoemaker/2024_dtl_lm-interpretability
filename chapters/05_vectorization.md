@@ -29,13 +29,16 @@ document-term matrix, to work with vectorized texts, discuss weighting
 strategies for managing high-frequency tokens, and train a classification model
 to distinguish style.
 
-+ **Data**: 20 Henry James novels, collected by [Jonathan Reeve][reeve] and
++ **Data:** 20 Henry James novels, collected by [Jonathan Reeve][reeve] and
   broken into chapters with Reeve's [chapterization][chapterize] tool. Labels
   are from David L. Hoover's [clustering][clustering] of James's novels
++ **Credits:** Portions of this chapter are adapted from the UC Davis DataLab's
+  [Natural Language Processing for Data Science][nlp]
 
 [reeve]: https://github.com/JonathanReeve/james-sentence
 [chapterize]: https://github.com/JonathanReeve/chapterize
-[clustering]: https://dlsanthology.mla.hcommons.org/textual-analysis/
+[clustering]: https://dlsanthology.mla.hcommons.org/textual-analysis
+[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
 
 
 ## Preliminaries

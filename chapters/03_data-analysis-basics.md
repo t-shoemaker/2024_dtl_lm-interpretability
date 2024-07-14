@@ -27,10 +27,14 @@ text files into memory, align them with corresponding metadata, and produce
 information about their contents. Also covered: preparing text for numerical
 operations and graphing data.
 
-+ **Data**: Melanie Walsh’s [corpus][data] of ~380 obituaries from the _New
++ **Data:** Melanie Walsh’s [corpus][data] of ~380 obituaries from the _New
   York Times_
++ **Credits:** Portions of this chapter are adapted from the UC Davis DataLab's
+  [Python Basics][python] and [Natural Language Processing for Data Science][nlp]
 
 [data]: https://melaniewalsh.github.io/Intro-Cultural-Analytics/00-Datasets/00-Datasets.html#politics-history
+[python]: https://ucdavisdatalab.github.io/workshop_python_basics
+[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
 
 
 ## Preliminaries

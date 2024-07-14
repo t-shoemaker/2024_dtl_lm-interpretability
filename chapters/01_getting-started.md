@@ -17,10 +17,17 @@ This chapter introduces fundamental concepts for working with code. We begin
 with the Unix command line and environment management, after which we will turn
 to an overview of the Python programming language.
 
-+ **Prerequisites:** if you are using Windows, install [Git
-for Windows][git]. It comes with Git Bash, a Unix-style command-line interface.
++ **Prerequisites:** If you are using Windows, install [Git
+  for Windows][git]. It comes with Git Bash, a Unix-style command-line
+  interface
++ **Credits:** Portions of this chapter are adapted from the UC Davis DataLab's
+  [Introduction to the Command Line][cmd], [Introduction to Remote
+  Computing][remote], and [Python Basics][python]
 
 [git]: https://git-scm.com/downloads
+[cmd]: https://ucdavisdatalab.github.io/workshop_introduction_to_the_command_line
+[remote]: https://ucdavisdatalab.github.io/workshop_intro_to_remote_computing
+[python]: https://ucdavisdatalab.github.io/workshop_python_basics
 
 
 ## Command Line Basics
