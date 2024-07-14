@@ -326,7 +326,7 @@ the same format:
 $ pwd
 ```
 ```
-/Users/tyler/2024_dtl_llm-interpretability
+/Users/tyler/2024_dtl_lm-interpretability
 ```
 
 Note that this path begins with `/`. This is the top-most directory in your
@@ -653,26 +653,54 @@ Now, use `ripgrep` to search for "NLP" in `chapters`:
 $ rg -i "NLP" chapters
 ```
 ```
-chapters/02_python-basics.md
-309:all repeated tokens. The result will be a set of in NLP are called **types**:
+chapters/06_vector-spaces.md
+36:  [Natural Language Processing for Data Science][nlp]
+40:[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
+125:reigning metaphor of NLP, a space of this sort is a stand-in for meaning: the
+190:  in the same direction as the first. Most vector operations in NLP use the
+674:to be made available by the Stanford NLP group. It has been trained on a 2014
+680:[glove]: https://nlp.stanford.edu/projects/glove/
 
 chapters/01_getting-started.md
-666:Now, use `ripgrep` to search for "NLP" in `chapters`:
-669:$ rg -i "NLP" chapters
-673:648:  in the same direction as the first. Most vector operations in NLP use the
-676:309:all repeated tokens. The result will be a set of in NLP are called **types**:
-679:664:Now, use `ripgrep` to search for "NLP" in `chapters`:
-680:667:$ rg -i "NLP" chapters
-694:$ rg -i "NLP" chapters
-863:machine learning/AI and natural language processing (NLP): most people are
-1272:nlp = "natural language processing"
-1273:nlp.title()
-1279:nlp.count("g")
-1294:dir(nlp)
-1422:computing, NLP, and machine learning/AI. A full list of them is provided in the
+650:Now, use `ripgrep` to search for "NLP" in `chapters`:
+653:$ rg -i "NLP" chapters
+657:309:all repeated tokens. The result will be a set of in NLP are called **types**:
+660:666:Now, use `ripgrep` to search for "NLP" in `chapters`:
+661:669:$ rg -i "NLP" chapters
+662:673:648:  in the same direction as the first. Most vector operations in NLP use the
+663:676:309:all repeated tokens. The result will be a set of in NLP are called **types**:
+664:679:664:Now, use `ripgrep` to search for "NLP" in `chapters`:
+665:680:667:$ rg -i "NLP" chapters
+666:694:$ rg -i "NLP" chapters
+667:863:machine learning/AI and natural language processing (NLP): most people are
+668:1272:nlp = "natural language processing"
+669:1273:nlp.title()
+670:1279:nlp.count("g")
+671:1294:dir(nlp)
+672:1422:computing, NLP, and machine learning/AI. A full list of them is provided in the
+675:648:  in the same direction as the first. Most vector operations in NLP use the
+689:$ rg -i "NLP" chapters
+858:machine learning/AI and natural language processing (NLP): most people are
+1267:nlp = "natural language processing"
+1268:nlp.title()
+1274:nlp.count("g")
+1289:dir(nlp)
+1417:computing, NLP, and machine learning/AI. A full list of them is provided in the
+
+chapters/02_python-basics.md
+313:all repeated tokens. The result will be a set of in NLP are called **types**:
+
+chapters/03_data-analysis-basics.md
+33:  [Python Basics][python] and [Natural Language Processing for Data Science][nlp]
+37:[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
 
 chapters/05_vectorization.md
-648:  in the same direction as the first. Most vector operations in NLP use the
+36:  [Natural Language Processing for Data Science][nlp]
+41:[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
+
+chapters/07_intro-to-llms.md
+34:  [Natural Language Processing for Data Science][nlp]
+37:[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
 ```
 
 See how it picked up the very text you're reading now?
@@ -1415,11 +1443,11 @@ $ micromamba install python=310
 
 For the chapters ahead, we will use several different packages for numerical
 computing, NLP, and machine learning/AI. A full list of them is provided in the
-`dtl2024.yml` file; create a new environment from this file using `micromamba`,
-and you'll have everything you need:
+`env.yml` file; create a new environment from this file using `micromamba`, and
+you'll have everything you need:
 
 ```sh
-$ micromamba env create --file dtl2024.yml
+$ micromamba env create --file env.yml
 ```
 
 This will make a new environment, `dtl2024`, on your computer. Activate it like
