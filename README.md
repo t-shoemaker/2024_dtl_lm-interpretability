@@ -1,8 +1,8 @@
 # Introduction to Interpretability for Language Models
 
-_Instructor:_ Tyler Shoemaker
-_Dates:_ 07/15/2014--08/02/2024
-_Meeting time:_ MWF, 12:00-3:00pm EST
++ **Instructor:** Tyler Shoemaker
++ **Dates:** 07/15/2014--08/02/2024
++ **Meeting time:** MWF, 12:00-3:00pm EST
 
 This is a three-week crash course on interpretability and language modeling.
 The course starts with an introduction to Python, moves on to language models
