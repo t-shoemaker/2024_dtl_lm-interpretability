@@ -1,0 +1,2367 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>1. Getting Started &#8212; Introduction to Interpretability for Language Models</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/01_getting-started';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Overview" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Introduction to Interpretability for Language Models</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Overview
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Basics</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">1. Getting Started</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/01_getting-started.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Getting Started</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#command-line-basics">1.1. Command Line Basics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#launching-a-command-line-interface">1.1.1. Launching a command-line interface</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#input-and-interactions">1.1.2. Input and interactions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#command-line-syntax">1.1.3. Command-line syntax</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-help">1.1.4. Getting help</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#directory-structures">1.2. Directory Structures</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#paths">1.2.1. Paths</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#path-hierarchies">1.2.2. Path hierarchies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#absolute-vs-relative-paths">1.2.3. Absolute vs. relative paths</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#navigating-with-a-cli">1.2.4. Navigating with a CLI</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#environment-setup">1.3. Environment Setup</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#micromamba">1.3.1. Micromamba</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#jupyter-lab">1.3.2. Jupyter Lab</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-code-in-python">1.4. Writing Code in Python</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#variables">1.4.1. Variables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#strings">1.4.2. Strings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numbers">1.4.3. Numbers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparisons">1.4.4. Comparisons</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conditionals">1.4.5. Conditionals</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions-and-methods">1.5. Functions and Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calling-functions">1.5.1. Calling functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calling-methods">1.5.2. Calling Methods</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#function-and-method-documentation">1.5.3. Function and method documentation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modules-and-packages">1.6. Modules and Packages</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#importing-modules">1.6.1. Importing modules</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-packages">1.6.2. Installing packages</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#debugging-code">1.7. Debugging Code</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="getting-started">
+<h1><span class="section-number">1. </span>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h1>
+<p>This chapter introduces fundamental concepts for working with code. We begin
+with the Unix command line and environment management, after which we will turn
+to an overview of the Python programming language.</p>
+<ul class="simple">
+<li><p><strong>Prerequisites:</strong> If you are using Windows, install <a class="reference external" href="https://git-scm.com/downloads">Git
+for Windows</a>. It comes with Git Bash, a Unix-style command-line
+interface</p></li>
+<li><p><strong>Credits:</strong> Portions of this chapter are adapted from the UC Davis DataLab’s
+<a class="reference external" href="https://ucdavisdatalab.github.io/workshop_introduction_to_the_command_line">Introduction to the Command Line</a>, <a class="reference external" href="https://ucdavisdatalab.github.io/workshop_intro_to_remote_computing">Introduction to Remote
+Computing</a>, and <a class="reference external" href="https://ucdavisdatalab.github.io/workshop_python_basics">Python Basics</a></p></li>
+</ul>
+<section id="command-line-basics">
+<h2><span class="section-number">1.1. </span>Command Line Basics<a class="headerlink" href="#command-line-basics" title="Link to this heading">#</a></h2>
+<p>Most modern coding platforms follow the conventions of mainstream computing,
+using a <strong>graphical user interface</strong> (GUI) to display information and accept
+user input. But there is still real value in knowing the basics of the
+<strong>command-line interface</strong> (CLI), which relies solely on text input. Learning
+how to use the CLI will teach you a great deal about how your computer works,
+and there are still several instances where CLIs are the only point of access
+to a system.</p>
+<p>The CLI contains three main parts:</p>
+<ol class="arabic simple">
+<li><p>A <strong>terminal</strong>: an environment you use to send/receive information to/from
+your computer</p></li>
+<li><p>A <strong>shell</strong>: a program that executes commands you enter into the terminal</p></li>
+<li><p>The <strong>command line</strong>: where you enter the commands that the shell executes</p></li>
+</ol>
+<p>As we move through this chapter, keep one key thing in mind: a CLI is just
+another mode of interaction with your computer. Everything you can access
+through a windowing system on a GUI is also accessible with a CLI.</p>
+<section id="launching-a-command-line-interface">
+<h3><span class="section-number">1.1.1. </span>Launching a command-line interface<a class="headerlink" href="#launching-a-command-line-interface" title="Link to this heading">#</a></h3>
+<p>MacOS comes with a pre-installed CLI called Terminal. To launch it, go to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Applications</span> <span class="o">-&gt;</span> <span class="n">Utilities</span> <span class="o">-&gt;</span> <span class="n">Terminal</span>
+</pre></div>
+</div>
+<p>Windows users will use Git Bash. To launch it, do the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Windows</span> <span class="n">Start</span> <span class="n">Menu</span> <span class="o">-&gt;</span> <span class="n">search</span> <span class="s2">&quot;Git Bash&quot;</span>
+</pre></div>
+</div>
+<p>Or:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Windows</span> <span class="n">Start</span> <span class="n">Menu</span> <span class="o">-&gt;</span> <span class="n">Programs</span> <span class="o">-&gt;</span> <span class="n">Git</span> <span class="n">Bash</span>
+</pre></div>
+</div>
+<p>You should see something like this when your CLI launches:</p>
+<p><img alt="A command-line interface window" src="../_images/cli.png" /></p>
+<p>The window above shows a basic command line with a <strong>prompt</strong>. A prompt is an
+input field where you type your commands, and it is prepended with useful
+information about your computer:</p>
+<ul class="simple">
+<li><p>First, <code class="docutils literal notranslate"><span class="pre">tyler&#64;brain</span></code> tells us the current user (<code class="docutils literal notranslate"><span class="pre">tyler</span></code>) and the current
+computer (<code class="docutils literal notranslate"><span class="pre">brain</span></code>). That may seem like redundant information, but with the
+command line it’s possible to log in to other computers</p></li>
+<li><p>The prompt also tells us where we are on this computer’s file system. Right
+now we are at <code class="docutils literal notranslate"><span class="pre">~</span></code>. We’ll discuss what this symbol means later. For now, just
+keep in mind that this is where you should look to get your bearings</p></li>
+<li><p>Finally, we see <code class="docutils literal notranslate"><span class="pre">%</span></code>. It is an indicator that the CLI is waiting for input</p></li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>In the following sections, we will display CLI commands by prepending them with
+an indicator character, <code class="docutils literal notranslate"><span class="pre">$</span></code>. You do not need to type this character yourself,
+it’s just to signal that a cell shows a command.</p>
+</div>
+</section>
+<section id="input-and-interactions">
+<h3><span class="section-number">1.1.2. </span>Input and interactions<a class="headerlink" href="#input-and-interactions" title="Link to this heading">#</a></h3>
+<p>Time to enter some commands. This is simply a matter of typing them in after
+the prompt and pressing <code class="docutils literal notranslate"><span class="pre">Return</span></code>/<code class="docutils literal notranslate"><span class="pre">Enter</span></code>.</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">echo</span></code> will print back to screen any text that you supply the
+command:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Hello world!&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Hello world!
+</pre></div>
+</div>
+<p>You can see what files and folders are in your current location with <code class="docutils literal notranslate"><span class="pre">ls</span></code>
+(“list”):</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ls
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_build</span>      <span class="n">_config</span><span class="o">.</span><span class="n">yml</span> <span class="n">_toc</span><span class="o">.</span><span class="n">yml</span>    <span class="n">chapters</span>    <span class="n">data</span>        <span class="n">env</span>         <span class="n">img</span>         <span class="n">scratch</span>     <span class="n">src</span>
+</pre></div>
+</div>
+<p>Send <code class="docutils literal notranslate"><span class="pre">ls</span></code> the name of a subfolder to show its contents:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ls<span class="w"> </span>chapters
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">01</span><span class="n">_getting</span><span class="o">-</span><span class="n">started</span><span class="o">.</span><span class="n">md</span>      <span class="mi">04</span><span class="n">_ngram</span><span class="o">-</span><span class="n">models</span><span class="o">.</span><span class="n">md</span>         <span class="mi">07</span><span class="n">_intro</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">llms</span><span class="o">.</span><span class="n">md</span>        <span class="n">index</span><span class="o">.</span><span class="n">md</span>
+<span class="mi">02</span><span class="n">_python</span><span class="o">-</span><span class="n">basics</span><span class="o">.</span><span class="n">md</span>        <span class="mi">05</span><span class="n">_vectorization</span><span class="o">.</span><span class="n">md</span>        <span class="mi">08</span><span class="n">_bert</span><span class="o">.</span><span class="n">md</span>
+<span class="mi">03</span><span class="n">_data</span><span class="o">-</span><span class="n">analysis</span><span class="o">-</span><span class="n">basics</span><span class="o">.</span><span class="n">md</span> <span class="mi">06</span><span class="n">_vector</span><span class="o">-</span><span class="n">spaces</span><span class="o">.</span><span class="n">md</span>        <span class="mi">09</span><span class="n">_gpt</span><span class="o">.</span><span class="n">md</span>
+</pre></div>
+</div>
+<p>Want more information? Modify the base functionality of <code class="docutils literal notranslate"><span class="pre">ls</span></code>—or any
+command—with <strong>flags</strong>. We do this by adding a dash <code class="docutils literal notranslate"><span class="pre">-</span></code> and then a letter, or
+a combination of letters, directly after the dash. Below, we send <code class="docutils literal notranslate"><span class="pre">ls</span></code> flags to
+have it show all contents (<code class="docutils literal notranslate"><span class="pre">a</span></code>) with long-formatted output (<code class="docutils literal notranslate"><span class="pre">l</span></code>) in a
+human-readable fashion (<code class="docutils literal notranslate"><span class="pre">h</span></code>):</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ls<span class="w"> </span>-alh
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">13</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span>  <span class="n">staff</span>   <span class="mi">416</span><span class="n">B</span> <span class="n">May</span> <span class="mi">25</span> <span class="mi">01</span><span class="p">:</span><span class="mi">46</span> <span class="o">.</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">5</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span>  <span class="n">staff</span>   <span class="mi">160</span><span class="n">B</span> <span class="n">May</span>  <span class="mi">8</span> <span class="mi">12</span><span class="p">:</span><span class="mi">58</span> <span class="o">..</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">14</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span>  <span class="n">staff</span>   <span class="mi">448</span><span class="n">B</span> <span class="n">May</span> <span class="mi">25</span> <span class="mi">01</span><span class="p">:</span><span class="mi">35</span> <span class="o">.</span><span class="n">git</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span>   <span class="mi">1</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span>  <span class="n">staff</span>    <span class="mi">20</span><span class="n">B</span> <span class="n">Apr</span> <span class="mi">22</span> <span class="mi">15</span><span class="p">:</span><span class="mi">44</span> <span class="o">.</span><span class="n">gitignore</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">6</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span>  <span class="n">staff</span>   <span class="mi">192</span><span class="n">B</span> <span class="n">Apr</span> <span class="mi">25</span> <span class="mi">22</span><span class="p">:</span><span class="mi">01</span> <span class="n">_build</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span>   <span class="mi">1</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span>  <span class="n">staff</span>   <span class="mi">501</span><span class="n">B</span> <span class="n">Apr</span> <span class="mi">21</span> <span class="mi">23</span><span class="p">:</span><span class="mi">23</span> <span class="n">_config</span><span class="o">.</span><span class="n">yml</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span>   <span class="mi">1</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span>  <span class="n">staff</span>   <span class="mi">583</span><span class="n">B</span> <span class="n">Apr</span> <span class="mi">22</span> <span class="mi">10</span><span class="p">:</span><span class="mi">10</span> <span class="n">_toc</span><span class="o">.</span><span class="n">yml</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">12</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span>  <span class="n">staff</span>   <span class="mi">384</span><span class="n">B</span> <span class="n">May</span> <span class="mi">30</span> <span class="mi">13</span><span class="p">:</span><span class="mi">00</span> <span class="n">chapters</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>  <span class="mi">11</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span>  <span class="n">staff</span>   <span class="mi">352</span><span class="n">B</span> <span class="n">May</span> <span class="mi">17</span> <span class="mi">17</span><span class="p">:</span><span class="mi">16</span> <span class="n">data</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">5</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span>  <span class="n">staff</span>   <span class="mi">160</span><span class="n">B</span> <span class="n">May</span> <span class="mi">30</span> <span class="mi">12</span><span class="p">:</span><span class="mi">37</span> <span class="n">img</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span>   <span class="mi">5</span> <span class="o">&lt;</span><span class="n">username</span><span class="o">&gt;</span>  <span class="n">staff</span>   <span class="mi">160</span><span class="n">B</span> <span class="n">May</span> <span class="mi">25</span> <span class="mi">01</span><span class="p">:</span><span class="mi">35</span> <span class="n">src</span>
+</pre></div>
+</div>
+<p>Long-formatted output shows you metadata about files and folders, including
+information about the their owner/group (<code class="docutils literal notranslate"><span class="pre">&lt;username&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">staff</span></code>), their
+permissions (those strings of <code class="docutils literal notranslate"><span class="pre">r</span></code>’s, <code class="docutils literal notranslate"><span class="pre">w</span></code>’s, and <code class="docutils literal notranslate"><span class="pre">x</span></code>’s), their size, and the
+last date they were modified. We won’t discuss permissions in depth, but know
+that they dictate who can read <code class="docutils literal notranslate"><span class="pre">r</span></code>, write <code class="docutils literal notranslate"><span class="pre">w</span></code>, and execute <code class="docutils literal notranslate"><span class="pre">x</span></code> files.</p>
+<p>Any file or folder prepended with <code class="docutils literal notranslate"><span class="pre">.</span></code> in its name will be hidden by default on
+your computer. But using the all <code class="docutils literal notranslate"><span class="pre">-a</span></code> flag, as we did above, will show them:
+<code class="docutils literal notranslate"><span class="pre">.</span></code>, <code class="docutils literal notranslate"><span class="pre">..</span></code>, <code class="docutils literal notranslate"><span class="pre">.git</span></code>, and <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code>. The first two are special notations for
+navigating your computer, which we discuss in the next section. The third,
+<code class="docutils literal notranslate"><span class="pre">.git</span></code>, is a subfolder that stores version control information about this
+reader, and <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> is a <strong>dotfile</strong>. Dotfiles often contain various
+configuration settings that people use to customize their computers. In this
+case, <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> controls what parts of this folder version control should
+ignore.</p>
+</section>
+<section id="command-line-syntax">
+<h3><span class="section-number">1.1.3. </span>Command-line syntax<a class="headerlink" href="#command-line-syntax" title="Link to this heading">#</a></h3>
+<p>Depending on your computer and CLI, the above output may differ slightly, but
+in general the basic presentation and functionality will be the same. Commands
+use a space to delimit their different components, and flags are called with
+<code class="docutils literal notranslate"><span class="pre">-</span></code> to modify those commands. When put together, we can generalize these
+components to a command-line <strong>syntax</strong>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>&lt;command&gt;<span class="w"> </span>&lt;optional<span class="w"> </span>flags&gt;<span class="w"> </span>&lt;file/data<span class="w"> </span>on<span class="w"> </span>which<span class="w"> </span>to<span class="w"> </span>run<span class="w"> </span>the<span class="w"> </span>command&gt;
+</pre></div>
+</div>
+<p>One caveat: since spaces are a meaningful part of the command-line syntax, file
+names with spaces in them can cause problems. You’ll need to <strong>escape</strong> these
+names with <code class="docutils literal notranslate"><span class="pre">\</span></code>.</p>
+<p>This will throw an error:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>&lt;command&gt;<span class="w"> </span>file<span class="w"> </span>name.txt
+</pre></div>
+</div>
+<p>But this will not:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>&lt;command&gt;<span class="w"> </span>file<span class="se">\ </span>name.txt
+</pre></div>
+</div>
+<p>Be sure to read error messages when you see them. While the CLI is often quite
+mute, it will do its best to show you what you did wrong when an error arises.
+Below, for example, the shell explains that it cannot find a command, which
+actually stems from a typing error:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>lschapters
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zsh</span><span class="p">:</span> <span class="n">command</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span> <span class="n">lschapters</span>
+</pre></div>
+</div>
+<p>Likewise, here, <code class="docutils literal notranslate"><span class="pre">ls</span></code> cannot find the requested folder because it does not
+exist:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ls<span class="w"> </span>storage
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ls</span><span class="p">:</span> <span class="n">storage</span><span class="p">:</span> <span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="ow">or</span> <span class="n">directory</span>
+</pre></div>
+</div>
+<p>One last thing about general CLI usage. Sometimes, you need to stop a process
+immediately. Use <code class="docutils literal notranslate"><span class="pre">CTRL+C</span></code> to <strong>interrupt</strong> it. But keep in mind that, for the
+most part, it isn’t possible to undo a command. Take care to know exactly what
+you’re running and what you’re running it on, especially as you get acclimated
+to the CLI.</p>
+</section>
+<section id="getting-help">
+<h3><span class="section-number">1.1.4. </span>Getting help<a class="headerlink" href="#getting-help" title="Link to this heading">#</a></h3>
+<p>There are dozens of commands available to you on your computer, and you can
+install even more. If you’d like to see an overview of some of the most common
+commands, take a look at Valerie Summet’s <a class="reference external" href="https://geog-464.github.io/unix_cheatsheet.html">Unix cheat sheet</a>.</p>
+<p>You can also use <code class="docutils literal notranslate"><span class="pre">man</span></code> (“manual”). This opens the <strong>manual page</strong> for another
+command. Here you will find usage information, including what flags a command
+accepts.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>man<span class="w"> </span>ls
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>LS(1)                                            General Commands Manual                                            LS(1)
+
+NAME
+     ls – list directory contents
+
+SYNOPSIS
+     ls [-@ABCFGHILOPRSTUWabcdefghiklmnopqrstuvwxy1%,] [--color=when] [-D format] [file ...]
+
+DESCRIPTION
+     For each operand that names a file of a type other than directory, ls displays its name as well as any requested,
+     associated information.  For each operand that names a file of type directory, ls displays the names of files
+     contained within that directory, as well as any requested, associated information.
+
+     If no operands are given, the contents of the current directory are displayed.  If more than one operand is given,
+     non-directory operands are displayed first; directory and non-directory operands are sorted separately and in
+     lexicographical order.
+
+     The following options are available:
+
+&lt;...&gt;
+</pre></div>
+</div>
+<p>A shortened version of this output is often available by flagging a command
+with <code class="docutils literal notranslate"><span class="pre">--help</span></code>. Sometimes, too, you will need to know the version of the command
+you’re using. You can find this information with <code class="docutils literal notranslate"><span class="pre">--version</span></code>, or <code class="docutils literal notranslate"><span class="pre">--v</span></code>.</p>
+</section>
+</section>
+<section id="directory-structures">
+<h2><span class="section-number">1.2. </span>Directory Structures<a class="headerlink" href="#directory-structures" title="Link to this heading">#</a></h2>
+<p>Remember that a CLI is just another mode of interaction with your computer.
+This section will solidify that idea by showing you how to navigate your
+computer’s <strong>directory structure</strong>, the arrangement and organization of its
+data.</p>
+<section id="paths">
+<h3><span class="section-number">1.2.1. </span>Paths<a class="headerlink" href="#paths" title="Link to this heading">#</a></h3>
+<p>A directory structure is like a map of all the locations you can navigate on
+your computer. These locations are <strong>directories</strong> (or folders), and within
+them are <strong>files</strong> (chunks of data). Each file has an <strong>address</strong> on this map,
+and there is a <strong>path</strong> that leads to it. The windowing systems of modern
+computers manage these paths automatically when you click around on your
+computer, but it’s also possible to navigate on the command line. You’ll just
+need to specify paths yourself.</p>
+<p>In a Unix environment, we do this with the following syntax:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>/this/is/a/path/to/your/file.txt
+</pre></div>
+</div>
+<p>This is called a <strong>file path</strong>. It threads through multiple directories to
+point at your desired file, <code class="docutils literal notranslate"><span class="pre">file.txt</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Non-Unix environments, like Windows DOS, use <code class="docutils literal notranslate"><span class="pre">\</span></code> instead of <code class="docutils literal notranslate"><span class="pre">/</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>C:<span class="se">\t</span>his<span class="se">\i</span>s<span class="se">\a\p</span>ath<span class="se">\t</span>o<span class="se">\y</span>our<span class="se">\f</span>ile.txt
+</pre></div>
+</div>
+<p>This is why Windows users had to download Git Bash. It emulates Unix-style
+functionality on those machines. Generally speaking, the Unix command line is
+far more pervasive than DOS, so you’ll find yourself using Unix-style
+commands/syntax more frequently.</p>
+</div>
+</section>
+<section id="path-hierarchies">
+<h3><span class="section-number">1.2.2. </span>Path hierarchies<a class="headerlink" href="#path-hierarchies" title="Link to this heading">#</a></h3>
+<p>A directory structure is <strong>hierarchical</strong>. Directories are “above” or “below”
+one another, and it’s crucial to get a sense of this so that you can navigate
+your computer. In the file path above, every <code class="docutils literal notranslate"><span class="pre">/</span></code> demarcates a new one of these
+directory levels.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">pwd</span></code> (“print working directory”) to display your current location using
+the same format:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">pwd</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">tyler</span><span class="o">/</span><span class="mi">2024</span><span class="n">_dtl_llm</span><span class="o">-</span><span class="n">interpretability</span>
+</pre></div>
+</div>
+<p>Note that this path begins with <code class="docutils literal notranslate"><span class="pre">/</span></code>. This is the top-most directory in your
+computer, called the <strong>root</strong>. It’s like the trunk of a tree: every directory
+branches off from it. But, to add some complications, directories can also
+branch off one another. Whenever you make a new directory, you’ve created
+another branch in this tree, and this branch is at the same time a branch of
+root and a branch of whatever directory you’re currently in.</p>
+<p>For example, here is the structure of this reader’s <code class="docutils literal notranslate"><span class="pre">data</span></code> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>data
+├── datasets
+├── models
+│   └── bert_blurb_classifier
+│       └── final
+└── texts
+    ├── dickinson
+    │   └── poems
+    └── nyt
+        └── obituaries
+</pre></div>
+</div>
+<p>See the branching paths?</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>DOS again diverges from Unix in its representation of the root. For the former,
+the root is usually called <code class="docutils literal notranslate"><span class="pre">C:</span></code> or <code class="docutils literal notranslate"><span class="pre">D:</span></code>, which designates the actual device on
+which your data is stored.</p>
+</div>
+</section>
+<section id="absolute-vs-relative-paths">
+<h3><span class="section-number">1.2.3. </span>Absolute vs. relative paths<a class="headerlink" href="#absolute-vs-relative-paths" title="Link to this heading">#</a></h3>
+<p>No matter the operating system, there are two different ways to specify a file
+path on the command line. Recall our <code class="docutils literal notranslate"><span class="pre">pwd</span></code> output above:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">pwd</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">tyler</span><span class="o">/</span><span class="mi">2024</span><span class="n">_dtl_llm</span><span class="o">-</span><span class="n">interpretability</span>
+</pre></div>
+</div>
+<p>It starts with root <code class="docutils literal notranslate"><span class="pre">/</span></code>. When you see a path like this, it’s showing you the
+full, or <strong>absolute</strong>, location of a directory or file. By typing out this
+path, you can navigate directly to this location, regardless of where you are
+on your computer.</p>
+<p>By contrast, a <strong>relative</strong> path is context-specific. It depends on where you
+are in your computer’s directory structure. Unix uses shorthand to denote this
+location:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">.</span></code> denotes the current location in your computer</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">..</span></code> denotes the directory above that location</p></li>
+</ul>
+<p>Remember seeing these earlier with <code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-alh</span></code>? Your computer tracks locations by
+placing these two symbols in every directory you create. Thus, this enables you
+to use this shorthand notation to avoid typing out the entire path to a file.
+This is useful if you’re a ways off from root, or if, for a coding project, you
+are using files that rely on a specific directory structure, which could be
+ported to someone else’s computer.</p>
+<p>Besides <code class="docutils literal notranslate"><span class="pre">.</span></code> and <code class="docutils literal notranslate"><span class="pre">..</span></code>, there is also <code class="docutils literal notranslate"><span class="pre">~</span></code>, which we saw in the CLI prompt
+earlier. This denotes your <strong>home directory</strong>, which your computer uses to
+store data and configurations that are specific to you. Use <code class="docutils literal notranslate"><span class="pre">cd</span></code> (“change
+directory”) in combination with <code class="docutils literal notranslate"><span class="pre">~</span></code> to return to home, no matter where you are
+in your computer’s directory structure.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>~
+</pre></div>
+</div>
+<p>Take a look at your prompt: it should list out <code class="docutils literal notranslate"><span class="pre">~</span></code> in the location position.</p>
+</section>
+<section id="navigating-with-a-cli">
+<h3><span class="section-number">1.2.4. </span>Navigating with a CLI<a class="headerlink" href="#navigating-with-a-cli" title="Link to this heading">#</a></h3>
+<p>Here’s an example of absolute and relative paths. Say you are here:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">here</span><span class="o">/</span><span class="ow">is</span><span class="o">/</span><span class="n">where</span><span class="o">/</span><span class="n">you</span><span class="o">/</span><span class="n">are</span><span class="o">/</span><span class="n">located</span><span class="o">/</span><span class="ow">in</span><span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">computer</span>
+                                       <span class="o">^^^^^^^^</span>
+</pre></div>
+</div>
+<p>…and you want to get to <code class="docutils literal notranslate"><span class="pre">located</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">here</span><span class="o">/</span><span class="ow">is</span><span class="o">/</span><span class="n">where</span><span class="o">/</span><span class="n">you</span><span class="o">/</span><span class="n">are</span><span class="o">/</span><span class="n">located</span><span class="o">/</span><span class="ow">in</span><span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">computer</span>
+                       <span class="o">^^^^^^^</span>
+</pre></div>
+</div>
+<p>You could use an absolute path:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/here/is/where/you/are/located
+</pre></div>
+</div>
+<p>The logic of this path runs like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>root
+└── here
+│   └── is
+│       └── where
+│           └── you
+│               └── are
+└──────────────────&gt;└── located
+                        └── in
+                            └── your
+                                └── computer
+</pre></div>
+</div>
+<p>Alternatively, you could use a relative path:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>../../../
+</pre></div>
+</div>
+<p>In contrast with the absolute path, the logic of this relative one runs like
+this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>root
+└── here
+    └── is
+        └── where
+            └── you
+                └── are
+                    └── located
+                    ^   └── in
+                    │       └── your
+                    │           └── computer
+                    └───────────────┘
+</pre></div>
+</div>
+<p>Your relative path would take you three directories up from <code class="docutils literal notranslate"><span class="pre">computer</span></code> to
+<code class="docutils literal notranslate"><span class="pre">located</span></code>. That’s considerably shorter than writing the path out in full, but
+there’s also a downside: using multiple <code class="docutils literal notranslate"><span class="pre">..</span></code> symbols makes it hard to know what
+the context of the path is, and it’s easy to get confused. So, there’s a
+trade-off between absolute and relative paths, which you’ll often find yourself
+making.</p>
+<p>Finally, we can move data and directories around on our computers using paths.
+To move a file, use <code class="docutils literal notranslate"><span class="pre">mv</span></code> (“move”), which works like so:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mv<span class="w"> </span>&lt;location/of/file&gt;<span class="w"> </span>&lt;location/where/you/want/to/move/the/file&gt;
+</pre></div>
+</div>
+<p>If we’re in a directory that looks like this:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>ls
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">file</span><span class="o">.</span><span class="n">txt</span>  <span class="n">subdirectory</span>
+</pre></div>
+</div>
+<p>…and we’d like to move <code class="docutils literal notranslate"><span class="pre">file.txt</span></code> into <code class="docutils literal notranslate"><span class="pre">subdirectory</span></code>, we use:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mv<span class="w"> </span>file.txt<span class="w"> </span>subdirectory
+</pre></div>
+</div>
+<p>Or, maybe we want to make a new directory inside <code class="docutils literal notranslate"><span class="pre">subdirectory</span></code>. Use <code class="docutils literal notranslate"><span class="pre">mkdir</span></code>
+(“make directory”) to make a new directory, <code class="docutils literal notranslate"><span class="pre">new</span></code>, which will sit under
+<code class="docutils literal notranslate"><span class="pre">subdirectory</span></code>.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mkdir<span class="w"> </span>subdirectory/new
+</pre></div>
+</div>
+<p>Now, from our current location, we move <code class="docutils literal notranslate"><span class="pre">file.txt</span></code> into <code class="docutils literal notranslate"><span class="pre">new</span></code>.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mv<span class="w"> </span>subdirectory/file.txt<span class="w"> </span>subdirectory/new/file.txt
+</pre></div>
+</div>
+<p>This is what the directory structure looks like now:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>current_location
+└──<span class="w"> </span>subdirectory
+<span class="w">    </span>└──<span class="w"> </span>new
+<span class="w">        </span>└──<span class="w"> </span>file.txt
+</pre></div>
+</div>
+</section>
+</section>
+<section id="environment-setup">
+<h2><span class="section-number">1.3. </span>Environment Setup<a class="headerlink" href="#environment-setup" title="Link to this heading">#</a></h2>
+<p>Processes—applications, background tasks, code, etc.—run on your computer
+in a <strong>computer environment</strong>. These environments are collections of hardware,
+software, and various configurations, and the latter two are portable between
+computers (ideally). This portability is great for when you get a new computer
+and want to recreate your current environment, whether by replicating certain
+settings or installing external software; but the real power of porting
+environments stems from the ability to freeze them and share them with others.</p>
+<p>You’ll often have to do this when writing code, because some people may not
+have certain pieces of software that you have on your computer. And, as we’ll
+discuss a little later on, writing code often relies on specific versions of
+programming language packages, which can conflict with one another—and cause
+massive headaches. Using an <strong>environment manager</strong> to encapsulate your setup
+will help you circumvent such problems and let others run your code as you
+intended.</p>
+<section id="micromamba">
+<h3><span class="section-number">1.3.1. </span>Micromamba<a class="headerlink" href="#micromamba" title="Link to this heading">#</a></h3>
+<p>We will use <a class="reference external" href="https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html"><code class="docutils literal notranslate"><span class="pre">micromamba</span></code></a> to manage environments for the work that lies
+ahead. It allows us to create new <strong>virtual environments</strong> and install software
+into them, including different versions of Python and associated packages.
+<code class="docutils literal notranslate"><span class="pre">micromamba</span></code> is based on <a class="reference external" href="https://mamba.readthedocs.io/en/latest/user_guide/mamba.html"><code class="docutils literal notranslate"><span class="pre">mamba</span></code></a>, which is in turn based on
+<a class="reference external" href="https://docs.conda.io/en/latest/"><code class="docutils literal notranslate"><span class="pre">conda</span></code></a>; the three are drop-in replacements for each another, so when
+you see discussions about one, know that the topic will likely port over to the
+others.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">micromamba</span></code> documentation (linked above) will always feature the most
+recent version of installation instructions. As of this writing (summer 2024),
+installing via the script option in a CLI works like so:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">SHELL</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>&lt;<span class="o">(</span>curl<span class="w"> </span>-L<span class="w"> </span>micro.mamba.pm/install.sh<span class="o">)</span>
+</pre></div>
+</div>
+<p>Running this command will download and install a script. During installation,
+you’ll be asked a series of questions:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Micromamba</span> <span class="pre">binary</span> <span class="pre">folder?</span> <span class="pre">[~/.local/bin]</span></code>: Where do you want to install the
+program? Select the default by pressing <code class="docutils literal notranslate"><span class="pre">Enter</span></code>/<code class="docutils literal notranslate"><span class="pre">Return</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Init</span> <span class="pre">shell</span> <span class="pre">(bash)?</span> <span class="pre">[Y/n]</span></code>: Configure your shell for <code class="docutils literal notranslate"><span class="pre">micromamba</span></code>? Enter <code class="docutils literal notranslate"><span class="pre">Y</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Configure</span> <span class="pre">conda-forge?</span> <span class="pre">[Y/n]</span></code>: Default to the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> repository when
+searching for packages to install? Enter <code class="docutils literal notranslate"><span class="pre">Y</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Prefix</span> <span class="pre">location?</span> <span class="pre">[~/micromamba]</span></code>: Where would you like to install
+environments? The default is under your home directory, which is fine. Press
+<code class="docutils literal notranslate"><span class="pre">Enter</span></code>/<code class="docutils literal notranslate"><span class="pre">Return</span></code></p></li>
+</ul>
+<p>With these options set, reload your shell to initialize <code class="docutils literal notranslate"><span class="pre">micromamba</span></code>:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+zsh</label><div class="sd-tab-content docutils">
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>~/.zshrc
+</pre></div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+bash</label><div class="sd-tab-content docutils">
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>~/.bashrc
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You don’t need to run <code class="docutils literal notranslate"><span class="pre">source</span></code> to initialize <code class="docutils literal notranslate"><span class="pre">micromamba</span></code> every time you open
+your CLI. Your CLI actually runs this command when on start up—we just have
+the program running already.</p>
+</div>
+<p>Now check the version of <code class="docutils literal notranslate"><span class="pre">micromamba</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>--version
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">1.5.8</span>
+</pre></div>
+</div>
+<p>If you see output like the above, you’re set!</p>
+<p>Time to create a new environment. Generally, it’s a good idea to make a new
+environment for every project. Below, we make one called <code class="docutils literal notranslate"><span class="pre">practice</span></code>.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>create<span class="w"> </span>--name<span class="w"> </span>practice
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Empty</span> <span class="n">environment</span> <span class="n">created</span> <span class="n">at</span> <span class="n">prefix</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">practice</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">env</span> <span class="pre">list</span></code> subcommand to list out all environments:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>env<span class="w"> </span>list
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  Name      Active  Path
+──────────────────────────────────────────────────────────
+  practice          &lt;path/to/micromamba/envs/practice&gt;
+</pre></div>
+</div>
+<p>Activate an environment with the <code class="docutils literal notranslate"><span class="pre">activate</span> <span class="pre">&lt;enviroment&gt;</span></code> subcommand.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>activate<span class="w"> </span>practice
+</pre></div>
+</div>
+<p>Note your prompt. It will update to reflect that you’re in a <code class="docutils literal notranslate"><span class="pre">micromamba</span></code>
+environment:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>practice<span class="o">)</span><span class="w"> </span>you@your_computer<span class="w"> </span>~$
+</pre></div>
+</div>
+<p>Let’s install some software. Below, we install <a class="reference external" href="https://github.com/BurntSushi/ripgrep"><code class="docutils literal notranslate"><span class="pre">ripgrep</span></code></a>, which enables
+you to search text files in a directory:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>install<span class="w"> </span>ripgrep
+</pre></div>
+</div>
+<p>When prompted, enter <code class="docutils literal notranslate"><span class="pre">Y</span></code> to confirm that you’d like to install the program.</p>
+<p>Now, use <code class="docutils literal notranslate"><span class="pre">ripgrep</span></code> to search for “NLP” in <code class="docutils literal notranslate"><span class="pre">chapters</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>rg<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;NLP&quot;</span><span class="w"> </span>chapters
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>chapters/02_python-basics.md
+309:all repeated tokens. The result will be a set of in NLP are called **types**:
+
+chapters/01_getting-started.md
+666:Now, use `ripgrep` to search for &quot;NLP&quot; in `chapters`:
+669:$ rg -i &quot;NLP&quot; chapters
+673:648:  in the same direction as the first. Most vector operations in NLP use the
+676:309:all repeated tokens. The result will be a set of in NLP are called **types**:
+679:664:Now, use `ripgrep` to search for &quot;NLP&quot; in `chapters`:
+680:667:$ rg -i &quot;NLP&quot; chapters
+694:$ rg -i &quot;NLP&quot; chapters
+863:machine learning/AI and natural language processing (NLP): most people are
+1272:nlp = &quot;natural language processing&quot;
+1273:nlp.title()
+1279:nlp.count(&quot;g&quot;)
+1294:dir(nlp)
+1422:computing, NLP, and machine learning/AI. A full list of them is provided in the
+
+chapters/05_vectorization.md
+648:  in the same direction as the first. Most vector operations in NLP use the
+</pre></div>
+</div>
+<p>See how it picked up the very text you’re reading now?</p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">deactivate</span></code> subcommand to deactivate an environment.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>deactivate
+</pre></div>
+</div>
+<p>Now, if you try to use <code class="docutils literal notranslate"><span class="pre">ripgrep</span></code>, you’ll get an error:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>rg<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;NLP&quot;</span><span class="w"> </span>chapters
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">zsh</span><span class="p">:</span> <span class="n">command</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span> <span class="n">rg</span>
+</pre></div>
+</div>
+<p>Why the error? You’ve installed <code class="docutils literal notranslate"><span class="pre">ripgrep</span></code> into a separate environment managed
+by <code class="docutils literal notranslate"><span class="pre">micromamba</span></code>, which is sealed off from the rest of your computer.</p>
+<p>To see all packages installed in an environment, use <code class="docutils literal notranslate"><span class="pre">list</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>activate<span class="w"> </span>practice
+$<span class="w"> </span>micromamba<span class="w"> </span>list
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>List of packages in environment: &quot;&lt;path/to/micromamba/envs/practice&gt;&quot;
+
+  Name           Version  Build        Channel
+────────────────────────────────────────────────────
+  _libgcc_mutex  0.1      conda_forge  conda-forge
+  _openmp_mutex  4.5      2_gnu        conda-forge
+  libgcc-ng      13.2.0   h77fa898_7   conda-forge
+  libgomp        13.2.0   h77fa898_7   conda-forge
+  ripgrep        14.1.0   he8a937b_0   conda-forge
+</pre></div>
+</div>
+<p>Why does this list have more than <code class="docutils literal notranslate"><span class="pre">ripgrep</span></code>? Those are the program’s
+<strong>dependencies</strong>, external pieces of software written and released by other
+programmers that <code class="docutils literal notranslate"><span class="pre">ripgrep</span></code> uses to run. If you want to use <code class="docutils literal notranslate"><span class="pre">ripgrep</span></code>, you need
+those as well, and it’s <code class="docutils literal notranslate"><span class="pre">micromamba</span></code>’s job to figure out how to manage those
+dependencies.</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">micromamba</span></code> will include them when you export your environment
+with the <code class="docutils literal notranslate"><span class="pre">env</span> <span class="pre">export</span></code> subcommand:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>env<span class="w"> </span><span class="nb">export</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="n">practice</span>
+<span class="n">channels</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+<span class="n">dependencies</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">_libgcc_mutex</span><span class="o">=</span><span class="mf">0.1</span><span class="o">=</span><span class="n">conda_forge</span>
+<span class="o">-</span> <span class="n">_openmp_mutex</span><span class="o">=</span><span class="mf">4.5</span><span class="o">=</span><span class="mi">2</span><span class="n">_gnu</span>
+<span class="o">-</span> <span class="n">libgcc</span><span class="o">-</span><span class="n">ng</span><span class="o">=</span><span class="mf">13.2.0</span><span class="o">=</span><span class="n">h77fa898_7</span>
+<span class="o">-</span> <span class="n">libgomp</span><span class="o">=</span><span class="mf">13.2.0</span><span class="o">=</span><span class="n">h77fa898_7</span>
+<span class="o">-</span> <span class="n">ripgrep</span><span class="o">=</span><span class="mf">14.1.0</span><span class="o">=</span><span class="n">he8a937b_0</span>
+</pre></div>
+</div>
+<p>Those letter and number combinations after each entry are specific versions,
+which another person could use to recreate your current environment. That said,
+sometimes operating system differences complicate versioning, so set the
+<code class="docutils literal notranslate"><span class="pre">--from-history</span></code> flag to get only the names of the packages you’ve installed:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>env<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--from-history
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="n">practice</span>
+<span class="n">channels</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+<span class="n">dependencies</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">ripgrep</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you installed a package with a specific version, e.g.:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>install<span class="w"> </span><span class="nv">ripgrep</span><span class="o">=</span><span class="m">12</span>.1
+</pre></div>
+</div>
+<p>…the <code class="docutils literal notranslate"><span class="pre">--from-history</span></code> flag will preserve this:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>env<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--from-history
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="n">practice</span>
+<span class="n">channels</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+<span class="n">dependencies</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">ripgrep</span><span class="o">=</span><span class="mf">12.1</span>
+</pre></div>
+</div>
+</div>
+<p>Redirect the output of your environment export to a YAML file using <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>env<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--from-history<span class="w"> </span>&gt;<span class="w"> </span>practice.yml
+</pre></div>
+</div>
+<p>And that way someone can install it on their own computer, using:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>practice.yml
+</pre></div>
+</div>
+<p>Finally, to remove an environment, deactivate it and run the following:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>env<span class="w"> </span>remove<span class="w"> </span>--name<span class="w"> </span>practice
+</pre></div>
+</div>
+</section>
+<section id="jupyter-lab">
+<h3><span class="section-number">1.3.2. </span>Jupyter Lab<a class="headerlink" href="#jupyter-lab" title="Link to this heading">#</a></h3>
+<p>With an environment manager installed, we turn now to a development environment
+for writing and running code. There are several applications to choose from; we
+will use a simple, open-source environment called <a class="reference external" href="https://jupyter.org/">JupyterLab</a>. JupyterLab
+runs in your web browser, it’s highly portable and flexible, and it has an
+integrated <strong>notebook interface</strong> for writing, documenting, recreating, and
+running code.</p>
+<p>Before we download JupyterLab, we’ll create a new <code class="docutils literal notranslate"><span class="pre">micromamba</span></code> environment,
+<code class="docutils literal notranslate"><span class="pre">main</span></code>. While it’s a good idea to have project-specific virtual environments,
+using a separate one to run JupyterLab and other such general programs will
+keep you from re-installing the same software over and over.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>--name<span class="w"> </span>main
+</pre></div>
+</div>
+<p>Now, we install JupyterLab with <code class="docutils literal notranslate"><span class="pre">micromamba</span></code>.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>activate<span class="w"> </span>main
+$<span class="w"> </span>micromamba<span class="w"> </span>install<span class="w"> </span>jupyterlab
+</pre></div>
+</div>
+<p>To run the application, enter the following in your CLI:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>jupyter<span class="w"> </span>lab
+</pre></div>
+</div>
+<p>This will open a new tab in your web browser, where JupyterLab will be running:</p>
+<p><img alt="JupyterLab interface" src="../_images/juypterlab.png" /></p>
+<p>At the left you’ll see a file browser. In the Launcher, there are options to
+launch coding interfaces (under both Notebook and Console), a terminal, or
+various text files. To run code, JupyterLab uses <strong>kernels</strong>. Kernels are
+associated with specific programming languages, and they allow users to write
+code in an interactive way. We’ll use a Python kernel, but you can also install
+ones for R, Julia, and other languages.</p>
+<p>It’s also possible to create a kernel for a virtual environment. We’ll do this
+shortly. But for now, click on the default kernel, Python 3, under Notebook.
+This will launch a <strong>Jupyter notebook</strong>. These files support code execution in
+<strong>cells</strong>, text formatting via <a class="reference external" href="https://jupyter-notebook.readthedocs.io/en/stable/examples/Notebook/Working%20With%20Markdown%20Cells.html">Markdown</a>, image rendering, and more. While
+programmers typically write their code in plain text files, the interactivity
+and formatting features of Jupyter notebooks make them highly useful for
+developing and demonstrating code. That said, unlike plain text files, these
+files must be rendered in a web browser by Jupyter. There’s no easy way to see
+their contents otherwise.</p>
+</section>
+</section>
+<section id="writing-code-in-python">
+<h2><span class="section-number">1.4. </span>Writing Code in Python<a class="headerlink" href="#writing-code-in-python" title="Link to this heading">#</a></h2>
+<p>We will be writing all of our code in Python. It’s a massively popular,
+general-purpose programming language with big communities of support. For our
+purposes, most notable among these communities are the ones that support
+machine learning/AI and natural language processing (NLP): most people are
+using Python to write this kind of code.</p>
+<p>To write Python code in a notebook, click on a cell and type an <strong>expression</strong>.
+Expressions are combinations of values, variables, operators, and functions,
+which Python (and other programming languages) <strong>interprets</strong> and then
+<strong>evaluates</strong>.</p>
+<p>Here is a simple expression:</p>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p>Press <code class="docutils literal notranslate"><span class="pre">Shift</span></code> + <code class="docutils literal notranslate"><span class="pre">Enter</span></code> to run it:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, try subtraction:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">7</span> <span class="o">-</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6
+</pre></div>
+</div>
+</div>
+</div>
+<p>You can write any arithmetic equation in Python using these and other
+<strong>operators</strong>. These are symbols that represent common operations for
+arithmetic, comparison, and logical evaluation. The table below records
+Python’s arithmetic operators.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Operator</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">+</span></code></p></td>
+<td><p>Addition</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-</span></code></p></td>
+<td><p>Subtraction</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
+<td><p>Multiplication</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/</span></code></p></td>
+<td><p>Division</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">%</span></code></p></td>
+<td><p>Remainder division (modulo)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">**</span></code></p></td>
+<td><p>Exponentiation</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Use parentheses <code class="docutils literal notranslate"><span class="pre">(</span> <span class="pre">)</span></code> to create more complicated expressions. Python will
+evaluate these expressions in the standard order of operations: parentheses,
+exponentiation, multiplication, division, addition, and then subtraction.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">7</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>24
+</pre></div>
+</div>
+</div>
+</div>
+<p>Technically, there’s no need to add spaces between these expressions, but doing
+so helps with readability.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">2</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">7</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>24
+</pre></div>
+</div>
+</div>
+</div>
+<section id="variables">
+<h3><span class="section-number">1.4.1. </span>Variables<a class="headerlink" href="#variables" title="Link to this heading">#</a></h3>
+<p>Below, we calculate the area of a triangle with base 2.5 and height 4:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mf">2.5</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">*</span> <span class="mf">0.5</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>If we wanted to store the result of this expression for later use, we’d need to
+assign it to a <strong>variable</strong>. Create one by writing out the name of the variable
+and using the assignment operator <code class="docutils literal notranslate"><span class="pre">=</span></code> to link the variable with an expression.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">area</span> <span class="o">=</span> <span class="mf">2.5</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">*</span> <span class="mf">0.5</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Variables can be any combination of letters, numbers, or underscores <code class="docutils literal notranslate"><span class="pre">_</span></code>. They
+cannot start with a number, however, and other symbols are not allowed in their
+names. When you write code, you’ll find yourself using variables all the time.
+Not only do they store values; they also make your code more reusable and more
+readable, and they help you generalize your code beyond specific values.</p>
+<p>For example, we can create variables for <code class="docutils literal notranslate"><span class="pre">base</span></code> and <code class="docutils literal notranslate"><span class="pre">height</span></code> that allow us to
+change <code class="docutils literal notranslate"><span class="pre">area</span></code> with ease:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">base</span> <span class="o">=</span> <span class="mf">2.5</span>
+<span class="n">height</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">area</span> <span class="o">=</span> <span class="n">base</span> <span class="o">*</span> <span class="n">height</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">area</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>Want another value? Reassign the variable:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">height</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">area</span> <span class="o">=</span> <span class="n">base</span> <span class="o">*</span> <span class="n">height</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">area</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6.25
+</pre></div>
+</div>
+</div>
+</div>
+<p>Good variable names are descriptive. While these are two perfectly valid
+variables:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">i8</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">_a</span> <span class="o">=</span> <span class="mi">5</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>It would be hard to track what they stand for when you go to use them:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">i8</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">_a</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+<span class="n">result</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6.4031242374328485
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s clarify:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">leg_1</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">leg_2</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">hypotenuse</span> <span class="o">=</span> <span class="p">(</span><span class="n">leg_1</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">leg_2</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+<span class="n">hypotenuse</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6.4031242374328485
+</pre></div>
+</div>
+</div>
+</div>
+<p>In both cases, we calculated the hypotenuse of a right-angled triangle
+following the Pythagorean theorem, but the second expression makes this much
+more clear.</p>
+</section>
+<section id="strings">
+<h3><span class="section-number">1.4.2. </span>Strings<a class="headerlink" href="#strings" title="Link to this heading">#</a></h3>
+<p>Python uses different <strong>data types</strong> to store certain kinds of values. We’ve
+already used numeric types, but it’s also possible to create strings and
+logical values.</p>
+<p>To create a string in Python, use either single <code class="docutils literal notranslate"><span class="pre">'</span></code> or double <code class="docutils literal notranslate"><span class="pre">&quot;</span></code> quotes:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;I am a string&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;I am a string&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note that the quotes must match, or you’ll cause an error:</p>
+<div class="cell tag_raises-exception docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;I am a string&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span>  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+    <span class="s2">&quot;I am a string&#39;</span>
+    <span class="o">^</span>
+<span class="ne">SyntaxError</span>: unterminated string literal (detected at line 1)
+</pre></div>
+</div>
+</div>
+</div>
+<p>If you want to use quotations inside your string, you need to use a different
+kind of quotation mark to enclose that string:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;I&#39;m a string&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&quot;I&#39;m a string&quot;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Or, you can <strong>escape</strong> the string with <code class="docutils literal notranslate"><span class="pre">\</span></code>. This tells Python to treat the
+following symbol as if it were just a string, not a special character for the
+language itself.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;I</span><span class="se">\&#39;</span><span class="s1">m a string&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&quot;I&#39;m a string&quot;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note that there is a difference between numeric values and strings that
+represent values. That is, <code class="docutils literal notranslate"><span class="pre">1</span></code> does not equal <code class="docutils literal notranslate"><span class="pre">&quot;1&quot;</span></code>.</p>
+</section>
+<section id="numbers">
+<h3><span class="section-number">1.4.3. </span>Numbers<a class="headerlink" href="#numbers" title="Link to this heading">#</a></h3>
+<p>There are two kinds of numeric types In Python, <strong>integers</strong> and <strong>floats</strong>.
+Integers are just whole numbers:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">4</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4
+</pre></div>
+</div>
+</div>
+</div>
+<p>Whereas floats represent decimals:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mf">8.8</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>8.8
+</pre></div>
+</div>
+</div>
+</div>
+<p>When you perform arithmetic expressions in Python, the language will
+automatically determine whether the result should be represented as an integer
+or a float. Here’s an integer result:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">5</span> <span class="o">+</span> <span class="mi">5</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10
+</pre></div>
+</div>
+</div>
+</div>
+<p>And a float:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.3333333333333333
+</pre></div>
+</div>
+</div>
+</div>
+<p>Both numeric types may be either positive or negative. Use <code class="docutils literal notranslate"><span class="pre">-</span></code> to create a
+negative number:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mi">4</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-4
+</pre></div>
+</div>
+</div>
+</div>
+<p>Certain expressions will also produce negative numbers:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mi">8</span> <span class="o">-</span> <span class="mi">12</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-4
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="comparisons">
+<h3><span class="section-number">1.4.4. </span>Comparisons<a class="headerlink" href="#comparisons" title="Link to this heading">#</a></h3>
+<p>You’ll often need to compare values when you code. Use <strong>comparison</strong> operators
+to do so:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Operator</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;</span></code></p></td>
+<td><p>Less than</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&gt;</span></code></p></td>
+<td><p>Greater than</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;=</span></code></p></td>
+<td><p>Less than or equal to</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&gt;=</span></code></p></td>
+<td><p>Greater than or equal to</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">==</span></code></p></td>
+<td><p>Equal to</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">!=</span></code></p></td>
+<td><p>Not equal to</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Note that “equal to” uses two equal symbols to distinguish it from the
+assignment operator <code class="docutils literal notranslate"><span class="pre">=</span></code>.</p>
+<p>Comparisons return <code class="docutils literal notranslate"><span class="pre">True</span></code>/<code class="docutils literal notranslate"><span class="pre">False</span></code>, or <strong>Boolean</strong>, values. Here are a few:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mi">6</span> <span class="o">&lt;</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">5</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">9</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="mf">1.4</span> <span class="o">&gt;=</span> <span class="mf">1.6</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>False
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note that comparisons will often work across types:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;1&quot;</span> <span class="o">==</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>False
+</pre></div>
+</div>
+</div>
+</div>
+<p>Booleans are also assigned their own <strong>keywords</strong>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kc">True</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<p>And they may be compared as well:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kc">False</span> <span class="o">==</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>False
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="conditionals">
+<h3><span class="section-number">1.4.5. </span>Conditionals<a class="headerlink" href="#conditionals" title="Link to this heading">#</a></h3>
+<p>Python has other keywords besides Booleans. Keywords are predefined words that
+have special meanings to the programming language. We’ll see several of them,
+and as you write in Python, you’ll come to remember which ones to use. For
+example, you’ll often use <strong>conditional statements</strong> in your code to check the
+state of your code perform a <strong>branching</strong> operation. We manage these with
+special keywords.</p>
+<p>Below, we use <code class="docutils literal notranslate"><span class="pre">if</span></code> to determine whether a comparison is true. If our code meets
+this condition, we use the <code class="docutils literal notranslate"><span class="pre">print()</span></code> function to print <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Importantly, if a comparison does not meet our condition, the code does
+nothing.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We would need to handle this second case ourselves using <code class="docutils literal notranslate"><span class="pre">else</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>False
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note that the above checks use indentation. In Python, indentation is
+syntactically meaningful. The language uses indentation blocks to separate out
+certain portions of its operations that are only relevant in particular
+contexts.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<p>Blocks can quickly get very nested. Use <code class="docutils literal notranslate"><span class="pre">elif</span></code> (“else if”) to help with this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<p>Alternatively, you can combine conditional checks. This may be done with
+keywords. Below, we rewrite the above expression using <code class="docutils literal notranslate"><span class="pre">or</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="n">x</span> <span class="ow">or</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="mi">100</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here is a table of keywords for Boolean operations:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Keyword</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">and</span></code></p></td>
+<td><p>And</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">or</span></code></p></td>
+<td><p>Or</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">not</span></code></p></td>
+<td><p>Not</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">is</span></code></p></td>
+<td><p>Identity</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">in</span></code></p></td>
+<td><p>In</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="functions-and-methods">
+<h2><span class="section-number">1.5. </span>Functions and Methods<a class="headerlink" href="#functions-and-methods" title="Link to this heading">#</a></h2>
+<p>From here, you could construct whatever code you’d like. But writing out the
+logic for special equations or common mathematical operations, as well as for
+certain general use patterns like print statements, would be a lot of work.
+Worse, you’d have to do all of this every time you wanted to write a new piece
+of code.</p>
+<p>This is why <strong>functions</strong> exist. Functions are pieces of reusable code that
+offer access to all sorts of features in Python and its external packages.
+Functions are like little machines that accept inputs and produce some kind of
+output. In the context of programming languages, we call a function’s inputs
+<strong>arguments</strong> and its outputs <strong>return values</strong>. When you run a function, you
+<strong>call</strong> it.</p>
+<section id="calling-functions">
+<h3><span class="section-number">1.5.1. </span>Calling functions<a class="headerlink" href="#calling-functions" title="Link to this heading">#</a></h3>
+<p>Calling a function involves writing out its name followed by parentheses; put
+any arguments to the function inside those parentheses.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">round</span><span class="p">(</span><span class="mf">4.813</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5
+</pre></div>
+</div>
+</div>
+</div>
+<p>Functions often accept more than one argument. The one we used above,
+<code class="docutils literal notranslate"><span class="pre">round()</span></code>, has two: one for the number you’d like to round (<code class="docutils literal notranslate"><span class="pre">number</span></code>) and one
+for the number of decimal places to keep (<code class="docutils literal notranslate"><span class="pre">ndigits</span></code>). Separate arguments with a
+comma <code class="docutils literal notranslate"><span class="pre">,</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">round</span><span class="p">(</span><span class="mf">4.813</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4.8
+</pre></div>
+</div>
+</div>
+</div>
+<p>The arguments you supply to Python are assigned to a function’s <strong>parameters</strong>.
+These are function-specific variables that exist as long as the function runs.
+Some parameters have <strong>default arguments</strong>, so you don’t need to supply them
+when you call the function. That was the case the first time we used <code class="docutils literal notranslate"><span class="pre">round()</span></code>.
+Its second parameter defaults to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+<p>Normally, parameters are assigned by their position: the first argument goes to
+the first parameter, the second to the second, etc. But you can override these
+positions by writing out the parameter to which you want to assign an argument.</p>
+<p>The following three calls to <code class="docutils literal notranslate"><span class="pre">round()</span></code> are all the same:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">round</span><span class="p">(</span><span class="mf">4.813</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4.8
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">round</span><span class="p">(</span><span class="mf">4.813</span><span class="p">,</span> <span class="n">ndigits</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4.8
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">round</span><span class="p">(</span><span class="n">ndigits</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">number</span> <span class="o">=</span> <span class="mf">4.813</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4.8
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="calling-methods">
+<h3><span class="section-number">1.5.2. </span>Calling Methods<a class="headerlink" href="#calling-methods" title="Link to this heading">#</a></h3>
+<p>Functions, just like pieces of data, are <strong>objects</strong> in Python. Objects have
+<strong>attributes</strong>, which are typically metadata values about an object. But
+attributes can also be functions. When functions are attached to objects, we
+call them <strong>methods</strong>.</p>
+<p>Access attributes with the dot <code class="docutils literal notranslate"><span class="pre">.</span></code> operator. Below, we use the <code class="docutils literal notranslate"><span class="pre">.title()</span></code>
+method to convert a string to title case:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span> <span class="o">=</span> <span class="s2">&quot;natural language processing&quot;</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;Natural Language Processing&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">.count()</span></code> method will count the number of times a character appears.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>3
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="function-and-method-documentation">
+<h3><span class="section-number">1.5.3. </span>Function and method documentation<a class="headerlink" href="#function-and-method-documentation" title="Link to this heading">#</a></h3>
+<p>When you’re first learning to code, you’ll often find yourself wondering what
+functions are available to you. Luckily, base Python is well-documented, and
+the language comes with certain functionality to access this documentation.</p>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">dir()</span></code> function to see what attributes and methods are available for a
+given object.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">dir</span><span class="p">(</span><span class="n">nlp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;__add__&#39;,
+ &#39;__class__&#39;,
+ &#39;__contains__&#39;,
+ &#39;__delattr__&#39;,
+ &#39;__dir__&#39;,
+ &#39;__doc__&#39;,
+ &#39;__eq__&#39;,
+ &#39;__format__&#39;,
+ &#39;__ge__&#39;,
+ &#39;__getattribute__&#39;,
+ &#39;__getitem__&#39;,
+ &#39;__getnewargs__&#39;,
+ &#39;__getstate__&#39;,
+ &#39;__gt__&#39;,
+ &#39;__hash__&#39;,
+ &#39;__init__&#39;,
+ &#39;__init_subclass__&#39;,
+ &#39;__iter__&#39;,
+ &#39;__le__&#39;,
+ &#39;__len__&#39;,
+ &#39;__lt__&#39;,
+ &#39;__mod__&#39;,
+ &#39;__mul__&#39;,
+ &#39;__ne__&#39;,
+ &#39;__new__&#39;,
+ &#39;__reduce__&#39;,
+ &#39;__reduce_ex__&#39;,
+ &#39;__repr__&#39;,
+ &#39;__rmod__&#39;,
+ &#39;__rmul__&#39;,
+ &#39;__setattr__&#39;,
+ &#39;__sizeof__&#39;,
+ &#39;__str__&#39;,
+ &#39;__subclasshook__&#39;,
+ &#39;capitalize&#39;,
+ &#39;casefold&#39;,
+ &#39;center&#39;,
+ &#39;count&#39;,
+ &#39;encode&#39;,
+ &#39;endswith&#39;,
+ &#39;expandtabs&#39;,
+ &#39;find&#39;,
+ &#39;format&#39;,
+ &#39;format_map&#39;,
+ &#39;index&#39;,
+ &#39;isalnum&#39;,
+ &#39;isalpha&#39;,
+ &#39;isascii&#39;,
+ &#39;isdecimal&#39;,
+ &#39;isdigit&#39;,
+ &#39;isidentifier&#39;,
+ &#39;islower&#39;,
+ &#39;isnumeric&#39;,
+ &#39;isprintable&#39;,
+ &#39;isspace&#39;,
+ &#39;istitle&#39;,
+ &#39;isupper&#39;,
+ &#39;join&#39;,
+ &#39;ljust&#39;,
+ &#39;lower&#39;,
+ &#39;lstrip&#39;,
+ &#39;maketrans&#39;,
+ &#39;partition&#39;,
+ &#39;removeprefix&#39;,
+ &#39;removesuffix&#39;,
+ &#39;replace&#39;,
+ &#39;rfind&#39;,
+ &#39;rindex&#39;,
+ &#39;rjust&#39;,
+ &#39;rpartition&#39;,
+ &#39;rsplit&#39;,
+ &#39;rstrip&#39;,
+ &#39;split&#39;,
+ &#39;splitlines&#39;,
+ &#39;startswith&#39;,
+ &#39;strip&#39;,
+ &#39;swapcase&#39;,
+ &#39;title&#39;,
+ &#39;translate&#39;,
+ &#39;upper&#39;,
+ &#39;zfill&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">help()</span></code> function accepts another function, somewhat like the <code class="docutils literal notranslate"><span class="pre">man</span></code>
+command. The output of <code class="docutils literal notranslate"><span class="pre">help()</span></code> is the full documentation associated with a
+function. You’ll find what parameters are available to you in this output.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="nb">round</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Help on built-in function round in module builtins:
+
+round(number, ndigits=None)
+    Round a number to a given precision in decimal digits.
+
+    The return value is an integer if ndigits is omitted or None.  Otherwise
+    the return value has the same type as the number.  ndigits may be negative.
+</pre></div>
+</div>
+</div>
+</div>
+<p>Send operators enclosed in quotation marks to learn more about them:</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="s2">&quot;**&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The power operator
+******************
+
+The power operator binds more tightly than unary operators on its
+left; it binds less tightly than unary operators on its right.  The
+syntax is:
+
+   power ::= (await_expr | primary) [&quot;**&quot; u_expr]
+
+Thus, in an unparenthesized sequence of power and unary operators, the
+operators are evaluated from right to left (this does not constrain
+the evaluation order for the operands): &quot;-1**2&quot; results in &quot;-1&quot;.
+
+The power operator has the same semantics as the built-in &quot;pow()&quot;
+function, when called with two arguments: it yields its left argument
+raised to the power of its right argument.  The numeric arguments are
+first converted to a common type, and the result is of that type.
+
+For int operands, the result has the same type as the operands unless
+the second argument is negative; in that case, all arguments are
+converted to float and a float result is delivered. For example,
+&quot;10**2&quot; returns &quot;100&quot;, but &quot;10**-2&quot; returns &quot;0.01&quot;.
+
+Raising &quot;0.0&quot; to a negative power results in a &quot;ZeroDivisionError&quot;.
+Raising a negative number to a fractional power results in a &quot;complex&quot;
+number. (In earlier versions it raised a &quot;ValueError&quot;.)
+
+This operation can be customized using the special &quot;__pow__()&quot; method.
+
+Related help topics: EXPRESSIONS, OPERATORS
+</pre></div>
+</div>
+</div>
+</div>
+<p>Python’s documentation is also <a class="reference external" href="https://docs.python.org/3/">online</a>. It’s quite thorough, and you’ll
+learn a lot by searching around in it. Alternatively, you can always use a
+search engine. Python has millions of users, and there are countless resources
+online where you can learn more about the language.</p>
+</section>
+</section>
+<section id="modules-and-packages">
+<h2><span class="section-number">1.6. </span>Modules and Packages<a class="headerlink" href="#modules-and-packages" title="Link to this heading">#</a></h2>
+<p>When you code in Python, you have access to several dozen functions right away.
+But the language’s <strong>Standard Library</strong> also has other functions, which are
+stored in external <strong>modules</strong>. These are files that define functions, classes,
+and variables, which you can import into Python.</p>
+<section id="importing-modules">
+<h3><span class="section-number">1.6.1. </span>Importing modules<a class="headerlink" href="#importing-modules" title="Link to this heading">#</a></h3>
+<p>To import a module, use the <code class="docutils literal notranslate"><span class="pre">import</span></code> keyword. Below, we import the <code class="docutils literal notranslate"><span class="pre">math</span></code>
+module.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we can access functions from <code class="docutils literal notranslate"><span class="pre">math</span></code> using the dot <code class="docutils literal notranslate"><span class="pre">.</span></code> notation, just as we
+accessed attributes earlier. Below, we calculate the square root with <code class="docutils literal notranslate"><span class="pre">sqrt()</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note that this function must be associated with the module. We can’t use it
+separately.</p>
+<div class="cell tag_raises-exception docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sqrt</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">46</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="ne">NameError</span>: name &#39;sqrt&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+<p>But if you find yourself using <code class="docutils literal notranslate"><span class="pre">sqrt()</span></code> frequently, and if you don’t need other
+functions from <code class="docutils literal notranslate"><span class="pre">math</span></code>, you can import only this function using <code class="docutils literal notranslate"><span class="pre">from...import</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+
+<span class="n">sqrt</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>Use an asterisk <code class="docutils literal notranslate"><span class="pre">*</span></code> to import all pieces of code from a module, but be warned:
+you risk importing an object that overrides code you’ve written yourself.</p>
+<p>For example, we create a variable below:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sqrt</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">**</span> <span class="mf">0.5</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>…which our module import will override.</p>
+<div class="cell tag_raises-exception docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">if</span> <span class="n">sqrt</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">TypeError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">49</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="ne">----&gt; </span><span class="mi">3</span> <span class="k">if</span> <span class="n">sqrt</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="nb">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="ne">TypeError</span>: &#39;&lt;&#39; not supported between instances of &#39;builtin_function_or_method&#39; and &#39;int&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally, you can <strong>alias</strong> module imports using <code class="docutils literal notranslate"><span class="pre">as</span></code>. This provides some
+shorthand notation for specifying modules and their objects without having to
+write out the full name of the module every time.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span> <span class="k">as</span> <span class="nn">rand</span>
+
+<span class="n">rand</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>13
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="installing-packages">
+<h3><span class="section-number">1.6.2. </span>Installing packages<a class="headerlink" href="#installing-packages" title="Link to this heading">#</a></h3>
+<p><strong>Packages</strong> contain multiple modules. Python comes with several packages, but
+you can also install others. This is where <code class="docutils literal notranslate"><span class="pre">micromamba</span></code> comes back in. In
+addition to using <code class="docutils literal notranslate"><span class="pre">micromamba</span></code> as a manager for software installations, we can
+use it to install Python packages. These packages often rely on numerous other
+packages with all sorts of dependencies, so it’s best to let an environment
+manager handle installation.</p>
+<p>We actually saw an example of package installation earlier. When we installed
+JupyterLab, that was a Python package. But as a reminder, you can install any
+package with <code class="docutils literal notranslate"><span class="pre">micromamba</span></code> using the following syntax on the command line:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>install<span class="w"> </span>&lt;package&gt;
+</pre></div>
+</div>
+<p>Separate package names to install multiple ones at the same time:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>install<span class="w"> </span>&lt;package&gt;<span class="w"> </span>&lt;package&gt;<span class="w"> </span>&lt;...&gt;
+</pre></div>
+</div>
+<p>You can even install specific versions of Python:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>install<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">310</span>
+</pre></div>
+</div>
+<p>For the chapters ahead, we will use several different packages for numerical
+computing, NLP, and machine learning/AI. A full list of them is provided in the
+<code class="docutils literal notranslate"><span class="pre">dtl2024.yml</span></code> file; create a new environment from this file using <code class="docutils literal notranslate"><span class="pre">micromamba</span></code>,
+and you’ll have everything you need:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>dtl2024.yml
+</pre></div>
+</div>
+<p>This will make a new environment, <code class="docutils literal notranslate"><span class="pre">dtl2024</span></code>, on your computer. Activate it like
+so:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>activate<span class="w"> </span>dtl2024
+</pre></div>
+</div>
+<p>Now, to associate this environment with a new kernel in JupyterLab, run the
+following:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>ipykernel<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>--name<span class="o">=</span>dtl2024
+</pre></div>
+</div>
+<p>Shut down JupyterLab in your web browser:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">File</span> <span class="o">-&gt;</span> <span class="n">Shut</span> <span class="n">Down</span>
+</pre></div>
+</div>
+<p>…restart it from your <code class="docutils literal notranslate"><span class="pre">main</span></code> environment:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>activate<span class="w"> </span>main
+$<span class="w"> </span>jupyter<span class="w"> </span>lab
+</pre></div>
+</div>
+<p>…and you should see a new option to use the <code class="docutils literal notranslate"><span class="pre">dtl2024</span></code> kernel alongside the
+Python 3 one. If you launch a new Jupyter notebook with that kernel, you’ll be
+able to import packages from this new environment.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="debugging-code">
+<h2><span class="section-number">1.7. </span>Debugging Code<a class="headerlink" href="#debugging-code" title="Link to this heading">#</a></h2>
+<p>Finally, there is the matter of errors. Even seasoned programmers encounter
+bugs in their code, but when you are first learning how to code, errors can be
+especially frustrating. The best thing you can do for yourself is <em>carefully
+read the error messages</em>. In recent versions of Python especially, the Python
+development team has worked to improve their error messages and direct users
+right to the spot in some code that is causing problems.</p>
+<p>For example, we saw this error earlier:</p>
+<div class="cell tag_raises-exception docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;I am a string&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span>  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">52</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+    <span class="s2">&quot;I am a string&#39;</span>
+    <span class="o">^</span>
+<span class="ne">SyntaxError</span>: unterminated string literal (detected at line 1)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Take a look at the error message. It’s quite specific about the problem: there
+is a <code class="docutils literal notranslate"><span class="pre">SyntaxError</span></code> in the cell. What kind of <code class="docutils literal notranslate"><span class="pre">SyntaxError</span></code>? An “unterminated
+string literal.” That is, there is no closing quotation for this string.</p>
+<p>Here’s another error:</p>
+<div class="cell tag_raises-exception docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="n">x</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span>  <span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">53</span><span class="p">],</span> <span class="n">line</span> <span class="mi">5</span>
+    <span class="nb">print</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="o">^</span>
+<span class="ne">IndentationError</span>: expected an indented block after &#39;if&#39; statement on line 4
+</pre></div>
+</div>
+</div>
+</div>
+<p>We get an <code class="docutils literal notranslate"><span class="pre">IndentationError</span></code>, and Python points directly at the offending line.</p>
+<p>A third and final example:</p>
+<div class="cell tag_raises-exception docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">54</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="ne">NameError</span>: name &#39;data&#39; is not defined
+</pre></div>
+</div>
+</div>
+</div>
+<p>We haven’t defined a variable named <code class="docutils literal notranslate"><span class="pre">data</span></code>, so Python throws a <code class="docutils literal notranslate"><span class="pre">NameError</span></code>.</p>
+<p>If, after reading error messages, you find that you still don’t know what to
+do, paste the message into your preferred search engine and look around.
+Remember: millions of people use Python, so someone is bound to have
+encountered your error and asked around on forums like <a class="reference external" href="https://stackoverflow.com/">Stack Overflow</a>.
+And then, of course, there are the chatbots. They, too, can help you debug your
+code, though you should take care to confirm that their answers are, in fact,
+correct.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Overview</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#command-line-basics">1.1. Command Line Basics</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#launching-a-command-line-interface">1.1.1. Launching a command-line interface</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#input-and-interactions">1.1.2. Input and interactions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#command-line-syntax">1.1.3. Command-line syntax</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-help">1.1.4. Getting help</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#directory-structures">1.2. Directory Structures</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#paths">1.2.1. Paths</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#path-hierarchies">1.2.2. Path hierarchies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#absolute-vs-relative-paths">1.2.3. Absolute vs. relative paths</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#navigating-with-a-cli">1.2.4. Navigating with a CLI</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#environment-setup">1.3. Environment Setup</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#micromamba">1.3.1. Micromamba</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#jupyter-lab">1.3.2. Jupyter Lab</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-code-in-python">1.4. Writing Code in Python</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#variables">1.4.1. Variables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#strings">1.4.2. Strings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numbers">1.4.3. Numbers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#comparisons">1.4.4. Comparisons</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conditionals">1.4.5. Conditionals</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions-and-methods">1.5. Functions and Methods</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calling-functions">1.5.1. Calling functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calling-methods">1.5.2. Calling Methods</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#function-and-method-documentation">1.5.3. Function and method documentation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modules-and-packages">1.6. Modules and Packages</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#importing-modules">1.6.1. Importing modules</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-packages">1.6.2. Installing packages</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#debugging-code">1.7. Debugging Code</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Tyler Shoemaker
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
