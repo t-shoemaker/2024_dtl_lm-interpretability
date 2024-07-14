@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
   
@@ -632,7 +632,7 @@ the same format:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">pwd</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">tyler</span><span class="o">/</span><span class="mi">2024</span><span class="n">_dtl_llm</span><span class="o">-</span><span class="n">interpretability</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">tyler</span><span class="o">/</span><span class="mi">2024</span><span class="n">_dtl_lm</span><span class="o">-</span><span class="n">interpretability</span>
 </pre></div>
 </div>
 <p>Note that this path begins with <code class="docutils literal notranslate"><span class="pre">/</span></code>. This is the top-most directory in your
@@ -898,26 +898,54 @@ you to search text files in a directory:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>rg<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;NLP&quot;</span><span class="w"> </span>chapters
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>chapters/02_python-basics.md
-309:all repeated tokens. The result will be a set of in NLP are called **types**:
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>chapters/06_vector-spaces.md
+36:  [Natural Language Processing for Data Science][nlp]
+40:[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
+125:reigning metaphor of NLP, a space of this sort is a stand-in for meaning: the
+190:  in the same direction as the first. Most vector operations in NLP use the
+674:to be made available by the Stanford NLP group. It has been trained on a 2014
+680:[glove]: https://nlp.stanford.edu/projects/glove/
 
 chapters/01_getting-started.md
-666:Now, use `ripgrep` to search for &quot;NLP&quot; in `chapters`:
-669:$ rg -i &quot;NLP&quot; chapters
-673:648:  in the same direction as the first. Most vector operations in NLP use the
-676:309:all repeated tokens. The result will be a set of in NLP are called **types**:
-679:664:Now, use `ripgrep` to search for &quot;NLP&quot; in `chapters`:
-680:667:$ rg -i &quot;NLP&quot; chapters
-694:$ rg -i &quot;NLP&quot; chapters
-863:machine learning/AI and natural language processing (NLP): most people are
-1272:nlp = &quot;natural language processing&quot;
-1273:nlp.title()
-1279:nlp.count(&quot;g&quot;)
-1294:dir(nlp)
-1422:computing, NLP, and machine learning/AI. A full list of them is provided in the
+650:Now, use `ripgrep` to search for &quot;NLP&quot; in `chapters`:
+653:$ rg -i &quot;NLP&quot; chapters
+657:309:all repeated tokens. The result will be a set of in NLP are called **types**:
+660:666:Now, use `ripgrep` to search for &quot;NLP&quot; in `chapters`:
+661:669:$ rg -i &quot;NLP&quot; chapters
+662:673:648:  in the same direction as the first. Most vector operations in NLP use the
+663:676:309:all repeated tokens. The result will be a set of in NLP are called **types**:
+664:679:664:Now, use `ripgrep` to search for &quot;NLP&quot; in `chapters`:
+665:680:667:$ rg -i &quot;NLP&quot; chapters
+666:694:$ rg -i &quot;NLP&quot; chapters
+667:863:machine learning/AI and natural language processing (NLP): most people are
+668:1272:nlp = &quot;natural language processing&quot;
+669:1273:nlp.title()
+670:1279:nlp.count(&quot;g&quot;)
+671:1294:dir(nlp)
+672:1422:computing, NLP, and machine learning/AI. A full list of them is provided in the
+675:648:  in the same direction as the first. Most vector operations in NLP use the
+689:$ rg -i &quot;NLP&quot; chapters
+858:machine learning/AI and natural language processing (NLP): most people are
+1267:nlp = &quot;natural language processing&quot;
+1268:nlp.title()
+1274:nlp.count(&quot;g&quot;)
+1289:dir(nlp)
+1417:computing, NLP, and machine learning/AI. A full list of them is provided in the
+
+chapters/02_python-basics.md
+313:all repeated tokens. The result will be a set of in NLP are called **types**:
+
+chapters/03_data-analysis-basics.md
+33:  [Python Basics][python] and [Natural Language Processing for Data Science][nlp]
+37:[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
 
 chapters/05_vectorization.md
-648:  in the same direction as the first. Most vector operations in NLP use the
+36:  [Natural Language Processing for Data Science][nlp]
+41:[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
+
+chapters/07_intro-to-llms.md
+34:  [Natural Language Processing for Data Science][nlp]
+37:[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
 </pre></div>
 </div>
 <p>See how it picked up the very text you’re reading now?</p>
@@ -2066,7 +2094,7 @@ write out the full name of the module every time.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>13
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>9
 </pre></div>
 </div>
 </div>
@@ -2096,9 +2124,9 @@ package with <code class="docutils literal notranslate"><span class="pre">microm
 </div>
 <p>For the chapters ahead, we will use several different packages for numerical
 computing, NLP, and machine learning/AI. A full list of them is provided in the
-<code class="docutils literal notranslate"><span class="pre">dtl2024.yml</span></code> file; create a new environment from this file using <code class="docutils literal notranslate"><span class="pre">micromamba</span></code>,
-and you’ll have everything you need:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>dtl2024.yml
+<code class="docutils literal notranslate"><span class="pre">env.yml</span></code> file; create a new environment from this file using <code class="docutils literal notranslate"><span class="pre">micromamba</span></code>, and
+you’ll have everything you need:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>micromamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>--file<span class="w"> </span>env.yml
 </pre></div>
 </div>
 <p>This will make a new environment, <code class="docutils literal notranslate"><span class="pre">dtl2024</span></code>, on your computer. Activate it like
@@ -2132,7 +2160,7 @@ able to import packages from this new environment.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5
 </pre></div>
 </div>
 </div>
