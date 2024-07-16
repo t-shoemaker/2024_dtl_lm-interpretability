@@ -44,12 +44,20 @@ We need the following libraries:
 ```{code-cell}
 :tags: [remove-output]
 import torch
+import torch.nn as nn
 from transformers import AutoTokenizer, AutoModel
 import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
+import circuitsvis as cv
 import matplotlib.pyplot as plt
 import seaborn as sns
+```
+
+Later, we will work with the Emily Dickinson poems we've already seen.
+
+```{code-cell}
+poems = pd.read_parquet("data/datasets/dickinson_poems.parquet")
 ```
 
 
@@ -62,7 +70,7 @@ for a variety of tasks. They do this by **pretraining** a general model to
 perform a foundational task, usually next-token prediction. Then, once that
 model is trained, practitioners **fine-tune** that model for other tasks. The
 fine-tuned variants benefit from the generalized language representations
-learned during pretraining, but they adapt those representations to more
+learned during pretraining but they adapt those representations to more
 specific contexts and tasks.
 
 The best place to find these pretrained models is [Hugging Face][hf]. The
@@ -70,16 +78,15 @@ company hosts thousands of them on its platform, and it also develops various
 machine learning tools for working with these models. Hugging Face also
 features fine-tuned models for various tasks, which may work out of the box for
 your needs. Take a look at the [model listing][mlist] to see all models on the
-platform. At the left, you'll see categories for model types, task types, and
-more.
+platform. At left you'll see categories for model types, task types, and more.
 
 [hf]: https://huggingface.co/
 [mlist]: https://huggingface.co/models
 
 ### Loading a model
 
-To load a model from Hugging Face, first specify the **checkpoint** you'd like
-to use. Typically this is just the name of the model.
+To load a model from Hugging Face, specify the **checkpoint** you'd like to
+use. Typically this is just the name of the model.
 
 ```{code-cell}
 checkpoint = "google-bert/bert-base-uncased"
@@ -87,7 +94,7 @@ checkpoint = "google-bert/bert-base-uncased"
 
 The `transformers` library has different tokenizer and model classes for
 different models/architectures and tasks. You can write these out directly, or
-use the `Auto` classes, which dynamically determine what class you'll need for
+use the `Auto*` classes, which dynamically determine what class you'll need for
 a model and task. Below, we load the base BERT model without specifying a task.
 
 ```{code-cell}
@@ -99,8 +106,7 @@ bert = AutoModel.from_pretrained(checkpoint)
 If you don't have this model stored on your own computer, it will download
 directly from Hugging Face. The default directory for storing Hugging Face data
 is `~/.cache/hugggingface`. Set a `HF_HOME` environment variable from the
-command line if you want Hugging Face downloads to default to a different
-location on your computer.
+command line do direct downloads to a different location on your computer.
 
 ```sh
 export HF_HOME=/path/to/another/directory
@@ -109,15 +115,15 @@ export HF_HOME=/path/to/another/directory
 
 ## Subword Tokenization
 
-Note that we have initialized a tokenizer and model from the same checkpoint.
-This is important: LLMs depend on specific tokenizers, which are themselves
-trained on corpus data before their corresponding models even see that data.
-But why do tokenizers need to be trained in the first place?
+You may have noticed that we initialized a tokenizer and model from the same
+checkpoint. This is important: LLMs depend on specific tokenizers, which are
+themselves trained on corpus data before their corresponding models even see
+that data. But why do tokenizers need to be trained in the first place?
 
 The answer has to do with the highly general nature of LLMs. These models are
 trained on huge corpora, which means they must represent millions of different
 pieces of text. Model vocabularies would quickly balloon to a huge size if they
-represented all these tokens, however, and at any rate this would both
+represented all unique tokens, however, and at any rate this would be both
 inefficient and a waste of resources, since some tokens are extremely rare. In
 traditional tokenization and model building, you'd set a cutoff below which
 rare tokens could be ignored, but LLMs need _all_ text. That means they need to
@@ -265,7 +271,7 @@ Token ID `0` is the `[PAD]` token.
 tokenizer.decode(0)
 ```
 
-Note the attention masks:
+And here are the attention masks:
 
 ```{code-cell}
 two_sequence_inputs["attention_mask"]
@@ -407,12 +413,43 @@ bert.embeddings.token_type_embeddings
 
 ### Attention
 
-If you look back to the encoder part of the model, you'll see that the first
-part of the layer is an attention component.
+If you look back to the encoder part of the model, you'll see that first
+component in the layer is an attention mechanism. This mechanism enables
+the model to draw many-to-many relationships between tokens. During training,
+attention helps the model form strong (or weak) relationships between certain
+tokens, which in turn allows it to focus on different parts of input sequences
+dynamically. When fed an input sequence, the model learns to privilege
+relationships between certain parts of the input over others, and in doing so,
+it captures complex patterns, local contexts, and long-range dependencies among
+the tokens.
+
+You will often see different forms of attention described in the context of
+Transformers. **Self-attention** means that each token in an input sequence is
+compared with every other token. This enables the model to capture
+relationships across the entire input sequence. **Multi-head attention**
+involves using multiple attention mechanisms in parallel, which are then
+concatenated together when they are passed elsewhere in the network. During
+training, each head learns to focus on different kinds of relationships in the
+text data.
+
+At core, however, attention is expressed as the following:
+
+$$
+Attention(Q, K, V) = softmax(\frac{QK^T}{\sqrt{d_k}})V
+$$
+
+Where:
+
++ $Q$, $K$, and $V$ are query, key, and value matrices, which correspond to all
+  tokens in an input sequence
++ $d_k$ is the dimensionality of the key matrix
++ $softmax$ expresses result as a probability distribution of possible outcomes
+
+The following function implements this equation.
 
 ```py
-def calculate_attention(embeddings):
-    """Calculate attention across word embeddings.
+def scaled_dot_product_attention(embeddings):
+    """Calculate scaled dot-product attention across word embeddings.
 
     Parameters
     ----------
@@ -455,12 +492,55 @@ def calculate_attention(embeddings):
     return weighted
 ```
 
+We could call the above function like so:
+
 ```py
-attention_scores = calculate_attention(embeddings)
+attention_scores = scaled_dot_product_attention(embeddings)
+```
+
+Or, we can use the PyTorch implementation for multi-head attention. First, we
+initialize the layer.
+
+```py
+attention_layer = nn.MultiHeadAttention(embed_dim = 768, num_heads = 12)
+```
+
+Then we build the key, query, and value matrices. With those built, we run them
+through the layer.
+
+```py
+Q = K = V = embeddings.transpose(0, 1)
+attention_scores, _ = attention_layer(Q, K, V)
+attention_scores = attention_scores.transpose(0, 1)
 ```
 
 
 ### Linear transform
+
+Once attention scores are computed, the model passes them through a **linear
+layer**. You will also see this called a "fully connected" layer---that is, it
+connects every input neuron to every output neuron. This layer maps an input
+matrix to an output matrix via learnable parameters: a weight matrix and a bias
+vector.
+
+We express the transformation as follows:
+
+$$
+y = Wx + b
+$$
+
+Where, for the resultant matrix $y$:
+
++ $W$ is a weight matrix with dimensions $(m, p)$, where $m$ is the number of
+  input features and $p$ is the number of output features
++ $x$ is an input matrix with dimensions $(n, m)$, where $n$ is the batch size
++ $b$ is a bias vector with dimensions $p$
+
+Every value in $W$ determines how much each input feature contributes to the
+output. This emphasizes the importance (or lack of importance) of features for
+a training task. Additionally, a linear transformation projects attention
+scores into a new feature space, which helps to summarize relationships in the
+input data and capture complex patterns. 
 
 ```py
 linear_layer = nn.Linear(in_features = 768, out_features = 3072, bias = True)
@@ -468,11 +548,114 @@ transformed = linear_layer(attention_scores)
 ```
 
 
-### Activation layer
+### Normalization and dropout
+
+With the new projection created, the model then applies normalization and
+dropout.
+
+**Normalization** standardizes inputs. This helps to stabilize the model
+training by constraining values to a smaller range. It also speeds up
+computations. 
 
 ```py
-activation_layer = nn.ReLU()
-activations = activation_layer(transformed)
+norm_layer = nn.BatchNorm1d(num_features = 768)
+normed = norm_layer(transformed)
+```
+
+The dropout layer randomly zeros-out a set percentage of values in its input
+matrix. This combats overfitting by preventing the model from becoming too
+reliant on any single dimension.
+
+```py
+dropout_layer = nn.Dropout(p = 0.1)
+dropped = dropout_layer(normalized)
+```
+
+
+### Activation layer
+
+Finally, the model passes the data through an **activation layer**. This layer
+introduces non-linearity in the model, which in turn allows it to learn more
+complex patterns that cannot be approximated through simple, linear
+relationships. You can think of linear layers as filters of a sort: they use
+specially designed cutoffs to determine how input values are transformed into
+outputs.
+
+There are several different kinds of activation functions. We'll demonstrate a
+few below. First, we create a set of input values.
+
+```{code-cell}
+:tags: [output_scroll]
+x = np.linspace(-5, 5, 100)
+x
+```
+
+Now create a dictionary of functions and a buffer to store outputs.
+
+```{code-cell}
+activations = {
+    "tanh": nn.Tanh(),
+    "sigmoid": nn.Sigmoid(),
+    "ReLU": nn.ReLU(),
+    "GELU": nn.GELU()
+}
+x_activated = []
+```
+
+Add the original values to the buffer.
+
+```{code-cell}
+for value in x:
+    x_activated.append({
+        "activation": "original", "input": value, "output": value
+    })
+```
+
+Go through each function, transform the original values, and append the outputs
+to the buffer. Then format into a DataFrame.
+
+```{code-cell}
+for name, func in activations.items():
+    x_inputs = torch.tensor(x, dtype = torch.float32)
+    x_transformed = func(x_inputs).numpy()
+
+    for input_value, output_value in zip(x, x_transformed):
+        x_activated.append({
+            "activation": name, "input": input_value, "output": output_value
+        })
+
+df = pd.DataFrame(x_activated)
+```
+
+Now plot.
+
+```{code-cell}
+plt.figure(figsize = (4, 4))
+g = sns.lineplot(
+    x = "input",
+    y = "output",
+    hue = "activation",
+    style = "activation",
+    dashes = [(2, 2), "", "", "", ""],
+    alpha = 0.8,
+    data = df
+)
+g.set(
+    title = "Activation Functions",
+    xlabel = "Input values",
+    ylabel = "Output values",
+)
+plt.legend(loc = "upper left", bbox_to_anchor = (1, 1))
+plt.grid(True)
+plt.show()
+```
+
+GELU, or Gaussian Error Linear Unit, is a popular activation function for
+Transformers.
+
+```py
+activation_layer = nn.GELU()
+activated = activation_layer(dropped)
 ```
 
 
@@ -487,7 +670,7 @@ doing this for us, but we can always do so explicitly:
 device = 0 if torch.cuda.is_available() else "cpu"
 bert.to(device)
 
-print("Moved model to", device)
+print(f"Moved model to {device}")
 ```
 
 :::{tip}
@@ -512,6 +695,7 @@ model or trying understand model internals, there's no need for gradients. With
 the context manager built, send the inputs to the model.
 
 ```{code-cell}
+:tags: [remove-output]
 with torch.no_grad():
     outputs = bert(**inputs, output_hidden_states = True)
 ```
@@ -576,11 +760,11 @@ Other optional outputs, which we don't have here, include the following:
 
 ### Which layer? Which token?
 
-The next chapter will demonstrate a classification task with BERT. This
-involves modifying the network layers to output one of a set of labels for
-input. All this will happen inside the model itself, but it's also perfectly
-fine to generate embeddings with a model and to use those embeddings for some
-other task that has nothing to do with a LLM.
+The next chapter demonstrates a classification task with BERT. This involves
+modifying the network layers to output one of a set of labels for input. All
+this will happen inside the model itself, but you can also generate embeddings
+with a model and to use those embeddings for some other task that has nothing
+to do with a LLM.
 
 People often use the last hidden state embeddings for other tasks, though
 there's no hard and fast rule saying that this is necessary. The
@@ -593,18 +777,13 @@ earlier layer, or set of layers.
 
 For general document embeddings, there are a number of options:
 
-+ Instead of using the `[CLS]` token, **mean pooling** involves computing the
-  mean of all tokens in the last hidden layer. This can potentially smooth out
-  noise
-+ **Max pooling** takes the max of all tokens' last hidden layer embeddings.
-  This boosts salient features in a sequence
-+ Other people compute the **mean of the last four layers** and select `[CLS]`
-  from that (though you could use all tokens, too); others take the **sum of
-  the last four layers**. Both strategies combine information from a greater
-  portion of the model
-+ A **concatenation of the last four layers** (like appending layers in a list)
-  is yet another option. This can potentially combine different levels of
-  abstraction
+| Strategy                       | Token(s) | Description                     | Effect                          |
+|--------------------------------|----------|---------------------------------|---------------------------------|
+| Mean pooling                   | All      | Mean of the last hidden layer   | Smoothes out noise              |
+| Max pooling                    | All      | Max of the last hidden layer    | Boosts salient features         |
+| Last four layer mean           | `[CLS]`  | Mean of last four hidden layers | Smoothing with more information |
+| Last four layer max            | `[CLS]`  | Max of last four hidden layers  | Saliency with more information  |
+| Concatenate last four layers   | `[CLS]`  | Append the last four layers     | Combine levels of abstraction   |
 
 Finally, while using `[CLS]` is customary, it's not necessary for all purposes
 and you can select another token if you feel it would be better. You can even
@@ -613,14 +792,124 @@ one of the reasons `[CLS]` is customary is because this token is in every input
 sequence. The same cannot always be said of other tokens.
 
 
-## Examining Context
+## Examining Attention
 
-Let's look at an example of how dynamic embeddings different from static ones.
-We'll use the Emily Dickinson poems from the first language modeling chapter.
+The rest of this chapter will demonstrate how all the above layers transform
+data over the course of model processing. We won't do analysis per se, just
+some looking around.
+
+First: attention. Let's re-run our inputs through the model and ask it to
+return attention scores.
 
 ```{code-cell}
-poems = pd.read_parquet("data/datasets/dickinson_poems.parquet")
+:tags: [remove-output]
+with torch.no_grad():
+    outputs = bert(**inputs, output_attentions = True)
 ```
+
+Stored in the `.attentions` attribute are attention weights for each layer in
+the network. The shape of each weight matrix is as follows: batch size, number
+of heads, number of tokens, number of tokens.
+
+```{code-cell}
+print("Number of weight matrices:", len(outputs.attentions))
+print("Shape of a weight matrix:", outputs.attentions[0].shape)
+```
+
+
+### Visualizing attention weights
+
+Below, we extract the matrices from the model outputs, squeeze out the batch
+dimension, and convert the PyTorch matrices to NumPy ones.
+
+```{code-cell}
+attentions = [attn.squeeze(0).numpy() for attn in outputs.attentions]
+```
+
+Use `circuitsvis` to render a heatmap for every head in a layer. Use labels
+from the tokenizer.
+
+```{code-cell}
+labels = [tokenizer.decode(tokid) for tokid in inputs["input_ids"].view(-1)]
+cv.attention.attention_heads(
+    attentions[0],
+    labels,
+    negative_color = "#1f78b4",
+    positive_color = "#e31a1c"
+)
+```
+
+One thing you'll see immediately is that earlier layers have much more diffuse
+attention weightings than later layers. Here's the sixth layer:
+
+```{code-cell}
+cv.attention.attention_heads(
+    attentions[5],
+    labels,
+    negative_color = "#1f78b4",
+    positive_color = "#e31a1c"
+)
+```
+
+Take a look at head 3. There is a relatively strong relationship here between
+"my" and "i".
+
+Finally, here is the last layer:
+
+```{code-cell}
+cv.attention.attention_heads(
+    attentions[-1],
+    labels,
+    negative_color = "#1f78b4",
+    positive_color = "#e31a1c"
+)
+```
+
+
+### Token-to-token relationships
+
+We can also look at token-to-token relationships. Below, for every layer in the
+network, we find the token with the highest attention score for a target token.
+Note that we will ignore `[CLS]` and `[SEP]` tokens for this bit of code.
+
+```{code-cell}
+tokens = labels[1:-1]
+highest_attention_tokens = []
+for layer in attentions:
+    # Drop `[CLS]` and `[SEP]`, then take the max over the heads
+    layer = layer[:, 1:-1, 1:-1]
+    avg_attention = layer.max(axis = 0)
+
+    # March through each token and find the maximum value in the attention
+    # layer
+    layer_result = []
+    for idx, token in enumerate(tokens):
+        highest_idx = np.argmax(avg_attention[idx, :])
+        highest_token = tokens[highest_idx]
+        layer_result.append((token, highest_token))
+
+    # Add to the buffer
+    highest_attention_tokens.append(layer_result)
+```
+
+Now, for the three layers above, we print out every token in the input sequence
+along with the token that scores highest in the attention matrix.
+
+```{code-cell}
+:tags: [output_scroll]
+for idx in (0, 5, 11):
+    print(f"Layer: {idx}\n----------")
+    for source, target in highest_attention_tokens[idx]:
+        print(f"{source} -> {target}")
+    print("\n")
+```
+
+
+## Examining Context
+
+Let's now look at an example of how dynamic embeddings different from static
+ones. We'll use the Emily Dickinson poems from the first language modeling
+chapter.
 
 First, tokenize:
 
@@ -781,18 +1070,17 @@ emb2layer = (
 Now we plot the document-level cosine similarity scores for each layer.
 
 ```{code-cell}
-fig, ax = plt.subplots(figsize = (9, 6))
+plt.figure(figsize = (9, 6))
 g = sns.violinplot(
     data = emb2layer,
     x = "layer",
     y = "cosine_similarity",
     hue = "layer",
     palette = "Paired",
-    ax = ax,
     legend = False
 )
 g.set(
-    title = "Layer-wise cosine similarity scores for static -> dynamic docs",
+    title = "Layer-wise Cosine Similarity Scores for Static -> Dynamic Docs",
     xlabel = "Layer",
     ylabel = "Cosine similarity scores"
 )
@@ -846,18 +1134,17 @@ layer2layer = (
 And plot.
 
 ```{code-cell}
-fig, ax = plt.subplots(figsize = (9, 6))
+plt.figure(figsize = (9, 6))
 g = sns.violinplot(
     data = layer2layer,
     x = "step",
     y = "cosine_similarity",
     hue = "step",
     palette = "Paired",
-    ax = ax,
     legend = False
 )
 g.set(
-    title = "Layer-to-layer cosine similarity scores for docs",
+    title = "Layer-to-layer Cosine Similarity Scores for Docs",
     xlabel = "Layer step",
     ylabel = "Cosine similarity scores"
 )
