@@ -93,9 +93,9 @@ hoover_counts.sort_values("hoover")
 ```
 
 Tokens for each chapter are stored as strings in `tokens` and `masked`.
-Chapters have been tokenized with `nltk.wordpunct_tokenize()`. Why `masked`?
-That column has had its proper noun tokens masked out with `PN`. You will see
-why later on.
+Chapters have been tokenized with `nltk.word_tokenize()`. Why `masked`? That
+column has had its proper noun tokens masked out with `PN`. You will see why
+later on.
 
 ````{dropdown} See masking code
 ```py
@@ -733,7 +733,7 @@ vis_data["label"] = vis_data["label_idx"].map(lambda x: periods[x])
 Create a plot.
 
 ```{code-cell}
-fig, ax = plt.subplots(figsize = (10, 10))
+plt.figure(figsize = (10, 10))
 g = sns.scatterplot(
     x = "x",
     y = "y",
@@ -741,7 +741,6 @@ g = sns.scatterplot(
     palette = "tab10",
     alpha = 0.8,
     data = vis_data,
-    ax = ax
 )
 g.set(title = "James chapters", xlabel = "Dim. 1", ylabel = "Dim. 2")
 plt.show()
@@ -766,7 +765,7 @@ vis_data["incorrect"] = np.where(
 Re-plot.
 
 ```{code-cell}
-fig, ax = plt.subplots(figsize = (10, 10))
+plt.figure(figsize = (10, 10))
 g = sns.scatterplot(
     x = "x",
     y = "y",
@@ -776,7 +775,6 @@ g = sns.scatterplot(
     sizes = (300, 35),
     palette = "tab10",
     data = vis_data,
-    ax = ax,
     legend = "full"
 )
 g.set(title = "James chapters", xlabel = "Dim. 1", ylabel = "Dim. 2")

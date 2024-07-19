@@ -101,7 +101,7 @@ def preprocess(doc, ngram = 1):
 
     # Tokenize the string. Optionally, make 2-gram (or more) sequences from
     # those tokens
-    tokens = nltk.wordpunct_tokenize(doc)
+    tokens = nltk.word_tokenize(doc)
     if ngram > 1:
         tokens = list(nltk.ngrams(tokens, ngram))
     
@@ -551,9 +551,9 @@ Why is this? Well, take a look at a histogram of the bigram probabilities. It's
 minimum and maximum probability values.
 
 ```{code-cell}
-fig, ax = plt.subplots(figsize = (9, 4))
-sns.histplot(bigram_df["prob"], bins = 10, kde = True, ax = ax)
-ax.set(title = "Bigram probabilities")
+plt.figure(figsize = (9, 4))
+g = sns.histplot(bigram_df["prob"], bins = 10, kde = True)
+g.set(title = "Bigram probabilities")
 plt.show()
 ```
 
@@ -913,7 +913,9 @@ A `for` loop that runs this function over our different samplers is below:
 
 ```{code-cell}
 samplers = {
-    "weighted": sample_weighted, "greedy": sample_greedy, "topk": sample_topk
+    "weighted": sample_weighted,
+    "greedy": sample_greedy,
+    "topk": sample_topk
 }
 for strategy, sampler in samplers.items():
     print("Strategy:", strategy)
