@@ -392,8 +392,18 @@ To get around this, we use a more sophisticated tokenizer from the `nltk`
 package, which is based on a series of regexes.
 
 ```{code-cell}
-print(nltk.wordpunct_tokenize(example))
+print(nltk.word_tokenize(example))
 ```
+
+:::{tip}
+You need to download this tokenizer the first time you use it, so don't fret if
+you get an error. Just follow the instructions to download the file, which are
+as follows:
+
+```py
+nltk.download("punkt")
+```
+:::
 
 Below, we incorporate this tokenizer into a preprocessing function that
 performs the following steps:
@@ -423,7 +433,7 @@ def preprocess(doc, ngram = 1):
 
     # Tokenize the string. Optionally, make 2-gram (or more) sequences from
     # those tokens
-    tokens = nltk.wordpunct_tokenize(doc)
+    tokens = nltk.word_tokenize(doc)
     if ngram > 1:
         tokens = list(nltk.ngrams(tokens, ngram))
     
@@ -480,12 +490,11 @@ def plot_metrics(data, variable, title = "", xlabel = "", figsize = (15, 5)):
     if variable not in data.columns:
         raise ValueError(variable, "not in data")
 
-    # Create a figure with an axis
-    fig, ax = plt.subplots(figsize = figsize)
-
-    # Put a graph on that axis, then set some features
+    # Create a figure with a plot in it, then add labels
+    plt.figure(figsize = figsize)
     g = sns.histplot(data = data, x = variable)
-    g.set(title = title, xlabel = xlabel, ylabel = "Count");
+    g.set(title = title, xlabel = xlabel, ylabel = "Count")
+    plt.show()
 ```
 
 
@@ -635,10 +644,9 @@ most frequent tokens.
 
 ```{code-cell}
 N = 1000
-fig, ax = plt.subplots(figsize = (15, 5))
-g = sns.scatterplot(
-    data = token_freq[:N], x = "tokens", y = "count", ax = ax
-)
+
+plt.figure(figsize = (15, 5))
+g = sns.scatterplot(data = token_freq[:N], x = "tokens", y = "count")
 g.set(xlabel = "Tokens", ylabel = "Token counts", title = f"Top {N:,} Tokens")
 plt.xticks(rotation = 90, ticks = range(0, N, 25))
 plt.show()
@@ -660,11 +668,9 @@ sampled.sort_values("count", ascending = False, inplace = True)
 Now we plot on a line plot.
 
 ```{code-cell}
-fig, ax = plt.subplots(figsize = (15, 5))
+plt.figure(figsize = (15, 5))
 g = sns.lineplot(sampled, x = "tokens", y = "count")
-g.set(
-    xlabel = "Tokens", ylabel = "Count", title = f"Sampled (N = {N:,}) Tokens"
-)
+g.set(xlabel = "Tokens", ylabel = "Count", title = f"{N:,} Sampled Tokens")
 plt.xticks(rotation = 90, ticks = range(0, N, 500))
 plt.show()
 ```
