@@ -548,7 +548,7 @@ its outputs can be directed to another `.apply()` call, or **chained**.
 
 ```{code-cell}
 manifest["num_types"] = manifest["tokens"].apply(np.unique).apply(len)
-plot_metrics(manifest, "num_tokens", title = "Type counts", xlabel = "Types")
+plot_metrics(manifest, "num_types", title = "Type counts", xlabel = "Types")
 ```
 
 The **type-token** ratio is a measure of lexical diversity.
