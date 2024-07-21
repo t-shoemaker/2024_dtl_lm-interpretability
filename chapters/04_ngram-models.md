@@ -155,7 +155,7 @@ def preprocess(doc, ngram = 1):
 
     # Tokenize the string. Optionally, make 2-gram (or more) sequences from
     # those tokens
-    tokens = nltk.wordpunct_tokenize(doc)
+    tokens = nltk.word_tokenize(doc)
     if ngram > 1:
         tokens = list(nltk.ngrams(tokens, ngram))
     
@@ -218,9 +218,18 @@ performs the following operations:
 
 ```{code-cell}
 unigram_df = pd.DataFrame({"w1": unigrams})
-unigram_df = unigram_df.explode("w1")
-unigram_df = unigram_df.value_counts("w1")
-unigram_df = unigram_df.to_frame("n")
+unigram_df = (
+    unigram_df
+    .explode("w1")
+    .value_counts("w1")
+    .to_frame("n")
+)
+```
+
+Fully formatted:
+
+```{code-cell}
+unigram_df.head()
 ```
 
 With the data formatted, we can compute metrics about these tokens.
@@ -245,12 +254,12 @@ $$
 S(w) = \frac{1}{P(w)}
 $$
 
-We use this to calculate **information**, which is the log normalized surprise
-of a token. Note our use of $log_2$. This is to express information in terms of
-**bits**.
+We use this to calculate **information**, which is the log-normalized surprise
+of a token. Note our use of $\log_2$. This is to express information in terms
+of **bits**.
 
 $$
-I(w) = log_2(S(w))
+I(w) = \log_2(S(w))
 $$
 
 Doing this in code is also straightforward:
@@ -297,7 +306,7 @@ of uncertainty in our token frequencies. It is the **weighted average** of the
 number of bits required to encode some data.
 
 $$
-H = \Sigma_{w} P(w) \cdot I(w)
+H = \sum_{w} P(w) \cdot I(w)
 $$
 
 Why not take the average of $I$? Look at the skew in tokens frequency. Certain
@@ -349,14 +358,19 @@ measure of how well one distribution approximates the other.
 We express cross-entropy as follows:
 
 $$
-H_{\text{cross}} = -\Sigma_w P_w log_2(q_w)
+H_{\text{cross}}(P, Q) = -\sum_w P(w)\log_2(Q(w))
 $$
 
-Where cross-entropy is the sum of true probabilities $P_w$ for tokens $w$
-multiplied by the log of their predicted probabilities $q_w$. In this small
-experiment, "predicted" probabilities will just be the average probability of a
-token in the corpus. This acts as a baseline against which we can measure the
-sampling strategies.
+Where:
+
++ $H_{\text{cross}}(P, Q)$ is the cross-entropy between the true distribution
+  $P$ and the estimated distribution $Q$
++ $P(w)$ is the true probability of the token $w$
++ $Q(w)$ is the estimated probability of the token $w$
+
+In this small experiment, "predicted" probabilities will just be the average
+probability of a token in the corpus. This acts as a baseline against which we
+can measure the sampling strategies.
 
 
 ### Unigram modeling
@@ -379,9 +393,9 @@ def calculate_cross_entropy(Pw, Qw):
 
     Parameters
     ----------
-    Pw : Iterable
+    Pw : np.ndarray
         True values of the distribution
-    Qw : Iterable
+    Qw : np.ndarray
         Predicted distribution
 
     Returns
@@ -389,8 +403,8 @@ def calculate_cross_entropy(Pw, Qw):
     cross_entropy : float
         The cross-entropy
     """
-    Qw = np.log2(Qw)
-    Sigma = np.sum(Pw * Qw)
+    log_Qw = np.log2(Qw)
+    Sigma = np.sum(Pw * log_Qw)
     cross_entropy = -Sigma
     
     return cross_entropy
@@ -422,7 +436,7 @@ used to report on model performance you will most often see it transformed into
 **perplexity**. Perplexity is cross-entropy's exponentiation:
 
 $$
-Perplexity = 2^{H_{\text{cross}}}
+PP = 2^{H_{\text{cross}}}
 $$
 
 The value this produces is the average number of choices a model has to make to
@@ -432,7 +446,7 @@ over the average cross-entropy scores form the sampling run above.
 ```{code-cell}
 perplexity = pd.DataFrame(results)
 for col in perplexity.columns:
-    perplexity[col] = np.exp(perplexity[col].mean())
+    perplexity[col] = np.exp2(perplexity[col].mean())
 
 print(perplexity.mean().sort_values())
 ```
@@ -485,11 +499,20 @@ Counting bigrams involves more footwork. Below, we do the following:
    column, `n`
 
 ```{code-cell}
-bigram_df = pd.DataFrame({"bigram": bigrams})
-bigram_df = bigram_df.explode("bigram")
+bigram_df = pd.DataFrame({"bigram": bigrams}).explode("bigram")
 bigram_df[["w1", "w2"]] = bigram_df["bigram"].apply(pd.Series)
-bigram_df = bigram_df.groupby(["w1", "w2"]).size()
-bigram_df = bigram_df.to_frame("n")
+bigram_df = (
+    bigram_df
+    .groupby(["w1", "w2"])
+    .size()
+    .to_frame("n")
+)
+```
+
+Fully formatted:
+
+```{code-cell}
+bigram_df.head()
 ```
 
 From here, we could calculate the metrics on our bigrams in the same way that
@@ -920,7 +943,7 @@ samplers = {
 for strategy, sampler in samplers.items():
     print("Strategy:", strategy)
     for _ in range(5):
-        sequence, _ =  generate_from_sampler(
+        sequence, metadata =  generate_from_sampler(
             unigram_df, bigram_df, bigram_probs, sampler, N = 15
         )
         print("+", " ".join(sequence))
@@ -950,7 +973,7 @@ A `for` loop will implement the generation:
 results = {"weighted": [], "greedy": [], "topk": []}
 for strategy, sampler in samplers.items():
     for _ in range(100):
-        _, metadata = generate_from_sampler(
+        sequence, metadata = generate_from_sampler(
             unigram_df, bigram_df, bigram_probs, sampler, N = N
         )
         cross_entropy = calculate_cross_entropy(baseline, metadata["prob"])
@@ -962,7 +985,7 @@ Now we look at the results, which we transform into perplexity scores.
 ```{code-cell}
 perplexity = pd.DataFrame(results)
 for col in perplexity.columns:
-    perplexity[col] = np.exp(perplexity[col].mean())
+    perplexity[col] = np.exp2(perplexity[col].mean())
 
 print(perplexity.mean().sort_values())
 ```
@@ -982,14 +1005,14 @@ bear this out:
 log_probs = {"weighted": [], "greedy": [], "topk": []}
 for strategy, sampler in samplers.items():
     for _ in range(100):
-        _, metadata = generate_from_sampler(
+        sequence, metadata = generate_from_sampler(
             unigram_df, bigram_df, bigram_probs, sampler, N = N
         )
         lp = -metadata["info"].mean()
         log_probs[strategy].append(lp)
 
 log_probs = pd.DataFrame(log_probs)
-print(log_probs.mean().sort_values(ascending=False))
+print(log_probs.mean().sort_values(ascending = False))
 ```
 
 This ends up being an important lesson, however: _a model that performs well
