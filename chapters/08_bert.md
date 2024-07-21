@@ -18,13 +18,30 @@ from matplotlib.pyplot import rcParams
 
 os.chdir("..")
 warnings.filterwarnings("ignore")
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 rcParams["figure.dpi"] = 150
 ```
 
 Bidirectional Encoder Representations from Transformers (BERT)
 ==============================================================
 
+This chapter demonstrates fine tuning with a BERT model, discussing data
+preparation, hyperparameter configurations, model training, and model
+evaluation. It then uses SHAP values to ground model predictions in concrete
+tokens.
+
++ **Data:** The University of Hamburg Language Technology Group's [Blurb Genre
+  Collection][blurbs], a large dataset of English book blurbs
++ **Credits:** Portions of this chapter are adapted from the UC Davis DataLab's
+  [Natural Language Processing for Data Science][nlp]
+
+[blurbs]: https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/blurb-genre-collection.html
+[nlp]: https://ucdavisdatalab.github.io/workshop_nlp_reader
+
+
 ## Preliminaries
+
+We will need several imports for this chapter.
 
 ```{code-cell}
 import torch
@@ -44,7 +61,7 @@ import nltk
 from nltk.corpus import stopwords
 ```
 
-Load data
+With imports finished, we load the data.
 
 ```{code-cell}
 blurbs = pd.read_parquet("data/datasets/ltg_book_blurbs.parquet")
@@ -107,10 +124,10 @@ recognize.
 
 ```{code-cell}
 :tags: [remove-stderr]
-model_name = "bert-base-uncased"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+ckpt = "bert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(ckpt)
 model = AutoModelForSequenceClassification.from_pretrained(
-    model_name, num_labels = num_labels
+    ckpt, num_labels = num_labels
 )
 ```
 
@@ -357,6 +374,7 @@ This combats overfitting. When the model doesn't improve after some number of
 epochs, we stop training.
 
 ```{code-cell}
+:tags: [remove-stderr]
 trainer = Trainer(
     model = model,
     tokenizer = tokenizer,
@@ -409,13 +427,14 @@ While we could separately tokenize texts and feed them through the model, a
 of task our model has been trained to do.
 
 ```{code-cell}
+:tags: [remove-stderr]
 classifier = pipeline(
     "text-classification", model = model, tokenizer = tokenizer
 )
 ```
 
 Below, we put a single text through the pipeline. It will return the model's
-prediction and a confidence score.
+prediction and a confidence score in a list, which we unpack with `,=`.
 
 ```{code-cell}
 sample = blurbs.sample(1)
@@ -446,27 +465,35 @@ Set `top_k` to `None` to return all scores.
 classifier(sample["text"].item(), top_k = None)
 ```
 
+Each of these scores are probabilities. Sum them together and you would get
+$1.0$. When the model selects a label, it chooses the label with the highest
+probability. This selection strategy is known as **argmax**.
+
+$$
+\text{argmax}(P) = \text{class}\,c\,\text{where} P_c = \max(P)
+$$
+
+Where $c$ is the assigned class because the probability $P$ is highest of all
+possible classes.
+
 
 ### Classification accuracy
 
-Let's look at a broader sample of texts and appraise the model's performance.
-Below, we take 250 blurbs and send them through the pipeline. A more fastidious
-version of this entire training setup would have spliced off this set of blurbs
-before doing the train/test split. That would have kept the model from ever
-seeing them until the moment we appraise performance to render a completely
-unbiased view of model performance. But for the purposes of demonstration, it's
-okay to sample from our data generally.
+Let's look at a broader sample of blurbs and appraise the model's performance.
+Below, we take 250 blurbs and send them through the pipeline. Note that this
+will mix training/evaluation datasets, but for the purposes of demonstration,
+it's okay to sample from our data generally.
 
 ```{code-cell}
-sample = blurbs.sample(250)
-predicted = classifier(sample["text"].tolist(), truncation = True)
+sample_large = blurbs.sample(250)
+predicted = classifier(sample_large["text"].tolist(), truncation = True)
 ```
 
 Now, we access the predicted labels and compare them against the true labels
 with `classification_report()`.
 
 ```{code-cell}
-y_true = sample["d1"].tolist()
+y_true = sample_large["d1"].tolist()
 y_pred = [prediction["label"] for prediction in predicted]
 report = classification_report(y_true, y_pred, zero_division = 0.0)
 print(report)
@@ -488,9 +515,9 @@ confusion = pd.DataFrame(
 Plot the matrix as a heatmap:
 
 ```{code-cell}
-fig, ax = plt.subplots(figsize = (5, 5))
-g = sns.heatmap(confusion, annot = True, cmap = "Blues", ax = ax);
-ax.set(ylabel = "True label", xlabel = "Predicted label")
+plt.figure(figsize = (5, 5))
+g = sns.heatmap(confusion, annot = True, cmap = "Blues")
+g.set(ylabel = "True label", xlabel = "Predicted label")
 plt.show()
 ```
 
@@ -499,64 +526,374 @@ Biography \& Memoir as Religion \& Philosophy. Likewise, it sometimes assigns
 Politics to Biography \& Memoir. Finally, there appears to be a little
 confusion between Literary Fiction and Romance.
 
+Let's look at some specific examples where the model is mistaken. First, we
+create a DataFrame.
 
-### Feature analysis: SHAP values
+```{code-cell}
+inspection_df = pd.DataFrame({
+    "text": sample_large["text"].tolist(),
+    "label": y_true,
+    "pred": y_pred
+})
+```
 
-```py
-pipe = pipeline(
+We subset on mis-classifications.
+
+```{code-cell}
+mask = inspection_df["label"] != inspection_df["pred"]
+wrong = inspection_df[mask]
+```
+
+Instances where the true label is Biography \& Memoir but the model predicts
+Politics are especially revealing. These are blurbs for memoirs written by
+political figures or by those who experienced significant political events.
+
+```{code-cell}
+:tags: [output_scroll]
+wrong_doc = wrong.loc[
+    (wrong["label"] == "Biography & Memoir") & (wrong["pred"] == "Politics"),
+    "text"
+].sample().item()
+print(wrong_doc)
+```
+
+That seems sensible enough. But right now, we only have two strategies for
+making sense of these mis-classifications: looking at the model's label
+assignments or reading the texts ourselves. There's no middle ground between
+high-level summary or low-level reading.
+
+
+## SHAP Values
+
+To bridge these two levels, we will turn to **SHAP values**. SHAP values
+provide a method of interpreting various machine learning models, including
+LLMs. Each one of these values represents how important a particular feature is
+for a model's prediction. In the case of BERT, these features are tokens. Using
+SHAP values, we can rank how important each token in a blurb is. This, in
+short, provides us with a way to highlight what the model is paying attention
+to when it makes its decisions.
+
+SHAP stands for "SHapley Additive exPlanations." They are generalizations of
+the Shapley value, a concept from game theory developed by Lloyd Shapley. In a
+gaming scenario, a Shapley value describes how much a player contributes to an
+outcome vis-a-vis a subset, or **coalition**, of all players in the game. The
+process of deriving this value is detailed below:
+
++ **Marginal contribution:** The difference in the value of a coalition when a
+  player is included versus when that player is excluded
++ **Coalition:** Any subset of the total number of players. A coalition's value
+  is the benefit that a coalition's players achieve when they work together
++ **Shapley value:** This value is computed by calculating a player's marginal
+  contributions to all possible permutations of coalitions. The average of
+  these contributions is the final value
+
+In the context of machine learning, players are features in the data (tokens).
+A coalition of these features produces some value, computed by the model's
+prediction function (e.g., argmax classification). SHAP values describe how
+much each feature contributes to the value produced by a coalition.
+
+The formula for calculating SHAP (and Shapley) values is as follows:
+
+$$
+\phi_i(v) = \sum_{S \subseteq N \setminus \{i\}} \frac{|S|!(|N| - |S| - 1)!}{|N|!} (v(S \cup \{i\}) - v(S))
+$$
+
+Where:
+
++ $\phi_i(v)$ is the SHAP value for player $i$
++ $S$ is a subset of the set of all players $N$ excluding player $i$ $(N
+  \setminus {i})$
++ $|S|$ is the number of players in subset $S$
++ $|N|$ is the total number of players
++ $v(S)$ is the value of a subset $S$
++ $v(S \cup \{i\}) - v(S)$ is the marginal contribution of player $i$ to subset
+  $S$
+
+
+### Building an explainer
+
+Luckily, we needn't calculate these values by hand; we can use the SHAP
+library instead. The logic of this library is to wrap a machine learning model
+with an `Explainer`, which, when called, will perform the above computations by
+permuting all features in each blurb and measuring the difference those
+permutations make for the final outcome.
+
+We set up an `Explainer` below. It requires a few more defaults for the
+`pipeline` objection, so we will re-initialize that as well.
+
+```{code-cell}
+:tags: [remove-stderr]
+classifier = pipeline(
     "text-classification",
     model = model,
     tokenizer = tokenizer,
     top_k = None,
-    truncation = True
+    truncation = True,
+    padding = True,
+    max_length = tokenizer.model_max_length
 )
-# RED: positive impact, BLUE: negative impact
-explainer = shap.Explainer(pipe)
+explainer = shap.Explainer(
+    classifier, output_names = list(model.config.id2label.values()), seed = 357
+)
 ```
+
+
+### Individual values
+
+Let's run our example from earlier through the `Explainer`. It may take a few
+minutes on a CPU because this process must permute all possible token
+coalitions.
+
+```{code-cell}
+:tags: [remove-stderr]
+explanation = explainer([sample["text"].item()])
+```
+
+The `.base_values` attribute contains expected values of the model's
+predictions for each class across the entire dataset. Their units are
+probabilities.
+
+```{code-cell}
+explanation.base_values
+```
+
+We align them with the labels like so:
+
+```{code-cell}
+example_base = pd.DataFrame(
+    explanation.base_values, columns = explanation.output_names
+)
+example_base
+```
+
+The `.values` attribute contains the SHAP values for an input sequence. Its
+dimensions are $(b, n, c)$, where $b$ is batch size, $n$ is number of tokens,
+and $c$ is number of classes.
+
+```{code-cell}
+explanation.values.shape
+```
+
+We can build a DataFrame of these values, where columns are the classes and
+rows are each token. High SHAP values are more important for a prediction,
+whereas low values are less important.
+
+```{code-cell}
+example_shap = pd.DataFrame(
+    explanation.values.squeeze(),
+    index = explanation.data[0],
+    columns = explanation.output_names
+)
+example_shap
+```
+
+Adding the sum of the SHAP values to the base values will re-create the
+probabilities from the model.
+
+```{code-cell}
+example_shap.sum() + example_base
+```
+
+Or:
+
+$$
+P = \sum\phi_i + \text{base}
+$$
+
+
+The SHAP library has useful plotting functions for token-by-token reading.
+Below, we visualize the SHAP values for our sample text. Tokens highlighted in
+red make positive contributions to the model's prediction (i.e., they have high
+SHAP values), while blue tokens are negative (i.e., they have low SHAP values).
+
+```{code-cell}
+shap.plots.text(explanation)
+```
+
+The output defaults to viewing SHAP values for the final prediction class, but
+click on other class names to see how the tokens interact with those as well.
+
+Below, we look at our mi-classified blurb from earlier, selecting only the two
+classes we targeted. This would be one way to compare (rather granularly) how
+the model has made its decisions. 
+
+```{code-cell}
+:tags: [remove-stderr]
+explanation = explainer([wrong_doc])
+shap.plots.text(explanation[:, :, ["Biography & Memoir", "Politics"]])
+```
+
+
+### Aggregate values
+
+An `Explainer` can take multiple texts at time. Below, we load the SHAP values
+and their corresponding base values for a sampling of 1,000 blurbs from the
+dataset. With these, we'll look at SHAP values in the aggregate.
+
 
 ```{code-cell}
 shap_values = pd.read_parquet("data/datasets/ltg_book_blurbs_1k-shap.parquet")
-shap_values.head()
+base_values = pd.read_parquet("data/datasets/ltg_book_blurbs_1k-base.parquet")
 ```
 
-```{code-cell}
-drop_tokens = stopwords.words("english")
-drop_tokens += '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~“”’—–…'.split()
+The structure of `shap_values` is somewhat complicated. It has a three-level
+index, for document, token, and text, respectively.
 
-mask = shap_values.index.get_level_values(2).str.lower().isin(drop_tokens)
-shap_values = shap_values[~mask]
+```{code-cell}
+shap_values
 ```
 
+Once more, to show that we can use SHAP values to get back to model
+predictions, we group by `document_id`, take the sum of the SHAP values, and
+add them back to the base values.
+
 ```{code-cell}
-# Initialize a DataFrame to store token-genre counts
+predicted = shap_values.groupby("document_id").sum() + base_values
+predicted = predicted.idxmax(axis = 1)
+predicted
+```
+
+You may have noticed at this point that there is a SHAP value for every single
+token in a blurb. That includes subwords as well as punctuation (technically,
+there is also a SHAP value for both `[CLS]` and `[SEP]`, but they've been
+stripped out). Importantly, each of these tokens are given individual SHAP
+values. And that should make sense: the whole point of LLMs is to furnish
+tokens with dynamic (i.e., context-dependent) representations.
+
+We'll see this if we take the maximum SHAP value for each class in a blurb.
+
+```{code-cell}
+shap_values.loc[(500,)].idxmax(axis = 0)
+```
+
+See the subwords? And note, too, the integers before each token: those are a
+token's index position in the blurb.
+
+We'll address this information later on, but first, let's think a little more
+high-level. Below, we find tokens that consistently have the highest SHAP
+values in a blurb. This involves counting how often a particular token is the
+highest-scoring token in a blurb and tallying up the final results afterwards.
+
+To do this, however, we will perform some preprocessing that (admittedly)
+erases some of the context sensitivity of LLMs: namely, we drop stopwords and
+change the case of our tokens to lowercase so variants are counted together. If
+we didn't do this, those variants and stopwords would clutter our final
+listing.
+
+```{code-cell}
+drop = nltk.corpus.stopwords.words("english")
+drop += '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~“”’—–…'.strip()
+lowercased = shap_values.index.get_level_values(2).str.lower()
+```
+
+Time to filter.
+
+```{code-cell}
+candidates = shap_values[~lowercased.isin(drop)]
+```
+
+Now, we initialize a DataFrame to store token-genre counts.
+
+```{code-cell}
 counts = pd.DataFrame(
     0,
-    index = shap_values.index.get_level_values(2).unique(),
-    columns = shap_values.columns
+    index = lowercased.unique(),
+    columns = candidates.columns
 )
+```
 
-# For every genre label...
-for col in shap_values.columns:
+From here, we set up a for loop to step through every genre label. Once we get
+the maximum SHAP value for each document, we add that information to the
+DataFrame above.
+
+```{code-cell}
+for genre in candidates.columns:
     # Get the token with the highest SHAP value in each document
-    max_tokens = shap_values[col].groupby(level = ["document_id"]).idxmax()
+    max_tokens = candidates[genre].groupby(level = ["document_id"]).idxmax()
 
-    # Format to a Series and count the number of times each token appears
+    # Format into a Series and count the number of times each token appears. Be
+    # sure to change the case!
     max_tokens = max_tokens.apply(pd.Series)
     max_tokens.columns = ["document_id", "token_id", "text"]
+    max_tokens["text"] = max_tokens["text"].str.lower()
     token_counts = max_tokens.value_counts("text")
 
-    # Index our counts DataFrame and assign the token counts
+    # Set our values
     counts.loc[token_counts.index, col] = token_counts.values
 ```
 
+Take the top-25 highest scoring tokens to produce an overview for each genre.
+
 ```{code-cell}
 k = 25
-topk = pd.DataFrame("", index = range(k), columns = shap_values.columns)
-for col in shap_values.columns:
+topk = pd.DataFrame("", index = range(k), columns = candidates.columns)
+for col in counts.columns:
     tokens = counts[col].nlargest(k).index.tolist()
     topk.loc[:, col] = tokens
 ```
 
+This, in effect, brings our fine-tuned model back into the realm of corpus
+analytics. We get the advantages of LLMs' dynamic embeddings mixed with the
+summary listings of distant reading.
+
 ```{code-cell}
 topk
 ```
+
+That said, the Dataframe above glosses over what could be crucial,
+context-sensitive information attached to each token. Remember: we have
+(potentially) different SHAP values for the 'same' two tokens because those
+tokens are at different index positions. More, our genre counts filter out
+tokens that _could_ be meaningful; punctuation, after all, has meaning.
+
+So, let's reset things. Below, we will try to track the significance of
+specific token positions in the blurbs. Our question will be this: does a
+token's position in the blurb have any relationship to whether it's the most
+important token?
+
+To answer this, we'll take the token with the highest SHAP value for each label
+in every document.
+
+```{code-cell}
+max_shap = shap_values.groupby("document_id").idxmax()
+```
+
+The following for loop will collect information from these values.
+
+```{code-cell}
+locations = {"token_id": [], "label": [], "label_id": [], "length": []}
+for (idx, row), label in zip(max_shap.iterrows(), predicted):
+    # Select the document ID, token ID, and the token for the predicted label
+    doc_id, token_id, token = row[label]
+
+    # Get the length of the document from `shap_values`. Then get the label ID
+    length = len(shap_values.loc[(doc_id,)])
+    label_id = label2id[label]
+
+    # Finally, append the values to the dictionary above
+    locations["token_id"].append(token_id)
+    locations["label"].append(label)
+    locations["label_id"].append(label_id)
+    locations["length"].append(length)
+```
+
+Now, we format into a DataFrame and divide `token_id` by `length` to express
+location as a percentage of the blurb.
+
+```{code-cell}
+locations = pd.DataFrame(locations)
+locations["location"] = round(locations["token_id"] / locations["length"], 1)
+```
+
+Is there any correlation between label and location?
+
+```{code-cell}
+locations[["label_id", "location"]].corr()
+```
+
+Unfortunately, no. However, you might keep such an analysis in mind if, for
+example, you were studying something like suspense. Perhaps suspenseful
+sentences (e.g. those labeled "suspenseful" or "not suspenseful") would reflect
+a meaningful correlation for token position. Narrativity in particular seems
+like it would greatly benefit from SHAP values, though a full analysis of this
+kind is something we leave for future work.

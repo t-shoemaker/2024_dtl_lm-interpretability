@@ -20,7 +20,7 @@ parse:
 
 execute:
   execute_notebooks: "auto"
-  timeout: 300
+  timeout: 600
 
 html:
   use_repository_button: true
