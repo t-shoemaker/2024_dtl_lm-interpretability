@@ -54,11 +54,10 @@ from transformers import TrainingArguments, Trainer, EarlyStoppingCallback
 from transformers import pipeline
 import evaluate
 from sklearn.metrics import classification_report, confusion_matrix
+import shap
+from nltk.corpus import stopwords
 import matplotlib.pyplot as plt
 import seaborn as sns
-import shap
-import nltk
-from nltk.corpus import stopwords
 ```
 
 With imports finished, we load the data.
@@ -781,7 +780,7 @@ we didn't do this, those variants and stopwords would clutter our final
 listing.
 
 ```{code-cell}
-drop = nltk.corpus.stopwords.words("english")
+drop = stopwords.words("english")
 drop += '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~“”’—–…'.strip()
 lowercased = shap_values.index.get_level_values(2).str.lower()
 ```
@@ -892,8 +891,10 @@ locations[["label_id", "location"]].corr()
 ```
 
 Unfortunately, no. However, you might keep such an analysis in mind if, for
-example, you were studying something like suspense. Perhaps suspenseful
-sentences (e.g. those labeled "suspenseful" or "not suspenseful") would reflect
-a meaningful correlation for token position. Narrativity in particular seems
-like it would greatly benefit from SHAP values, though a full analysis of this
-kind is something we leave for future work.
+example, you were studying something like suspense and had an annotated
+collection of suspenseful sentences and those that aren't. Perhaps those
+suspenseful sentences would reflect a meaningful correlation for token
+position. Generally speaking, analyses of narrativity seem like they would
+greatly benefit from SHAP values---though such an analysis is something we will
+leave for future work.
+
