@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
   
@@ -385,7 +385,7 @@ like probability, information, entropy, and perplexity. Using these measures as
 weighting for different sampling strategies, we implement a few simple text
 generators.</p>
 <ul class="simple">
-<li><p><strong>Data:</strong>: 59 <a class="reference external" href="https://www.poetryfoundation.org/poets/emily-dickinson#tab-poems">Emily Dickinson poems</a> collected from the Poetry
+<li><p><strong>Data:</strong> 59 <a class="reference external" href="https://www.poetryfoundation.org/poets/emily-dickinson#tab-poems">Emily Dickinson poems</a> collected from the Poetry
 Foundation</p></li>
 <li><p><strong>Credits:</strong> Portions of this chapter are adapted from Rafael Alvarado’s
 <a class="reference external" href="https://github.com/ontoligent/DS5001-2023-01-R/tree/main/lessons/M03_LanguageModels">Exploratory Text Analytics</a></p></li>
@@ -411,28 +411,31 @@ should be familiar: we defined them in the last chapter.</p>
 <details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-text">Show helper functions</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
-<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_corpus</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a corpus from file names.</span>
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_corpus</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a corpus from paths.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    datadir : Path</span>
-<span class="sd">        Directory where the files are stored</span>
-<span class="sd">    files : Iterable</span>
-<span class="sd">        A list of file names</span>
+<span class="sd">    paths : list[Path]</span>
+<span class="sd">        A list of paths</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    corpus : list</span>
+<span class="sd">    corpus : list[str]</span>
 <span class="sd">        The corpus</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Initialize an empty list to store the corpus</span>
     <span class="n">corpus</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">datadir</span> <span class="o">/</span> <span class="n">fname</span>
+    
+    <span class="c1"># March through each path, open the file, and load it</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
             <span class="n">doc</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="c1"># Then add the file to the list</span>
             <span class="n">corpus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
 
+    <span class="c1"># Return the result: a list of strings, where each string is the contents</span>
+    <span class="c1"># of a file</span>
     <span class="k">return</span> <span class="n">corpus</span>
 
 
@@ -559,7 +562,8 @@ a snippet:</p>
 <p>Now, load the corpus.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corpus</span> <span class="o">=</span> <span class="n">load_corpus</span><span class="p">(</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;poems&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;poems&quot;</span> <span class="o">/</span> <span class="n">fname</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]]</span>
+<span class="n">corpus</span> <span class="o">=</span> <span class="n">load_corpus</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -586,7 +590,7 @@ that, unlike with the obituaries, we are keeping the punctuation.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;a&#39;, &#39;bird&#39;, &#39;,&#39;, &#39;came&#39;, &#39;down&#39;, &#39;the&#39;, &#39;walk&#39;, &#39;-&#39;, &#39;he&#39;, &#39;did&#39;, &#39;not&#39;, &#39;know&#39;, &#39;i&#39;, &#39;saw&#39;, &#39;-&#39;, &#39;he&#39;, &#39;bit&#39;, &#39;an&#39;, &#39;angle&#39;, &#39;worm&#39;, &#39;in&#39;, &#39;halves&#39;, &#39;and&#39;, &#39;ate&#39;, &#39;the&#39;, &#39;fellow&#39;, &#39;,&#39;, &#39;raw&#39;, &#39;,&#39;, &#39;and&#39;, &#39;then&#39;, &#39;,&#39;, &#39;he&#39;, &#39;drank&#39;, &#39;a&#39;, &#39;dew&#39;, &#39;from&#39;, &#39;a&#39;, &#39;convenient&#39;, &#39;grass&#39;, &#39;-&#39;, &#39;and&#39;, &#39;then&#39;, &#39;hopped&#39;, &#39;sidewise&#39;, &#39;to&#39;, &#39;the&#39;, &#39;wall&#39;, &#39;to&#39;, &#39;let&#39;, &#39;a&#39;, &#39;beetle&#39;, &#39;pass&#39;, &#39;-&#39;, &#39;he&#39;, &#39;glanced&#39;, &#39;with&#39;, &#39;rapid&#39;, &#39;eyes&#39;, &#39;,&#39;, &#39;that&#39;, &#39;hurried&#39;, &#39;all&#39;, &#39;abroad&#39;, &#39;-&#39;, &#39;they&#39;, &#39;looked&#39;, &#39;like&#39;, &#39;frightened&#39;, &#39;beads&#39;, &#39;,&#39;, &#39;i&#39;, &#39;thought&#39;, &#39;,&#39;, &#39;he&#39;, &#39;stirred&#39;, &#39;his&#39;, &#39;velvet&#39;, &#39;head&#39;, &#39;.&#39;, &#39;-&#39;, &#39;like&#39;, &#39;one&#39;, &#39;in&#39;, &#39;danger&#39;, &#39;,&#39;, &#39;cautious&#39;, &#39;,&#39;, &#39;i&#39;, &#39;offered&#39;, &#39;him&#39;, &#39;a&#39;, &#39;crumb&#39;, &#39;,&#39;, &#39;and&#39;, &#39;he&#39;, &#39;unrolled&#39;, &#39;his&#39;, &#39;feathers&#39;, &#39;,&#39;, &#39;and&#39;, &#39;rowed&#39;, &#39;him&#39;, &#39;softer&#39;, &#39;home&#39;, &#39;-&#39;, &#39;than&#39;, &#39;oars&#39;, &#39;divide&#39;, &#39;the&#39;, &#39;ocean&#39;, &#39;,&#39;, &#39;too&#39;, &#39;silver&#39;, &#39;for&#39;, &#39;a&#39;, &#39;seam&#39;, &#39;,&#39;, &#39;or&#39;, &#39;butterflies&#39;, &#39;,&#39;, &#39;off&#39;, &#39;banks&#39;, &#39;of&#39;, &#39;noon&#39;, &#39;,&#39;, &#39;leap&#39;, &#39;,&#39;, &#39;plashless&#39;, &#39;as&#39;, &#39;they&#39;, &#39;swim&#39;, &#39;.&#39;]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;how&#39;, &#39;many&#39;, &#39;times&#39;, &#39;these&#39;, &#39;low&#39;, &#39;feet&#39;, &#39;staggered&#39;, &#39;-&#39;, &#39;only&#39;, &#39;the&#39;, &#39;soldered&#39;, &#39;mouth&#39;, &#39;can&#39;, &#39;tell&#39;, &#39;-&#39;, &#39;try&#39;, &#39;-&#39;, &#39;can&#39;, &#39;you&#39;, &#39;stir&#39;, &#39;the&#39;, &#39;awful&#39;, &#39;rivet&#39;, &#39;-&#39;, &#39;try&#39;, &#39;-&#39;, &#39;can&#39;, &#39;you&#39;, &#39;lift&#39;, &#39;the&#39;, &#39;hasps&#39;, &#39;of&#39;, &#39;steel&#39;, &#39;!&#39;, &#39;stroke&#39;, &#39;the&#39;, &#39;cool&#39;, &#39;forehead&#39;, &#39;-&#39;, &#39;hot&#39;, &#39;so&#39;, &#39;often&#39;, &#39;-&#39;, &#39;lift&#39;, &#39;-&#39;, &#39;if&#39;, &#39;you&#39;, &#39;care&#39;, &#39;-&#39;, &#39;the&#39;, &#39;listless&#39;, &#39;hair&#39;, &#39;-&#39;, &#39;handle&#39;, &#39;the&#39;, &#39;adamantine&#39;, &#39;fingers&#39;, &#39;never&#39;, &#39;a&#39;, &#39;thimble&#39;, &#39;-&#39;, &#39;more&#39;, &#39;-&#39;, &#39;shall&#39;, &#39;wear&#39;, &#39;-&#39;, &#39;buzz&#39;, &#39;the&#39;, &#39;dull&#39;, &#39;flies&#39;, &#39;-&#39;, &#39;on&#39;, &#39;the&#39;, &#39;chamber&#39;, &#39;window&#39;, &#39;-&#39;, &#39;brave&#39;, &#39;-&#39;, &#39;shines&#39;, &#39;the&#39;, &#39;sun&#39;, &#39;through&#39;, &#39;the&#39;, &#39;freckled&#39;, &#39;pane&#39;, &#39;-&#39;, &#39;fearless&#39;, &#39;-&#39;, &#39;the&#39;, &#39;cobweb&#39;, &#39;swings&#39;, &#39;from&#39;, &#39;the&#39;, &#39;ceiling&#39;, &#39;-&#39;, &#39;indolent&#39;, &#39;housewife&#39;, &#39;-&#39;, &#39;in&#39;, &#39;daisies&#39;, &#39;-&#39;, &#39;lain&#39;, &#39;!&#39;]
 </pre></div>
 </div>
 </div>
@@ -791,7 +795,7 @@ would simply choose tokens at random.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>! – of bee – the all mine – an
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>her a the the the hair not hear soul wood
 </pre></div>
 </div>
 </div>
@@ -806,7 +810,7 @@ would simply choose tokens at random.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tumbled fire everlasting our differed moved several drop town nuts
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>stanza cry oars just breathe breaths imperial shoe horrid play
 </pre></div>
 </div>
 </div>
@@ -889,7 +893,7 @@ probabilities in our corpus and repeat that value <code class="docutils literal 
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross-entropy: 0.07752334610447084
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross-entropy: 0.08007075960661701
 </pre></div>
 </div>
 </div>
@@ -931,8 +935,8 @@ over the average cross-entropy scores form the sampling run above.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>weighted      1.039992
-unweighted    1.056171
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>weighted      1.040151
+unweighted    1.056805
 dtype: float64
 </pre></div>
 </div>
@@ -974,7 +978,7 @@ Dickinson’s poetry.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(&#39;tell&#39;, &#39;all&#39;), (&#39;all&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;truth&#39;), (&#39;truth&#39;, &#39;but&#39;), (&#39;but&#39;, &#39;tell&#39;), (&#39;tell&#39;, &#39;it&#39;), (&#39;it&#39;, &#39;slant&#39;), (&#39;slant&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;success&#39;), (&#39;success&#39;, &#39;in&#39;), (&#39;in&#39;, &#39;circuit&#39;), (&#39;circuit&#39;, &#39;lies&#39;), (&#39;lies&#39;, &#39;too&#39;), (&#39;too&#39;, &#39;bright&#39;), (&#39;bright&#39;, &#39;for&#39;), (&#39;for&#39;, &#39;our&#39;), (&#39;our&#39;, &#39;infirm&#39;), (&#39;infirm&#39;, &#39;delight&#39;), (&#39;delight&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;truth&#39;), (&#39;truth&#39;, &quot;&#39;s&quot;), (&quot;&#39;s&quot;, &#39;superb&#39;), (&#39;superb&#39;, &#39;surprise&#39;), (&#39;surprise&#39;, &#39;as&#39;), (&#39;as&#39;, &#39;lightning&#39;), (&#39;lightning&#39;, &#39;to&#39;), (&#39;to&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;children&#39;), (&#39;children&#39;, &#39;eased&#39;), (&#39;eased&#39;, &#39;with&#39;), (&#39;with&#39;, &#39;explanation&#39;), (&#39;explanation&#39;, &#39;kind&#39;), (&#39;kind&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;truth&#39;), (&#39;truth&#39;, &#39;must&#39;), (&#39;must&#39;, &#39;dazzle&#39;), (&#39;dazzle&#39;, &#39;gradually&#39;), (&#39;gradually&#39;, &#39;or&#39;), (&#39;or&#39;, &#39;every&#39;), (&#39;every&#39;, &#39;man&#39;), (&#39;man&#39;, &#39;be&#39;), (&#39;be&#39;, &#39;blind&#39;), (&#39;blind&#39;, &#39;—&#39;)]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(&#39;i&#39;, &#39;have&#39;), (&#39;have&#39;, &#39;never&#39;), (&#39;never&#39;, &#39;seen&#39;), (&#39;seen&#39;, &#39;``&#39;), (&#39;``&#39;, &#39;volcanoes&#39;), (&#39;volcanoes&#39;, &quot;&#39;&#39;&quot;), (&quot;&#39;&#39;&quot;, &#39;—&#39;), (&#39;—&#39;, &#39;but&#39;), (&#39;but&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;when&#39;), (&#39;when&#39;, &#39;travellers&#39;), (&#39;travellers&#39;, &#39;tell&#39;), (&#39;tell&#39;, &#39;how&#39;), (&#39;how&#39;, &#39;those&#39;), (&#39;those&#39;, &#39;old&#39;), (&#39;old&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;phlegmatic&#39;), (&#39;phlegmatic&#39;, &#39;mountains&#39;), (&#39;mountains&#39;, &#39;usually&#39;), (&#39;usually&#39;, &#39;so&#39;), (&#39;so&#39;, &#39;still&#39;), (&#39;still&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;bear&#39;), (&#39;bear&#39;, &#39;within&#39;), (&#39;within&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;appalling&#39;), (&#39;appalling&#39;, &#39;ordnance&#39;), (&#39;ordnance&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;fire&#39;), (&#39;fire&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;smoke&#39;), (&#39;smoke&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;gun&#39;), (&#39;gun&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;taking&#39;), (&#39;taking&#39;, &#39;villages&#39;), (&#39;villages&#39;, &#39;for&#39;), (&#39;for&#39;, &#39;breakfast&#39;), (&#39;breakfast&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;appalling&#39;), (&#39;appalling&#39;, &#39;men&#39;), (&#39;men&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;if&#39;), (&#39;if&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;stillness&#39;), (&#39;stillness&#39;, &#39;is&#39;), (&#39;is&#39;, &#39;volcanic&#39;), (&#39;volcanic&#39;, &#39;in&#39;), (&#39;in&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;human&#39;), (&#39;human&#39;, &#39;face&#39;), (&#39;face&#39;, &#39;when&#39;), (&#39;when&#39;, &#39;upon&#39;), (&#39;upon&#39;, &#39;a&#39;), (&#39;a&#39;, &#39;pain&#39;), (&#39;pain&#39;, &#39;titanic&#39;), (&#39;titanic&#39;, &#39;features&#39;), (&#39;features&#39;, &#39;keep&#39;), (&#39;keep&#39;, &#39;their&#39;), (&#39;their&#39;, &#39;place&#39;), (&#39;place&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;if&#39;), (&#39;if&#39;, &#39;at&#39;), (&#39;at&#39;, &#39;length&#39;), (&#39;length&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;smouldering&#39;), (&#39;smouldering&#39;, &#39;anguish&#39;), (&#39;anguish&#39;, &#39;will&#39;), (&#39;will&#39;, &#39;not&#39;), (&#39;not&#39;, &#39;overcome&#39;), (&#39;overcome&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;palpitating&#39;), (&#39;palpitating&#39;, &#39;vineyard&#39;), (&#39;vineyard&#39;, &#39;in&#39;), (&#39;in&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;dust&#39;), (&#39;dust&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;be&#39;), (&#39;be&#39;, &#39;thrown&#39;), (&#39;thrown&#39;, &#39;?&#39;), (&#39;?&#39;, &#39;if&#39;), (&#39;if&#39;, &#39;some&#39;), (&#39;some&#39;, &#39;loving&#39;), (&#39;loving&#39;, &#39;antiquary&#39;), (&#39;antiquary&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;on&#39;), (&#39;on&#39;, &#39;resumption&#39;), (&#39;resumption&#39;, &#39;morn&#39;), (&#39;morn&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;will&#39;), (&#39;will&#39;, &#39;not&#39;), (&#39;not&#39;, &#39;cry&#39;), (&#39;cry&#39;, &#39;with&#39;), (&#39;with&#39;, &#39;joy&#39;), (&#39;joy&#39;, &#39;``&#39;), (&#39;``&#39;, &#39;pompeii&#39;), (&#39;pompeii&#39;, &quot;&#39;&#39;&quot;), (&quot;&#39;&#39;&quot;, &#39;!&#39;), (&#39;!&#39;, &#39;to&#39;), (&#39;to&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;hills&#39;), (&#39;hills&#39;, &#39;return&#39;), (&#39;return&#39;, &#39;!&#39;)]
 </pre></div>
 </div>
 </div>
@@ -1380,11 +1384,11 @@ this new DataFrame will represent the conditional probability of moving from
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>the soul - the soul has a bubble antedate and
-pillow - you not the mind that all the flag
-and me away my gown - then i took the
-dead , with blue - despair . somewhere – a
-the pier to die or pause dilapidation &#39;s corporeal illustration
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>of ground – dying eyes around - when , it
+alibi - blushes , nor would overflow with domains in
+and do the town – i guard my brain –
+it ’ ll put away we can tell you left
+s deep pillow - drop affirming it – some keep
 </pre></div>
 </div>
 </div>
@@ -1442,7 +1446,7 @@ the token/bigram is sampled more frequently than ones with lower probabilities.<
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>–
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-
 </pre></div>
 </div>
 </div>
@@ -1541,11 +1545,11 @@ performs a cutoff to the <code class="docutils literal notranslate"><span class=
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>–
--
-from
-from
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>with
+,
+–
 with
+-
 </pre></div>
 </div>
 </div>
@@ -1652,33 +1656,29 @@ which will correspond to one of the above sampling strategies.</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Strategy: weighted
-+ - and past it has a rush of all my soul has stopped - despair
-+ have passed the chance , and then – they were , though adjoining as dots
-+ eyes – and sore must go – and wonder how the sign in all -
-+ currer bell ” in the meadows – i never misses a tighter breathing and is
-+ floor too sharp became retire to him ! could abash the fellow , the fields
++ “ still ” laid . the figures i thought a legacy of ground , so
++ whip lash unbraiding in the smouldering anguish will not who bear within — or out
++ – and all the horror welcomes her — is out – in vision - and
++ brown - it wrinkled and every blossom on my ancle – the seal despair –
++ recess – too expensive ! but we passed the spreading wide that she one in
 
 
 Strategy: greedy
-+ filled was not the soul - and then the soul - and then the soul
-+ amber hand – and then the soul - and then the soul - and then
-+ i ’ s abyss , and then the soul - and then the soul -
-+ feeling comes , and then the soul - and then the soul - and then
-+ – and then the soul - and then the soul - and then the soul
++ and then the soul - and then the soul - and then the soul -
++ had nature an instant &#39;s a bird , and then the soul - and then
++ sore must be the soul - and then the soul - and then the soul
++ the soul - and then the soul - and then the soul - and then
++ - and then the soul - and then the soul - and then the soul
 
 
 Strategy: topk
-+ at the day i thought my ancle – and now we slowly – and the
-+ . alien , and my bars only tulle – we passed the stillness in corners
++ ! lips the house support itself and my life afresh annihilating me , the house
++ and yet it &#39;s a fly - and then i know the day i never
++ whole force flame and yet - by the sun – i felt a house is
++ lonely place — appalling men eat me – he exists . god preaches , as
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+ of the air from the sea ! but we can tell all - in my
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+ – the one in corners - the sea – and he bit an instant ,
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+ films can find no more numerous of me dead , and then – and me
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+ in the one that all the sea - to be blind — it a star
 </pre></div>
 </div>
 </div>
@@ -1734,9 +1734,9 @@ the corpus.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>greedy      3899.066232
-topk        5220.108933
-weighted    6820.903227
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>greedy      4323.149425
+topk        5365.529503
+weighted    5862.131479
 dtype: float64
 </pre></div>
 </div>
@@ -1768,9 +1768,9 @@ bear this out:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>greedy     -3.153784
-topk       -3.195786
-weighted   -3.225776
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>topk       -3.134420
+greedy     -3.149291
+weighted   -3.276105
 dtype: float64
 </pre></div>
 </div>
