@@ -56,28 +56,31 @@ should be familiar: we defined them in the last chapter.
 
 ```{code-cell}
 :tags: [remove_cell]
-def load_corpus(datadir, files):
-    """Load a corpus from file names.
+def load_corpus(paths):
+    """Load a corpus from paths.
 
     Parameters
     ----------
-    datadir : Path
-        Directory where the files are stored
-    files : Iterable
-        A list of file names
+    paths : list[Path]
+        A list of paths
 
     Returns
     -------
-    corpus : list
+    corpus : list[str]
         The corpus
     """
+    # Initialize an empty list to store the corpus
     corpus = []
-    for fname in files:
-        path = datadir / fname
+    
+    # March through each path, open the file, and load it
+    for path in paths:
         with path.open("r") as fin:
             doc = fin.read()
+            # Then add the file to the list
             corpus.append(doc)
 
+    # Return the result: a list of strings, where each string is the contents
+    # of a file
     return corpus
 
 
@@ -110,28 +113,31 @@ def preprocess(doc, ngram = 1):
 
 ````{dropdown} Show helper functions
 ```py
-def load_corpus(datadir, files):
-    """Load a corpus from file names.
+def load_corpus(paths):
+    """Load a corpus from paths.
 
     Parameters
     ----------
-    datadir : Path
-        Directory where the files are stored
-    files : Iterable
-        A list of file names
+    paths : list[Path]
+        A list of paths
 
     Returns
     -------
-    corpus : list
+    corpus : list[str]
         The corpus
     """
+    # Initialize an empty list to store the corpus
     corpus = []
-    for fname in files:
-        path = datadir / fname
+    
+    # March through each path, open the file, and load it
+    for path in paths:
         with path.open("r") as fin:
             doc = fin.read()
+            # Then add the file to the list
             corpus.append(doc)
 
+    # Return the result: a list of strings, where each string is the contents
+    # of a file
     return corpus
 
 
@@ -182,7 +188,8 @@ metadata.head()
 Now, load the corpus.
 
 ```{code-cell}
-corpus = load_corpus(datadir / "poems", metadata["file"])
+paths = [datadir / "poems" / fname for fname in metadata["file"]]
+corpus = load_corpus(paths)
 ```
 
 And we're ready!
