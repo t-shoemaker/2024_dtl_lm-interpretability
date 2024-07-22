@@ -1004,23 +1004,7 @@ way to generalize across all types of bigrams in the corpus.
 But consider what the results do tell us: greedy sampling performs the best by
 this metric. Since it always picks the most likely token, its selection will
 push toward the center of the probability mass, whereas the other two
-strategies allow tokens from outside that center. Looking at the log
-probabilities---the negative of information---for each sampling strategy should
-bear this out:
-
-```{code-cell}
-log_probs = {"weighted": [], "greedy": [], "topk": []}
-for strategy, sampler in samplers.items():
-    for _ in range(100):
-        sequence, metadata = generate_from_sampler(
-            unigram_df, bigram_df, bigram_probs, sampler, N = N
-        )
-        lp = -metadata["info"].mean()
-        log_probs[strategy].append(lp)
-
-log_probs = pd.DataFrame(log_probs)
-print(log_probs.mean().sort_values(ascending = False))
-```
-
-This ends up being an important lesson, however: _a model that performs well
+strategies allow tokens from outside that center. Even so, the latter two
+strategies produce more readable text, at least by our standards as human
+readers. This ends up being an important lesson: _a model that performs well
 with respect to metrics does not necessarily mean it is a good model_.
