@@ -9,9 +9,9 @@ import pandas as pd
 
 
 def get_blurb(
-    tag: bs4.element.Tag,
-    keys: tuple = ("author", "title", "d0", "d1", "published", "isbn"),
-) -> dict:
+    tag,
+    keys=("author", "title", "d0", "d1", "published", "isbn"),
+):
     """Get a book blurb and its associated metadata.
 
     Parameters
@@ -29,7 +29,7 @@ def get_blurb(
     return book
 
 
-def sample(df: pd.DataFrame, label: str, topn: int) -> pd.DataFrame:
+def sample(df, label, topn=10):
     """Sample the blurb DataFrame to the minimum of top-N label counts.
 
     Parameters
@@ -45,8 +45,7 @@ def sample(df: pd.DataFrame, label: str, topn: int) -> pd.DataFrame:
     sample = counts.min()
     df = df[df[label].isin(counts.index)]
     df = (
-        df
-        .groupby(label)
+        df.groupby(label)
         .apply(lambda group: group.sample(sample), include_groups=False)
         .droplevel(1)
         .reset_index()
@@ -55,7 +54,7 @@ def sample(df: pd.DataFrame, label: str, topn: int) -> pd.DataFrame:
     return df
 
 
-def main(args: argparse.Namespace) -> None:
+def main(args):
     """Run the script."""
     with args.infile.open("r") as fin:
         data = fin.read()

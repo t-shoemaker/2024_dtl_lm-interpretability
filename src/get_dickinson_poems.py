@@ -126,9 +126,7 @@ def main(args):
             print(poem, file=fout)
 
         # Add its metadata to a running list
-        poems.append(
-            {"title": title, "number": poem_number, "file": fname}
-        )
+        poems.append({"title": title, "number": poem_number, "file": fname})
 
         # Log, then sleep
         if (idx + 1) % 5 == 0:
