@@ -1,0 +1,1914 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>4. N-gram Models &#8212; Introduction to Interpretability for Language Models</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/04_ngram-models';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="3. Data Analysis in Python" href="03_data-analysis-basics.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Introduction to Interpretability for Language Models</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Overview
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Basics</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_getting-started.html">1. Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_python-basics.html">2. Python Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_data-analysis-basics.html">3. Data Analysis in Python</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Language Models</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4. N-gram Models</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/t-shoemaker/2024_dtl_lm-interpretability" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/04_ngram-models.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>N-gram Models</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">4.1. Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unigrams">4.2. Unigrams</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unigram-metrics">4.2.1. Unigram metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generation">4.2.2. Generation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unigram-modeling">4.2.3. Unigram modeling</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bigrams">4.3. Bigrams</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bigram-metrics">4.3.1. Bigram metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">4.3.2. Generation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sampling-strategies">4.4. Sampling Strategies</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#weighted-sampling">4.4.1. Weighted sampling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#greedy-sampling">4.4.2. Greedy sampling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#top-k-sampling">4.4.3. Top-k sampling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generation-with-different-sampling-strategies">4.4.4. Generation with different sampling strategies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-sampling-strategies">4.4.5. Measuring sampling strategies</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="n-gram-models">
+<h1><span class="section-number">4. </span>N-gram Models<a class="headerlink" href="#n-gram-models" title="Link to this heading">#</a></h1>
+<p>This chapter discusses n-gram models. We will create unigram (single-token) and
+bigram (two-token) sequences from a corpus, about which we compute measures
+like probability, information, entropy, and perplexity. Using these measures as
+weighting for different sampling strategies, we implement a few simple text
+generators.</p>
+<ul class="simple">
+<li><p><strong>Data:</strong>: 59 <a class="reference external" href="https://www.poetryfoundation.org/poets/emily-dickinson#tab-poems">Emily Dickinson poems</a> collected from the Poetry
+Foundation</p></li>
+<li><p><strong>Credits:</strong> Portions of this chapter are adapted from Rafael Alvarado’s
+<a class="reference external" href="https://github.com/ontoligent/DS5001-2023-01-R/tree/main/lessons/M03_LanguageModels">Exploratory Text Analytics</a></p></li>
+</ul>
+<section id="preliminaries">
+<h2><span class="section-number">4.1. </span>Preliminaries<a class="headerlink" href="#preliminaries" title="Link to this heading">#</a></h2>
+<p>Here are the libraries we need:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">nltk</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Two helper functions will load the corpus and prepare it for modeling. They
+should be familiar: we defined them in the last chapter.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Show helper functions</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">load_corpus</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a corpus from file names.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    datadir : Path</span>
+<span class="sd">        Directory where the files are stored</span>
+<span class="sd">    files : Iterable</span>
+<span class="sd">        A list of file names</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    corpus : list</span>
+<span class="sd">        The corpus</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">corpus</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">datadir</span> <span class="o">/</span> <span class="n">fname</span>
+        <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">corpus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">corpus</span>
+
+
+<span class="k">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">ngram</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Preprocess a document.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    doc : str</span>
+<span class="sd">        The document to preprocess</span>
+<span class="sd">    ngram : int</span>
+<span class="sd">        How many n-grams to break the document into</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tokens : list</span>
+<span class="sd">        Tokenized document</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># First, change the case of the words to lowercase</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="c1"># Tokenize the string. Optionally, make 2-gram (or more) sequences from</span>
+    <span class="c1"># those tokens</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">word_tokenize</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ngram</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">nltk</span><span class="o">.</span><span class="n">ngrams</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="n">ngram</span><span class="p">))</span>
+    
+    <span class="k">return</span> <span class="n">tokens</span>
+</pre></div>
+</div>
+</div>
+</details><p>Now, set up the data directory and load a file manifest.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">datadir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;data/texts/dickinson&quot;</span><span class="p">)</span>
+<span class="n">metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;metadata.csv&quot;</span><span class="p">)</span>
+
+<span class="n">metadata</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 59 entries, 0 to 58
+Data columns (total 3 columns):
+ #   Column  Non-Null Count  Dtype  
+---  ------  --------------  -----  
+ 0   title   59 non-null     object 
+ 1   number  57 non-null     float64
+ 2   file    59 non-null     object 
+dtypes: float64(1), object(2)
+memory usage: 1.5+ KB
+</pre></div>
+</div>
+</div>
+</div>
+<p>We won’t be using much of this data, but it helps keep our work aligned. Here’s
+a snippet:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">metadata</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>title</th>
+      <th>number</th>
+      <th>file</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>After great pain, a formal feeling comes –</td>
+      <td>372.0</td>
+      <td>00.txt</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>All overgrown by cunning moss,</td>
+      <td>146.0</td>
+      <td>01.txt</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Banish Air from Air</td>
+      <td>963.0</td>
+      <td>02.txt</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Because I could not stop for Death –</td>
+      <td>479.0</td>
+      <td>03.txt</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Before I got my eye put out –</td>
+      <td>336.0</td>
+      <td>04.txt</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Now, load the corpus.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corpus</span> <span class="o">=</span> <span class="n">load_corpus</span><span class="p">(</span><span class="n">datadir</span> <span class="o">/</span> <span class="s2">&quot;poems&quot;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And we’re ready!</p>
+</section>
+<section id="unigrams">
+<h2><span class="section-number">4.2. </span>Unigrams<a class="headerlink" href="#unigrams" title="Link to this heading">#</a></h2>
+<p>First: unigrams. Below, we preprocess the corpus into lists of tokens. Note
+that, unlike with the obituaries, we are keeping the punctuation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unigrams</span> <span class="o">=</span> <span class="p">[</span><span class="n">preprocess</span><span class="p">(</span><span class="n">poem</span><span class="p">,</span> <span class="n">ngram</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">poem</span> <span class="ow">in</span> <span class="n">corpus</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Example:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">corpus</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">unigrams</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;a&#39;, &#39;bird&#39;, &#39;,&#39;, &#39;came&#39;, &#39;down&#39;, &#39;the&#39;, &#39;walk&#39;, &#39;-&#39;, &#39;he&#39;, &#39;did&#39;, &#39;not&#39;, &#39;know&#39;, &#39;i&#39;, &#39;saw&#39;, &#39;-&#39;, &#39;he&#39;, &#39;bit&#39;, &#39;an&#39;, &#39;angle&#39;, &#39;worm&#39;, &#39;in&#39;, &#39;halves&#39;, &#39;and&#39;, &#39;ate&#39;, &#39;the&#39;, &#39;fellow&#39;, &#39;,&#39;, &#39;raw&#39;, &#39;,&#39;, &#39;and&#39;, &#39;then&#39;, &#39;,&#39;, &#39;he&#39;, &#39;drank&#39;, &#39;a&#39;, &#39;dew&#39;, &#39;from&#39;, &#39;a&#39;, &#39;convenient&#39;, &#39;grass&#39;, &#39;-&#39;, &#39;and&#39;, &#39;then&#39;, &#39;hopped&#39;, &#39;sidewise&#39;, &#39;to&#39;, &#39;the&#39;, &#39;wall&#39;, &#39;to&#39;, &#39;let&#39;, &#39;a&#39;, &#39;beetle&#39;, &#39;pass&#39;, &#39;-&#39;, &#39;he&#39;, &#39;glanced&#39;, &#39;with&#39;, &#39;rapid&#39;, &#39;eyes&#39;, &#39;,&#39;, &#39;that&#39;, &#39;hurried&#39;, &#39;all&#39;, &#39;abroad&#39;, &#39;-&#39;, &#39;they&#39;, &#39;looked&#39;, &#39;like&#39;, &#39;frightened&#39;, &#39;beads&#39;, &#39;,&#39;, &#39;i&#39;, &#39;thought&#39;, &#39;,&#39;, &#39;he&#39;, &#39;stirred&#39;, &#39;his&#39;, &#39;velvet&#39;, &#39;head&#39;, &#39;.&#39;, &#39;-&#39;, &#39;like&#39;, &#39;one&#39;, &#39;in&#39;, &#39;danger&#39;, &#39;,&#39;, &#39;cautious&#39;, &#39;,&#39;, &#39;i&#39;, &#39;offered&#39;, &#39;him&#39;, &#39;a&#39;, &#39;crumb&#39;, &#39;,&#39;, &#39;and&#39;, &#39;he&#39;, &#39;unrolled&#39;, &#39;his&#39;, &#39;feathers&#39;, &#39;,&#39;, &#39;and&#39;, &#39;rowed&#39;, &#39;him&#39;, &#39;softer&#39;, &#39;home&#39;, &#39;-&#39;, &#39;than&#39;, &#39;oars&#39;, &#39;divide&#39;, &#39;the&#39;, &#39;ocean&#39;, &#39;,&#39;, &#39;too&#39;, &#39;silver&#39;, &#39;for&#39;, &#39;a&#39;, &#39;seam&#39;, &#39;,&#39;, &#39;or&#39;, &#39;butterflies&#39;, &#39;,&#39;, &#39;off&#39;, &#39;banks&#39;, &#39;of&#39;, &#39;noon&#39;, &#39;,&#39;, &#39;leap&#39;, &#39;,&#39;, &#39;plashless&#39;, &#39;as&#39;, &#39;they&#39;, &#39;swim&#39;, &#39;.&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<section id="unigram-metrics">
+<h3><span class="section-number">4.2.1. </span>Unigram metrics<a class="headerlink" href="#unigram-metrics" title="Link to this heading">#</a></h3>
+<p>We convert to a DataFrame to run computations on these tokens. The cell below
+performs the following operations:</p>
+<ol class="arabic simple">
+<li><p>Make a DataFrame by assigning the token lists to a column, <code class="docutils literal notranslate"><span class="pre">w1</span></code></p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">.explode()</span></code> to unpack those lists into individual rows</p></li>
+<li><p>Count the number of times each token appears with <code class="docutils literal notranslate"><span class="pre">.value_counts()</span></code></p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">.to_frame()</span></code> to convert the counts (which is a Series) back to a
+DataFrame, storing the counts in a new column, <code class="docutils literal notranslate"><span class="pre">n</span></code></p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unigram_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;w1&quot;</span><span class="p">:</span> <span class="n">unigrams</span><span class="p">})</span>
+<span class="n">unigram_df</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">unigram_df</span>
+    <span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="s2">&quot;w1&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="s2">&quot;w1&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Fully formatted:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unigram_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>n</th>
+    </tr>
+    <tr>
+      <th>w1</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>-</th>
+      <td>269</td>
+    </tr>
+    <tr>
+      <th>the</th>
+      <td>265</td>
+    </tr>
+    <tr>
+      <th>–</th>
+      <td>235</td>
+    </tr>
+    <tr>
+      <th>,</th>
+      <td>189</td>
+    </tr>
+    <tr>
+      <th>and</th>
+      <td>137</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>With the data formatted, we can compute metrics about these tokens.</p>
+<p>Computing the <strong>probability</strong> of tokens is simple. For token <span class="math notranslate nohighlight">\(w\)</span>, we find its
+count <span class="math notranslate nohighlight">\(n\)</span> and divide that by the total number of tokens in the corpus, <span class="math notranslate nohighlight">\(C\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+P(w) = \frac{n(w)}{C}
+\]</div>
+<p>Implementing in code is straightforward:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">C</span> <span class="o">=</span> <span class="n">unigram_df</span><span class="p">[</span><span class="s2">&quot;n&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">unigram_df</span><span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">unigram_df</span><span class="p">[</span><span class="s2">&quot;n&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">C</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>A token’s <strong>surprise</strong> is its inverse probability.</p>
+<div class="math notranslate nohighlight">
+\[
+S(w) = \frac{1}{P(w)}
+\]</div>
+<p>We use this to calculate <strong>information</strong>, which is the log-normalized surprise
+of a token. Note our use of <span class="math notranslate nohighlight">\(\log_2\)</span>. This is to express information in terms
+of <strong>bits</strong>.</p>
+<div class="math notranslate nohighlight">
+\[
+I(w) = \log_2(S(w))
+\]</div>
+<p>Doing this in code is also straightforward:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unigram_df</span><span class="p">[</span><span class="s2">&quot;info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">unigram_df</span><span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>If we look at the information values, we will see that most are quite high.
+This should make sense. Information is just the normalized surprise of a token,
+which increases as its probability decreases. Because most tokens have low
+probability, they have high information.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">token_idx</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">unigram_df</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">measure</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">]):</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span>
+        <span class="n">unigram_df</span><span class="p">[</span><span class="n">measure</span><span class="p">],</span>
+        <span class="n">fill</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">cumulative</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">clip</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">unigram_df</span><span class="p">[</span><span class="n">measure</span><span class="p">])),</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">measure</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span>
+        <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Density (% tokens)&quot;</span>
+    <span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/0f3a28496278f155179b312e88e59d954f9cb926b357ae761a3eaa6a01b71a90.png" src="../_images/0f3a28496278f155179b312e88e59d954f9cb926b357ae761a3eaa6a01b71a90.png" />
+</div>
+</div>
+<p><strong>Self-entropy</strong> <span class="math notranslate nohighlight">\(h\)</span> is a token’s information value, calculated by multiplying
+its probability by its information:</p>
+<div class="math notranslate nohighlight">
+\[
+h(w) = P(w) \cdot I(w)
+\]</div>
+<p>The sum of all self-entropy values is the <strong>entropy</strong> <span class="math notranslate nohighlight">\(H\)</span>, an overall measure
+of uncertainty in our token frequencies. It is the <strong>weighted average</strong> of the
+number of bits required to encode some data.</p>
+<div class="math notranslate nohighlight">
+\[
+H = \sum_{w} P(w) \cdot I(w)
+\]</div>
+<p>Why not take the average of <span class="math notranslate nohighlight">\(I\)</span>? Look at the skew in tokens frequency. Certain
+tokens make disproportionate contributions to the overall distribution of
+values in our data, which a raw average would not reflect.</p>
+<p>In code, calculating entropy looks like the following:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">unigram_df</span><span class="p">[</span><span class="s2">&quot;self-entropy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">unigram_df</span><span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">unigram_df</span><span class="p">[</span><span class="s2">&quot;info&quot;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Entropy of unigrams:&quot;</span><span class="p">,</span> <span class="n">unigram_df</span><span class="p">[</span><span class="s2">&quot;self-entropy&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Entropy of unigrams: 8.392710150066268
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="generation">
+<h3><span class="section-number">4.2.2. </span>Generation<a class="headerlink" href="#generation" title="Link to this heading">#</a></h3>
+<p>Having the probability distribution of unigrams in our corpus enables to do
+text generation—of a very primitive kind. Technically, <em>generation</em> here just
+means sampling from the distribution. We <strong>weight</strong> our sampling function with
+token probabilities so that more probable tokens are sampled more frequently
+than less probable ones. If we didn’t do that weighting, the sampling function
+would simply choose tokens at random.</p>
+<p>Our sampling function is the <code class="docutils literal notranslate"><span class="pre">.sample()</span></code> method in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>. Below, we sample
+10 tokens and use the values in <code class="docutils literal notranslate"><span class="pre">prob</span></code> as our weighting. We set <code class="docutils literal notranslate"><span class="pre">replace</span></code> to
+<code class="docutils literal notranslate"><span class="pre">True</span></code> to allow a token to be sampled multiple times.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sampled</span> <span class="o">=</span> <span class="n">unigram_df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="s2">&quot;prob&quot;</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">seq</span> <span class="o">=</span> <span class="n">sampled</span><span class="o">.</span><span class="n">index</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>! – of bee – the all mine – an
+</pre></div>
+</div>
+</div>
+</div>
+<p>But, really, is the above any better than an unweighted sampling?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sampled</span> <span class="o">=</span> <span class="n">unigram_df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">seq</span> <span class="o">=</span> <span class="n">sampled</span><span class="o">.</span><span class="n">index</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tumbled fire everlasting our differed moved several drop town nuts
+</pre></div>
+</div>
+</div>
+</div>
+<p>…maybe? It’s hard to tell by reading the outputs alone. But what we can do is
+use another metric, <strong>cross-entropy</strong>, to measure how well these two sampling
+strategies do against a baseline probability distribution. Cross-entropy is
+closely related to entropy. It measures the average amount of information
+needed to encode one probability distribution into another. That is, it is a
+measure of how well one distribution approximates the other.</p>
+<p>We express cross-entropy as follows:</p>
+<div class="math notranslate nohighlight">
+\[
+H_{\text{cross}}(P, Q) = -\sum_w P(w)\log_2(Q(w))
+\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(H_{\text{cross}}(P, Q)\)</span> is the cross-entropy between the true distribution
+<span class="math notranslate nohighlight">\(P\)</span> and the estimated distribution <span class="math notranslate nohighlight">\(Q\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(P(w)\)</span> is the true probability of the token <span class="math notranslate nohighlight">\(w\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(Q(w)\)</span> is the estimated probability of the token <span class="math notranslate nohighlight">\(w\)</span></p></li>
+</ul>
+<p>In this small experiment, “predicted” probabilities will just be the average
+probability of a token in the corpus. This acts as a baseline against which we
+can measure the sampling strategies.</p>
+</section>
+<section id="unigram-modeling">
+<h3><span class="section-number">4.2.3. </span>Unigram modeling<a class="headerlink" href="#unigram-modeling" title="Link to this heading">#</a></h3>
+<p>Let’s set up the pieces we need. First, we define how many tokens <code class="docutils literal notranslate"><span class="pre">N</span></code> will be
+sampled for each strategy. Then we create a vector of the mean token
+probabilities in our corpus and repeat that value <code class="docutils literal notranslate"><span class="pre">N</span></code> times.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">baseline</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">unigram_df</span><span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">N</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">baseline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[0.00067843 0.00067843 0.00067843 0.00067843 0.00067843 0.00067843
+ 0.00067843 0.00067843 0.00067843 0.00067843]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we define a function to calculate cross-entropy:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">calculate_cross_entropy</span><span class="p">(</span><span class="n">Pw</span><span class="p">,</span> <span class="n">Qw</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the cross-entropy of distribution against another.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Pw : np.ndarray</span>
+<span class="sd">        True values of the distribution</span>
+<span class="sd">    Qw : np.ndarray</span>
+<span class="sd">        Predicted distribution</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cross_entropy : float</span>
+<span class="sd">        The cross-entropy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log_Qw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">Qw</span><span class="p">)</span>
+    <span class="n">Sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Pw</span> <span class="o">*</span> <span class="n">log_Qw</span><span class="p">)</span>
+    <span class="n">cross_entropy</span> <span class="o">=</span> <span class="o">-</span><span class="n">Sigma</span>
+    
+    <span class="k">return</span> <span class="n">cross_entropy</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here is some example output:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cross_entropy</span> <span class="o">=</span> <span class="n">calculate_cross_entropy</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="n">sampled</span><span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cross-entropy:&quot;</span><span class="p">,</span> <span class="n">cross_entropy</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross-entropy: 0.07752334610447084
+</pre></div>
+</div>
+</div>
+</div>
+<p>But to do our test, we will calculate the cross-entropy scores for our two
+sampling functions many times in a <code class="docutils literal notranslate"><span class="pre">for</span></code> loop:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">samplers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;weighted&quot;</span><span class="p">:</span> <span class="s2">&quot;prob&quot;</span><span class="p">,</span> <span class="s2">&quot;unweighted&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+<span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;weighted&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;unweighted&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+<span class="k">for</span> <span class="n">strategy</span><span class="p">,</span> <span class="n">sampler</span> <span class="ow">in</span> <span class="n">samplers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+        <span class="n">sequence</span> <span class="o">=</span> <span class="n">unigram_df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="n">N</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">sampler</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">cross_entropy</span> <span class="o">=</span> <span class="n">calculate_cross_entropy</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="n">sequence</span><span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">])</span>
+        <span class="n">results</span><span class="p">[</span><span class="n">strategy</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cross_entropy</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Cross-entropy is a common loss function in language modeling, but when it’s
+used to report on model performance you will most often see it transformed into
+<strong>perplexity</strong>. Perplexity is cross-entropy’s exponentiation:</p>
+<div class="math notranslate nohighlight">
+\[
+PP = 2^{H_{\text{cross}}}
+\]</div>
+<p>The value this produces is the average number of choices a model has to make to
+predict the next token in a generated sequence. Below, we calculate perplexity
+over the average cross-entropy scores form the sampling run above.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">perplexity</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">perplexity</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">perplexity</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="n">perplexity</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">perplexity</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>weighted      1.039992
+unweighted    1.056171
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>When compared against the average probability of tokens in our corpus, our
+weighted sampling strategy has slightly less perplexity than our unweighted
+one. That tells us it is somewhat easier to represent our baseline distribution
+with the weighted samples than with the unweighted ones. In other words, the
+weighted samples are a better approximation of the mean probability of tokens
+in our corpus.</p>
+<p>Cross-entropy and perplexity are two ways to validate such a model, but they
+are not necessarily the final determinants for what makes a good model. Neither
+sampling strategy gives us readable outputs, for example, and this is because
+the underlying data does not capture sequential relationships between tokens,
+which we readers expect. Any sampling strategy can only improve a unigram
+distribution by so much if those relationships are absent in the data.</p>
+</section>
+</section>
+<section id="bigrams">
+<h2><span class="section-number">4.3. </span>Bigrams<a class="headerlink" href="#bigrams" title="Link to this heading">#</a></h2>
+<p>We now turn to bigrams, or sequences of two tokens. Representing the corpus as
+bigrams will produce a model that encodes sequential information about
+Dickinson’s poetry.</p>
+<p>As before, we preprocess the corpus, but this time we set <code class="docutils literal notranslate"><span class="pre">ngram</span> <span class="pre">=</span> <span class="pre">2</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bigrams</span> <span class="o">=</span> <span class="p">[</span><span class="n">preprocess</span><span class="p">(</span><span class="n">poem</span><span class="p">,</span> <span class="n">ngram</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">poem</span> <span class="ow">in</span> <span class="n">corpus</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>An example:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">corpus</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">bigrams</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(&#39;tell&#39;, &#39;all&#39;), (&#39;all&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;truth&#39;), (&#39;truth&#39;, &#39;but&#39;), (&#39;but&#39;, &#39;tell&#39;), (&#39;tell&#39;, &#39;it&#39;), (&#39;it&#39;, &#39;slant&#39;), (&#39;slant&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;success&#39;), (&#39;success&#39;, &#39;in&#39;), (&#39;in&#39;, &#39;circuit&#39;), (&#39;circuit&#39;, &#39;lies&#39;), (&#39;lies&#39;, &#39;too&#39;), (&#39;too&#39;, &#39;bright&#39;), (&#39;bright&#39;, &#39;for&#39;), (&#39;for&#39;, &#39;our&#39;), (&#39;our&#39;, &#39;infirm&#39;), (&#39;infirm&#39;, &#39;delight&#39;), (&#39;delight&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;truth&#39;), (&#39;truth&#39;, &quot;&#39;s&quot;), (&quot;&#39;s&quot;, &#39;superb&#39;), (&#39;superb&#39;, &#39;surprise&#39;), (&#39;surprise&#39;, &#39;as&#39;), (&#39;as&#39;, &#39;lightning&#39;), (&#39;lightning&#39;, &#39;to&#39;), (&#39;to&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;children&#39;), (&#39;children&#39;, &#39;eased&#39;), (&#39;eased&#39;, &#39;with&#39;), (&#39;with&#39;, &#39;explanation&#39;), (&#39;explanation&#39;, &#39;kind&#39;), (&#39;kind&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;truth&#39;), (&#39;truth&#39;, &#39;must&#39;), (&#39;must&#39;, &#39;dazzle&#39;), (&#39;dazzle&#39;, &#39;gradually&#39;), (&#39;gradually&#39;, &#39;or&#39;), (&#39;or&#39;, &#39;every&#39;), (&#39;every&#39;, &#39;man&#39;), (&#39;man&#39;, &#39;be&#39;), (&#39;be&#39;, &#39;blind&#39;), (&#39;blind&#39;, &#39;—&#39;)]
+</pre></div>
+</div>
+</div>
+</div>
+<section id="bigram-metrics">
+<h3><span class="section-number">4.3.1. </span>Bigram metrics<a class="headerlink" href="#bigram-metrics" title="Link to this heading">#</a></h3>
+<p>Counting bigrams involves more footwork. Below, we do the following:</p>
+<ol class="arabic simple">
+<li><p>Make a DataFrame by assigning the bigram lists to a column, <code class="docutils literal notranslate"><span class="pre">bigram</span></code></p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">.explode()</span></code> to unpack those lists into individual rows</p></li>
+<li><p>Split each bigram into a <code class="docutils literal notranslate"><span class="pre">w1</span></code> and <code class="docutils literal notranslate"><span class="pre">w2</span></code> column by casting them to a Series
+with <code class="docutils literal notranslate"><span class="pre">.apply()</span></code></p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">.groupby()</span></code> on those two columns and take the <code class="docutils literal notranslate"><span class="pre">.size()</span></code> to count them</p></li>
+<li><p>Convert the counts back to a DataFrame with <code class="docutils literal notranslate"><span class="pre">.to_frame()</span></code> with a new count
+column, <code class="docutils literal notranslate"><span class="pre">n</span></code></p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bigram_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;bigram&quot;</span><span class="p">:</span> <span class="n">bigrams</span><span class="p">})</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="s2">&quot;bigram&quot;</span><span class="p">)</span>
+<span class="n">bigram_df</span><span class="p">[[</span><span class="s2">&quot;w1&quot;</span><span class="p">,</span> <span class="s2">&quot;w2&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">bigram_df</span><span class="p">[</span><span class="s2">&quot;bigram&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span>
+<span class="n">bigram_df</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">bigram_df</span>
+    <span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;w1&quot;</span><span class="p">,</span> <span class="s2">&quot;w2&quot;</span><span class="p">])</span>
+    <span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Fully formatted:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bigram_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>n</th>
+    </tr>
+    <tr>
+      <th>w1</th>
+      <th>w2</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">!</th>
+      <th>but</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>could</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>futile</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>i</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>lips</th>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>From here, we could calculate the metrics on our bigrams in the same way that
+we did for our unigrams. But that wouldn’t establish a relationship from the
+first token in the bigram to the second token, it would just produce data about
+the frequency of bigrams in the corpus.</p>
+<p>To establish that relationship, we must calculate the <strong>conditional
+probability</strong> of the two tokens in a bigram. That is, given token <code class="docutils literal notranslate"><span class="pre">w1</span></code>, how
+likely is token <code class="docutils literal notranslate"><span class="pre">w2</span></code> to follow?</p>
+<div class="math notranslate nohighlight">
+\[
+p(w2|w1) = \frac{P(w1, w2)}{P(w1)}
+\]</div>
+<p>This is easy to do with <code class="docutils literal notranslate"><span class="pre">pandas</span></code>: divide bigram frequencies by token
+frequencies in the unigram DataFrame.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bigram_df</span><span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bigram_df</span><span class="p">[</span><span class="s2">&quot;n&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">unigram_df</span><span class="p">[</span><span class="s2">&quot;n&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>With conditional probabilities made, we can again get the information values.
+But this time, those values will describe the relationship between the first
+and second words in a bigram with respect to all such relationships in the
+corpus.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bigram_df</span><span class="p">[</span><span class="s2">&quot;info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">bigram_df</span><span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Plotting bigram probability and information produces a very different picture
+of the relationship between these two measures than the one we observed with
+unigrams.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">token_idx</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bigram_df</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">measure</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">]):</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span>
+        <span class="n">bigram_df</span><span class="p">[</span><span class="n">measure</span><span class="p">],</span>
+        <span class="n">fill</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">cumulative</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">clip</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">bigram_df</span><span class="p">[</span><span class="n">measure</span><span class="p">])),</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">measure</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span>
+        <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Density (% tokens)&quot;</span>
+    <span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/efe0c1f39c4f9bccacd9e866500e1019cddd17a9b203c7da0f575a3e8eb97981.png" src="../_images/efe0c1f39c4f9bccacd9e866500e1019cddd17a9b203c7da0f575a3e8eb97981.png" />
+</div>
+</div>
+<p>Why is this? Well, take a look at a histogram of the bigram probabilities. It’s
+(roughly) a bimodal distribution, with many bigrams clustering around the
+minimum and maximum probability values.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">bigram_df</span><span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">],</span> <span class="n">bins</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">kde</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Bigram probabilities&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/17cd584f2480df0dedb8876e88599db93b1e04cbb936a61e37976f510f95e2d5.png" src="../_images/17cd584f2480df0dedb8876e88599db93b1e04cbb936a61e37976f510f95e2d5.png" />
+</div>
+</div>
+<p>Bigrams with <span class="math notranslate nohighlight">\(p(w2|w1) \approx 1.0\)</span> contain very little information. The second
+word always follows the first, so less information is required to encode this
+relationship. Likewise, bigrams with <span class="math notranslate nohighlight">\(p(w2|w1) \approx 0.0\)</span> have a lot of
+information: the second word follows many words, not just the first one, so
+more information is required to encode the possibility of observing this
+particular sequence.</p>
+<p>You may see where this is going: the bimodal distribution means there is a
+broad range of information values, with values clustered at the two ends of the
+data. This creates a gradually increasing line in the cumulative density plot
+above. As we move to bigram generation, keep this in mind.</p>
+</section>
+<section id="id1">
+<h3><span class="section-number">4.3.2. </span>Generation<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<p>Another way to think about the information weighting between bigrams is to
+consider bigrams as a directed graph, in which a <code class="docutils literal notranslate"><span class="pre">w1</span></code> token branches into
+various <code class="docutils literal notranslate"><span class="pre">w2</span></code> tokens. The graph below shows a few successors from the token
+“the” and the successors of those successors. Arrows indicate the direction of
+a sequence. Edge thickness corresponds to the information of the relationship
+between the two tokens in a bigram.</p>
+<img alt="Directed subgraph of &quot;the&quot; and some successors" class="align-center" src="../_images/dickinson_bigrams.png" />
+<p>Note the variation in thickness, which is also a proxy for the probability that
+<code class="docutils literal notranslate"><span class="pre">w2</span></code> follows from <code class="docutils literal notranslate"><span class="pre">w1</span></code>. Below is an improbable bigram. It requires a lot of
+information to encode:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bigram_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="s2">&quot;dower&quot;</span><span class="p">),</span> <span class="p">:]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>n</th>
+      <th>prob</th>
+      <th>info</th>
+    </tr>
+    <tr>
+      <th>w1</th>
+      <th>w2</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>the</th>
+      <th>dower</th>
+      <td>1</td>
+      <td>0.003774</td>
+      <td>8.049849</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Now: an extremely probable one. It requires very little information (none at
+all, in fact):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bigram_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="s2">&quot;crows&quot;</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)),</span> <span class="p">:]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>n</th>
+      <th>prob</th>
+      <th>info</th>
+    </tr>
+    <tr>
+      <th>w1</th>
+      <th>w2</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>crows</th>
+      <th>inspect</th>
+      <td>1</td>
+      <td>1.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>These two examples sit, respectively, at the maximum and minimum limit of the
+histogram above. Other bigrams in this graph are somewhere in between.</p>
+<p>Bigram generation involves traversing this graph. The general procedure is
+this: given a token, we use the conditional probabilities of all other tokens
+in the corpus as weights for our sampling function. Many weights will be zero,
+meaning it isn’t possible to move from one particular token to another. But for
+those weights that aren’t zero, we make a selection. Then, we use that new
+token as the basis for another selection, and so on. This is, in effect, a
+rudimentary <strong>Markov chain</strong>.</p>
+<p>Doing this is easier with a <strong>wide</strong> format for the bigram DataFrame. In this
+format, rows are <code class="docutils literal notranslate"><span class="pre">w1</span></code> in the bigrams and the columns are <code class="docutils literal notranslate"><span class="pre">w2</span></code>. Each cell in
+this new DataFrame will represent the conditional probability of moving from
+<code class="docutils literal notranslate"><span class="pre">w1</span></code> to <code class="docutils literal notranslate"><span class="pre">w2</span></code>. The resultant DataFrame will be quite large.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bigram_probs</span> <span class="o">=</span> <span class="n">bigram_df</span><span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="n">fill_value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape:&quot;</span><span class="p">,</span> <span class="n">bigram_probs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Shape: (1473, 1466)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Time to implement the generation function.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="n">unigram_df</span><span class="p">,</span> <span class="n">bigram_df</span><span class="p">,</span> <span class="n">bigram_probs</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate `N` new tokens.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    unigram_df : pd.DataFrame</span>
+<span class="sd">        The unigram data</span>
+<span class="sd">    bigram_df : pd.DataFrame</span>
+<span class="sd">        The bigram data</span>
+<span class="sd">    bigram_probs : pd.DataFrame</span>
+<span class="sd">        Conditional probabilities of the bigrams</span>
+<span class="sd">    N : int</span>
+<span class="sd">        Number of tokens to generate</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    generated : tuple</span>
+<span class="sd">        Generated tokens and some corresponding data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Randomly select a token row from the unigram DataFrame, using token</span>
+    <span class="c1"># frequency as a weighting. This means more frequent tokens are more likely</span>
+    <span class="c1"># to be sampled than infrequent ones</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="n">unigram_df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">weights</span> <span class="o">=</span> <span class="s2">&quot;n&quot;</span><span class="p">)</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="c1"># Initialize two empty lists to store our results. One will be the</span>
+    <span class="c1"># generated sequence, the other will be some metadata about that sequence</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Iterate N times.</span>
+    <span class="k">while</span> <span class="n">N</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># First, does our seed appear as the leading token in a bigram? If not,</span>
+        <span class="c1"># we have to try a new seed</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bigram_probs</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">seed</span> <span class="o">=</span> <span class="n">unigram_df</span><span class="p">[</span><span class="n">unigram_df</span><span class="o">.</span><span class="n">index</span> <span class="o">!=</span> <span class="n">seed</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">weights</span> <span class="o">=</span> <span class="s2">&quot;n&quot;</span><span class="p">)</span>
+            <span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+        <span class="c1"># Add the seed to the sequence</span>
+        <span class="n">sequence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="c1"># Get the row in the bigram probabilities that corresponds to our</span>
+        <span class="c1"># token, then sample from this token using the probabilities as</span>
+        <span class="c1"># weights</span>
+        <span class="n">next_token_row</span> <span class="o">=</span> <span class="n">bigram_probs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">seed</span><span class="p">]</span>
+        <span class="n">next_token</span> <span class="o">=</span> <span class="n">next_token_row</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">weights</span> <span class="o">=</span> <span class="n">next_token_row</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">next_token</span> <span class="o">=</span> <span class="n">next_token</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+        <span class="c1"># Get the probability and information of the resultant bigram</span>
+        <span class="n">bigram_prob</span> <span class="o">=</span> <span class="n">bigram_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">seed</span><span class="p">,</span> <span class="n">next_token</span><span class="p">),</span> <span class="s2">&quot;prob&quot;</span><span class="p">]</span>
+        <span class="n">bigram_info</span> <span class="o">=</span> <span class="n">bigram_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">seed</span><span class="p">,</span> <span class="n">next_token</span><span class="p">),</span> <span class="s2">&quot;info&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Store the above information in the metadata list, along with the</span>
+        <span class="c1"># bigram</span>
+        <span class="n">metadata</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">&quot;bigram&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">next_token</span><span class="p">),</span>
+            <span class="s2">&quot;prob&quot;</span><span class="p">:</span> <span class="n">bigram_prob</span><span class="p">,</span>
+            <span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="n">bigram_info</span>
+        <span class="p">})</span>
+
+        <span class="c1"># Set the next token to the new seed and decrease our counter</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="n">next_token</span>
+        <span class="n">N</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="c1"># Convert the metadata to a DataFrame and return it with the sequence</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">metadata</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s run this code a few times and look at the sequences first.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">sequence</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">generate</span><span class="p">(</span><span class="n">unigram_df</span><span class="p">,</span> <span class="n">bigram_df</span><span class="p">,</span> <span class="n">bigram_probs</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>the soul - the soul has a bubble antedate and
+pillow - you not the mind that all the flag
+and me away my gown - then i took the
+dead , with blue - despair . somewhere – a
+the pier to die or pause dilapidation &#39;s corporeal illustration
+</pre></div>
+</div>
+</div>
+</div>
+<p>Not bad! This reads considerably better than the unigram output. But can we do
+better? Let’s explore a few different bigram sampling strategies to find out.</p>
+</section>
+</section>
+<section id="sampling-strategies">
+<h2><span class="section-number">4.4. </span>Sampling Strategies<a class="headerlink" href="#sampling-strategies" title="Link to this heading">#</a></h2>
+<p>We will look at three different strategies for sampling:</p>
+<ol class="arabic simple">
+<li><p>Weighted sampling</p></li>
+<li><p>Greedy sampling</p></li>
+<li><p>Top-k sampling</p></li>
+</ol>
+<section id="weighted-sampling">
+<h3><span class="section-number">4.4.1. </span>Weighted sampling<a class="headerlink" href="#weighted-sampling" title="Link to this heading">#</a></h3>
+<p>The first should be familiar. It’s what we have been using all along. In
+weighted sampling, every token/bigram is assigned a weighted value, which
+corresponds to its probability in the corpus. Higher probabilities mean that
+the token/bigram is sampled more frequently than ones with lower probabilities.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sample_weighted</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform weighted sampling.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    weights : pd.DataFrame</span>
+<span class="sd">        DataFrame of weights</span>
+<span class="sd">    idx : int or str</span>
+<span class="sd">        An index to a row in `data`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    token</span>
+<span class="sd">        The sampled token</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">token</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>It looks like so:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sample</span> <span class="o">=</span> <span class="n">sample_weighted</span><span class="p">(</span><span class="n">bigram_probs</span><span class="p">,</span> <span class="s2">&quot;air&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>–
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="greedy-sampling">
+<h3><span class="section-number">4.4.2. </span>Greedy sampling<a class="headerlink" href="#greedy-sampling" title="Link to this heading">#</a></h3>
+<p>Greedy sampling always selects the most probable token. In a sense, it isn’t
+really sampling at all.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sample_greedy</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform greedy sampling.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    weights : pd.DataFrame</span>
+<span class="sd">        DataFrame of weights</span>
+<span class="sd">    idx : int or str</span>
+<span class="sd">        An index to a row in `data`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    token</span>
+<span class="sd">        The sampled token</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">max_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">max_value</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">token</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>An example:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">sample_greedy</span><span class="p">(</span><span class="n">bigram_probs</span><span class="p">,</span> <span class="s2">&quot;air&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-
+-
+-
+-
+-
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="top-k-sampling">
+<h3><span class="section-number">4.4.3. </span>Top-k sampling<a class="headerlink" href="#top-k-sampling" title="Link to this heading">#</a></h3>
+<p>Finally, top-k sampling works much like weighted sampling, except it first
+performs a cutoff to the <code class="docutils literal notranslate"><span class="pre">k</span></code> highest values in the candidate pool.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sample_topk</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform top-k sampling.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    weights : pd.DataFrame</span>
+<span class="sd">        DataFrame of weights</span>
+<span class="sd">    idx : int or str</span>
+<span class="sd">        An index to a row in `data`</span>
+<span class="sd">    k : int</span>
+<span class="sd">        The number of highest-values candidates from which to sample</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    token</span>
+<span class="sd">        The sampled token</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">topk</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">topk</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">topk</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">token</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here are a few examples:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">sample_topk</span><span class="p">(</span><span class="n">bigram_probs</span><span class="p">,</span> <span class="s2">&quot;air&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>–
+-
+from
+from
+with
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="generation-with-different-sampling-strategies">
+<h3><span class="section-number">4.4.4. </span>Generation with different sampling strategies<a class="headerlink" href="#generation-with-different-sampling-strategies" title="Link to this heading">#</a></h3>
+<p>Let’s now look at the results of these sampling strategies. To do so, we will
+rewrite the <code class="docutils literal notranslate"><span class="pre">generate()</span></code> function above to accept a new argument, <code class="docutils literal notranslate"><span class="pre">sampler</span></code>,
+which will correspond to one of the above sampling strategies.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generate_from_sampler</span><span class="p">(</span>
+    <span class="n">unigram_df</span><span class="p">,</span> <span class="n">bigram_df</span><span class="p">,</span> <span class="n">bigram_probs</span><span class="p">,</span> <span class="n">sampler</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate `N` new tokens.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    unigram_df : pd.DataFrame</span>
+<span class="sd">        The unigram data</span>
+<span class="sd">    bigram_df : pd.DataFrame</span>
+<span class="sd">        The bigram data</span>
+<span class="sd">    bigram_probs : pd.DataFrame</span>
+<span class="sd">        Conditional probabilities of the bigrams</span>
+<span class="sd">    sampler : Callable</span>
+<span class="sd">        A sampling function</span>
+<span class="sd">    N : int</span>
+<span class="sd">        Number of tokens to generate</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    generated : tuple</span>
+<span class="sd">        Generated tokens and some corresponding data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Randomly select a token row from the unigram DataFrame, using token</span>
+    <span class="c1"># frequency as a weighting. This means more frequent tokens are more likely</span>
+    <span class="c1"># to be sampled than infrequent ones</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="n">unigram_df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">weights</span> <span class="o">=</span> <span class="s2">&quot;n&quot;</span><span class="p">)</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="c1"># Initialize two empty lists to store our results. One will be the</span>
+    <span class="c1"># generated sequence, the other will be some metadata about that sequence</span>
+    <span class="n">sequence</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Iterate N times.</span>
+    <span class="k">while</span> <span class="n">N</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># First, does our seed appear as the leading token in a bigram? If not,</span>
+        <span class="c1"># we have to try a new seed</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bigram_probs</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">seed</span> <span class="o">=</span> <span class="n">unigram_df</span><span class="p">[</span><span class="n">unigram_df</span><span class="o">.</span><span class="n">index</span> <span class="o">!=</span> <span class="n">seed</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">weights</span> <span class="o">=</span> <span class="s2">&quot;n&quot;</span><span class="p">)</span>
+            <span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+        <span class="c1"># Add the seed to the sequence</span>
+        <span class="n">sequence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="c1"># Get the row in the bigram probabilities that corresponds to our</span>
+        <span class="c1"># token, then sample from this token using the sampler</span>
+        <span class="n">next_token</span> <span class="o">=</span> <span class="n">sampler</span><span class="p">(</span><span class="n">bigram_probs</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+
+        <span class="c1"># Get the probability and information of the resultant bigram</span>
+        <span class="n">bigram_prob</span> <span class="o">=</span> <span class="n">bigram_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">seed</span><span class="p">,</span> <span class="n">next_token</span><span class="p">),</span> <span class="s2">&quot;prob&quot;</span><span class="p">]</span>
+        <span class="n">bigram_info</span> <span class="o">=</span> <span class="n">bigram_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">seed</span><span class="p">,</span> <span class="n">next_token</span><span class="p">),</span> <span class="s2">&quot;info&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Store the above information in the metadata list, along with the</span>
+        <span class="c1"># bigram</span>
+        <span class="n">metadata</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s2">&quot;bigram&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">next_token</span><span class="p">),</span>
+            <span class="s2">&quot;prob&quot;</span><span class="p">:</span> <span class="n">bigram_prob</span><span class="p">,</span>
+            <span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="n">bigram_info</span>
+        <span class="p">})</span>
+
+        <span class="c1"># Set the next token to the new seed and decrease our counter</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="n">next_token</span>
+        <span class="n">N</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="c1"># Convert the metadata to a DataFrame and return it with the sequence</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">metadata</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>A <code class="docutils literal notranslate"><span class="pre">for</span></code> loop that runs this function over our different samplers is below:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">samplers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;weighted&quot;</span><span class="p">:</span> <span class="n">sample_weighted</span><span class="p">,</span>
+    <span class="s2">&quot;greedy&quot;</span><span class="p">:</span> <span class="n">sample_greedy</span><span class="p">,</span>
+    <span class="s2">&quot;topk&quot;</span><span class="p">:</span> <span class="n">sample_topk</span>
+<span class="p">}</span>
+<span class="k">for</span> <span class="n">strategy</span><span class="p">,</span> <span class="n">sampler</span> <span class="ow">in</span> <span class="n">samplers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Strategy:&quot;</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+        <span class="n">sequence</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span>  <span class="n">generate_from_sampler</span><span class="p">(</span>
+            <span class="n">unigram_df</span><span class="p">,</span> <span class="n">bigram_df</span><span class="p">,</span> <span class="n">bigram_probs</span><span class="p">,</span> <span class="n">sampler</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="mi">15</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Strategy: weighted
++ - and past it has a rush of all my soul has stopped - despair
++ have passed the chance , and then – they were , though adjoining as dots
++ eyes – and sore must go – and wonder how the sign in all -
++ currer bell ” in the meadows – i never misses a tighter breathing and is
++ floor too sharp became retire to him ! could abash the fellow , the fields
+
+
+Strategy: greedy
++ filled was not the soul - and then the soul - and then the soul
++ amber hand – and then the soul - and then the soul - and then
++ i ’ s abyss , and then the soul - and then the soul -
++ feeling comes , and then the soul - and then the soul - and then
++ – and then the soul - and then the soul - and then the soul
+
+
+Strategy: topk
++ at the day i thought my ancle – and now we slowly – and the
++ . alien , and my bars only tulle – we passed the stillness in corners
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+ of the air from the sea ! but we can tell all - in my
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+ – the one in corners - the sea – and he bit an instant ,
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+ films can find no more numerous of me dead , and then – and me
+</pre></div>
+</div>
+</div>
+</div>
+<p>Remember the earlier point about bigrams with <span class="math notranslate nohighlight">\(p(w2|w1) \approx 1.0\)</span>? That
+clearly influences the greedy sampling output. The generator gets trapped in a
+loop of bigrams that have exceedingly high probabilities.</p>
+</section>
+<section id="measuring-sampling-strategies">
+<h3><span class="section-number">4.4.5. </span>Measuring sampling strategies<a class="headerlink" href="#measuring-sampling-strategies" title="Link to this heading">#</a></h3>
+<p>Finally, we look at the cross-entropy of these various sampling strategies. As
+before, we use a baseline that corresponds to the mean bigram probabilities in
+the corpus.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">baseline</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">bigram_df</span><span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">N</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">baseline</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[0.38676428 0.38676428 0.38676428 0.38676428 0.38676428 0.38676428
+ 0.38676428 0.38676428 0.38676428 0.38676428]
+</pre></div>
+</div>
+</div>
+</div>
+<p>A <code class="docutils literal notranslate"><span class="pre">for</span></code> loop will implement the generation:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;weighted&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;greedy&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;topk&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+<span class="k">for</span> <span class="n">strategy</span><span class="p">,</span> <span class="n">sampler</span> <span class="ow">in</span> <span class="n">samplers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+        <span class="n">sequence</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">generate_from_sampler</span><span class="p">(</span>
+            <span class="n">unigram_df</span><span class="p">,</span> <span class="n">bigram_df</span><span class="p">,</span> <span class="n">bigram_probs</span><span class="p">,</span> <span class="n">sampler</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">N</span>
+        <span class="p">)</span>
+        <span class="n">cross_entropy</span> <span class="o">=</span> <span class="n">calculate_cross_entropy</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;prob&quot;</span><span class="p">])</span>
+        <span class="n">results</span><span class="p">[</span><span class="n">strategy</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cross_entropy</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we look at the results, which we transform into perplexity scores.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">perplexity</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">perplexity</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">perplexity</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp2</span><span class="p">(</span><span class="n">perplexity</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">perplexity</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>greedy      3899.066232
+topk        5220.108933
+weighted    6820.903227
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>These are poor—but unsurprising—results. With the bigram probabilities
+skewing to one-to-one relationships or one-to-dozens, there is effectively no
+way to generalize across all types of bigrams in the corpus.</p>
+<p>But consider what the results do tell us: greedy sampling performs the best by
+this metric. Since it always picks the most likely token, its selection will
+push toward the center of the probability mass, whereas the other two
+strategies allow tokens from outside that center. Looking at the log
+probabilities—the negative of information—for each sampling strategy should
+bear this out:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">log_probs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;weighted&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;greedy&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;topk&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+<span class="k">for</span> <span class="n">strategy</span><span class="p">,</span> <span class="n">sampler</span> <span class="ow">in</span> <span class="n">samplers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+        <span class="n">sequence</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">generate_from_sampler</span><span class="p">(</span>
+            <span class="n">unigram_df</span><span class="p">,</span> <span class="n">bigram_df</span><span class="p">,</span> <span class="n">bigram_probs</span><span class="p">,</span> <span class="n">sampler</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">N</span>
+        <span class="p">)</span>
+        <span class="n">lp</span> <span class="o">=</span> <span class="o">-</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;info&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">log_probs</span><span class="p">[</span><span class="n">strategy</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lp</span><span class="p">)</span>
+
+<span class="n">log_probs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">log_probs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">log_probs</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span> <span class="o">=</span> <span class="kc">False</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>greedy     -3.153784
+topk       -3.195786
+weighted   -3.225776
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>This ends up being an important lesson, however: <em>a model that performs well
+with respect to metrics does not necessarily mean it is a good model</em>.</p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="03_data-analysis-basics.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>Data Analysis in Python</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">4.1. Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unigrams">4.2. Unigrams</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unigram-metrics">4.2.1. Unigram metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generation">4.2.2. Generation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unigram-modeling">4.2.3. Unigram modeling</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bigrams">4.3. Bigrams</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bigram-metrics">4.3.1. Bigram metrics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">4.3.2. Generation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sampling-strategies">4.4. Sampling Strategies</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#weighted-sampling">4.4.1. Weighted sampling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#greedy-sampling">4.4.2. Greedy sampling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#top-k-sampling">4.4.3. Top-k sampling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generation-with-different-sampling-strategies">4.4.4. Generation with different sampling strategies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-sampling-strategies">4.4.5. Measuring sampling strategies</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Tyler Shoemaker
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
   
@@ -62,6 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/03_data-analysis-basics';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4. N-gram Models" href="04_ngram-models.html" />
     <link rel="prev" title="2. Python Basics" href="02_python-basics.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -179,6 +180,10 @@
 <li class="toctree-l1"><a class="reference internal" href="01_getting-started.html">1. Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="02_python-basics.html">2. Python Basics</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">3. Data Analysis in Python</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Language Models</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="04_ngram-models.html">4. N-gram Models</a></li>
 </ul>
 
     </div>
@@ -442,73 +447,41 @@ difference in syntax when using <code class="docutils literal notranslate"><span
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>November 12, 1945
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>May 23, 1967
 
  OBITUARY
 
- Jerome Kern Dies; Noted Composer, 60
+ Langston Hughes, Writer, 65, Dead
 
  By THE NEW YORK TIMES
 
- Jerome Kern, the composer, died yesterday at 1:10 P.M. of a cerebral hemorrhage in Doctors Hospital. His age was 60. At the bedside were his wife, Eva Leale Kern; his daughter, Elizabeth Kern, former wife of Artie Shaw, the bandleader, and Oscar Hammerstein 2d, producer and song writer, who was closely associated with Mr. Kern in his career. Shortly after Mr. Kern&#39;s death Irving Berlin called at the hospital.
+ Langston Hughes, the noted writer of novels, stories, poems and plays about Negro life, died last night in Polyclinic Hospital at the age of 65.
 
- Mr. Kern collapsed in front of 450 Park Avenue on Monday and was taken unconscious in an ambulance to City Hospital. On Wednesday he was transferred to Doctors Hospital. He had been in an oxygen tent the last three days.
+ Mr. Hughes was sometimes characterized as the &quot;O. Henry of Harlem.&quot; He was an extremely versatile and productive author who was particularly well known for his folksy humor.
 
- The composer, who resided at 917 Whittier Drive, Beverly Hills, Calif., came to New York on Nov. 2 to be co-sponsor with Mr. Hammerstein of a new production of their celebrated musical play, &quot;Show Boat,&quot; for which he had completed a new song shortly before he was stricken ill. The production is scheduled to open in the Ziegfield Theatre in January.
+ In a description of himself written for &quot;Twentieth Century Authors, a biographical dictionary, Mr. Hughes wrote: &quot;My chief literary influences have been Paul Laurence Dunbar, Carl Sandburg and Walt Whitman. My favorite public figures include Jimmy Durante, Marlene Dietrich, Mary McLeod Bethune, Mrs. Franklin D. Roosevelt, Marian Anderson and Henry Armstrong.&quot; &quot;I live in Harlem, New York City,&quot; his autobiographical sketch continued. &quot;I am unmarried. I like &#39;Tristan,&#39; goat&#39;s milk, short novels, lyric poems, heat, simple folk, boats and bullfights; I dislike &#39;Aida,&#39; parsnips, long novels, narrative poems, cold, pretentious folk, buses and bridges.&quot;
 
- Mr. Kern was also to have done a score for the Hammerstein and Richard Rodgers production of &quot;Annie Oakley,&quot; scheduled for April, but had not begun this assignment. He had stayed at the Hotel St. Regis.
+ It was said that whenever Mr. Hughes had a pencil and paper in his hands, he would scribble poetry. He recalled an anecdote about how he was &quot;discovered&quot; by the poet Vachel Lindsay.
 
- Known Best for &quot;Show Boat&quot;
+ Lindsay was dining at the Wardman Park Hotel in Washington when a busboy summoned his courage and slipped several sheets of paper beside the poet&#39;s plate. Lindsay was obviously annoyed, but he picked up the papers and read a poem titled &quot;The
 
- One of America&#39;s foremost composers of music for the theatre and screen, Mr. Kern was rated by critics with Victor Herbert in the field of musical theatre, and his &quot;Show Boat&quot; has been one of the high-water marks of the media. Tunes which have become part of the native songbooks--like &quot;Ol&#39; Man River,&quot; &quot;Why Do I Love You?&quot;, &quot;They Didn&#39;t Believe Me&quot; and &quot;Smoke Gets in Your Eyes&quot;--poured from his keyboard with a regularity that was the envy and amazement of his contemporaries. During a period of forty years he was credited with a total of 104 stage and screen vehicles containing his melodies. Fifteen of these were reported to have passed the 2,000,000 mark in record sales.
+ Weary Blues.&quot;
 
- It was said of him that he was not a graduate of Tin Pan Alley. Strictly speaking, only once, with Oscar Hammerstein 2d, who wrote the lyrics for &quot;Show Boat,&quot; did he deliberately write a song hit outside of a show or screen play. That was &quot;The
+ As Lindsay read, his interest grew. He called for the busboy and asked, &quot;Who wrote this!&quot; &quot;I did,&quot; replied Langston Hughes.
 
- Last Time I Saw Paris.&quot; He called himself a &quot;musical clothier--nothing more or less,&quot; and said: &quot;I write music to both the situations and the lyrics in plays.&quot; But critics pointed out that he was a finished musician and was able to create elaborate effects of counterpoint and complex instrumental and vocal ensembles which gave his operettas real value.
+ Lindsay introduced the youth to publishers who brought out such works by the rising poet and author as &quot;Shakespeare in Harlem,&quot; &quot;The Dream Keeper,&quot; &quot;Not Without Laughter, &quot;The Ways of White Folks,&quot; &quot;The Big Sea&quot; and &quot;Popo And Fifina&quot; as well as the initial &quot;The Weary Blues.&quot; &quot;My writing,&quot; Mr. Hughes said, &quot;has been largely concerned with the depicting of Negro life in America.&quot;
 
- A Modest Man
+ He also translated the poems of Negro writers in Cuba and Haiti because, Mr. Hughes noted, one of his main interests was &quot;the encouragement of literary ability among colored writers.&quot;
 
- A man of much modesty, he claimed no special rank as an artist. He once told an admirer: &quot;The fact that the theatregoing public likes my music is no credit to me. There are many other composers who write better music that the public doesn&#39;t like.&quot;
+ In one of his many anecdotes Mr. Hughes explained how he became a poet when he was named &quot;class poet&quot; in grammar school in Lincoln, Ill. &quot;I was a victim of a stereotype,&quot; he observed wryly. &quot;There were only two of us Negro kids in the whole class and our English teacher was always stressing the importance of rhythm in poetry. &quot;Well, everybody knows--except us--that all Negroes have rhythms, so they elected me class poet. I felt I couldn&#39;t let my white classmates down, and I&#39;ve been writing poetry ever since.&quot;
 
- Olin Downes, music critic for The New York Times, once wrote: &quot;A student of composition in America and Europe, Mr. Kern has technical and artistic background in a degree not shared by most of his American colleagues in his field. He knows his Richard
+ James Langston Hughes, who dropped his first name, was born in Joplin, Mo., on Feb. 1, 1902. His mother was a school teacher and his father was a storekeeper.
 
- Strauss, Rimsky-Korsakoff, Wagner, Berlioz et al.&quot; Of his &quot;Show Boat,&quot; the critic said: &quot;This is a score which, by reason of its melodic inspiration, its workmanship, its reflection of period and environment, has already won the position of a classic of its kind. It was created by a singularly gifted man, who had mastered his business * * * and its success has been richly deserved.&quot;
+ After his graduation from Central High School to Cleveland, he went to Mexico and then attended Columbia University for a year. Mr. Hughes held a variety of jobs, including seaman on trips to Europe and Africa, cook in a Montmartre nightclub in Paris and then busboy at the Washington hotel where he presented his poetry to Lindsay.
 
- Yet when the conductor Artur Rodzinski asked Mr. Kern for a symphonic arrangement the latter demurred at first on the ground that he wasn&#39;t sufficiently well equipped.
+ His first book, &quot;The Weary Blues,&quot; was published by Alfred A. Knopf in 1925.
 
- Mr. Kern was a small, jovial man, with white hair and keen blue eyes behind horn-rimmed glasses. He spoke in sporadic outburst and had a tremendous amount of nervous energy. He was an avid collector of rare books, and at one time it was said that he was better known in the bookshops than in the marts of the musical trade. When, in January, 1929, he disposed of his great collection because it had become too much of a responsibility, the library brought $1,729,462. The next day he passed a bookshop, saw a rare volume and bought it--out of habit, he is supposed to have confessed.
-
- Mother Taught Him Piano
-
- He was born in New York, Jan. 27, 1885, on Sutton Place when it was the city&#39;s brewery district. His first association with music came through his mother, who taught him to play the piano. After the usual schooling, his family sent him abroad and he studied composition in Germany and England. His first music job was with the Lyceum Music Publishing Company as a pianist and song-plugger at a salary of $7 a week. He also plugged sheet music at a local department store. Later he took a job with T. B. Harms &amp; amp; Co., music publishers, and eventually became vice president. In 1910 he married Eva Leale in England, where he gained his first real recognition.
-
- Only veteran followers of show music probably can recall his first musical comedy here, &quot;Mr. Wix of Wickham,&quot; but one critic reviewing the premiere stamped himself a prophet when he wrote, &quot;Who is this man Jerome Kern, whose music towers in an Eiffel way above the average primitive hurdy-gurdy accompaniment of our present-day musical comedy?&quot;
-
- After that the name of Jerome Kern became a byword in the theatre. He did the music for &quot;The Red Petticoat,&quot; in 1911, and from 1915 to 1918 did the scores for at least nineteen productions. &quot;Sally,&quot; in 1920, starred the late Marilyn
-
- Miller and one of its hit tunes was &quot;Look for the Silver Lining.&quot;
-
- Besides &quot;Show Boat,&quot; a partial listing of his musicals would include, &quot;Roberts,&quot; &quot;Music in the Air,&quot; &quot;Cat and the Fiddle,&quot; &quot;Sweet Adeline,&quot; &quot;Sunny&quot; and &quot;The Girl from Utah.&quot;
-
- Story Behind &quot;Show Boat&quot;
-
- The idea for turning Edna Ferber&#39;s novel, &quot;Show Boat,&quot; into a musical is credited to Mr. Kern. The late Alexander Woollcott used to prove the composer&#39;s modesty by telling how Mr. Kern called him on the telephone one day after he had read the book to ask how he could meet Miss Ferber. Mr. Woollcott said Miss Ferber probably would be honored to meet Mr. Kern. The meeting was arranged and subsequently Oscar Hammerstein 2d was assigned to write the lyrics. The December night that &quot;Show Boat&quot; opened in 1927 speculators were said to have received as much as $100 for a pair of tickets. The show brought fame to the late Jules
-
- Bledsoe, Negro baritone, who sang &quot;Ol&#39; Man River,&quot; the song that the composer considered his masterpiece. &quot;Show Boat&quot; was revived in 1932 with Paul Robeson after it had thrilled
-
- London. Mr. Robeson also appeared in it in 1936, when it was produced in Hollywood.
-
- In 1931 Mr. Kern went to Hollywood, and his contributions there were many. Several of his Broadway successes, besides &quot;Show Boat,&quot; were filmed. One of more recent scores was for Deanna Durbin&#39;s &quot;Can&#39;t Help Singing.&quot; At his death Metro-Goldwyn-Mayer had put into production, &quot;Till the Clouds Roll By,&quot; his musical biography. In 1939 Radio City staged a Jerome Kern Cavalcade and four years earlier Alexander Woollcott set a precedent for Jerome Kern testimonials when he put on a birthday party for the composer over a national hookup. The week of Dec. 11-17, 1944, was set aside for a Jerome Kern Jubilee, of which
-
- Paul Whiteman was chairman. During the period Mr. Kern&#39;s music was played throughout the nation.
-
- The funeral service will be private.
-
- Tribute by ASCAP President
-
- Deems Taylor, president of the American Society of Composers, Authors and Publishers, said when he was informed of Mr. Kern&#39;s death: &quot;I know that my own sorrow at his passing must be shared by the millions who for many years have derived so much pleasure from his lovely tunes. I think that no composer in his field since Victor
-
- Herbert has inspired so much real affection from countless hearers who never saw him face to face.&quot;
+ A scholarship then enabled him to complete his education at Lincoln University, from which he graduated in 1929.
 
  
 </pre></div>
@@ -580,7 +553,7 @@ function does below:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>096.txt
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>190.txt
 </pre></div>
 </div>
 </div>
@@ -2674,7 +2647,7 @@ tokens randomly.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/98dff05944c9d61b060ff530ee6c4d384c95993e4b56b33baadb49cb8fee3611.png" src="../_images/98dff05944c9d61b060ff530ee6c4d384c95993e4b56b33baadb49cb8fee3611.png" />
+<img alt="../_images/b738543ca30823427483ff884d151f2ed39c18e910c913d231ee5fe840da8572.png" src="../_images/b738543ca30823427483ff884d151f2ed39c18e910c913d231ee5fe840da8572.png" />
 </div>
 </div>
 <p>What is this telling us? Our token distribution is <strong>Zipfian</strong>. The <span class="math notranslate nohighlight">\(n\)</span>-th
@@ -2729,6 +2702,15 @@ subject of our next chapter.</p>
         <p class="prev-next-subtitle">previous</p>
         <p class="prev-next-title"><span class="section-number">2. </span>Python Basics</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="04_ngram-models.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>N-gram Models</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
