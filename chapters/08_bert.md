@@ -770,25 +770,40 @@ token's index position in the blurb.
 
 We'll address this information later on, but first, let's think a little more
 high-level. Below, we find tokens that consistently have the highest SHAP
-values in a blurb. This involves counting how often a particular token is the
-highest-scoring token in a blurb and tallying up the final results afterwards.
+values in a blurb. This involves counting how often a particular token's
+average SHAP value is the highest-scoring token in a blurb and tallying up the
+final results afterwards.
 
-To do this, however, we will perform some preprocessing that (admittedly)
-erases some of the context sensitivity of LLMs: namely, we drop stopwords and
-change the case of our tokens to lowercase so variants are counted together. If
-we didn't do this, those variants and stopwords would clutter our final
-listing.
+Below, we calculate the mean SHAP values. Note, however, that we first collapse
+the casing so variants are counted together. This drops some information about
+the tokens, but the variants may otherwise clutter the final output.
 
 ```{code-cell}
-drop = stopwords.words("english")
-drop += '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~“”’—–…'.strip()
-lowercased = shap_values.index.get_level_values(2).str.lower()
+mean_shap = shap.reset_index().copy()
+mean_shap["text"] = mean_shap["text"].str.lower()
+mean_shap.set_index(["document_id", "token_id", "text"], inplace = True)
+```
+
+On to calculating means.
+
+```{code-cell}
+mean_shap = mean_shap.groupby(["document_id", "text"]).mean()
+```
+
+Now, we perform an additional preprocessing step to remove stop words and
+punctuation. As with casing, we are trying to reduce clutter. So, in the code
+block below, we set up a mask with which to drop unwanted tokens.
+
+```{code-cell}
+drop = list(stopwords.words("english"))
+drop += list('!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~“”‘’„‟«»‹›—–…')
+mask = mean_shap.index.get_level_values(1).isin(drop)
 ```
 
 Time to filter.
 
 ```{code-cell}
-candidates = shap_values[~lowercased.isin(drop)]
+mean_shap = mean_shap[~mask]
 ```
 
 Now, we initialize a DataFrame to store token-genre counts.
@@ -796,8 +811,8 @@ Now, we initialize a DataFrame to store token-genre counts.
 ```{code-cell}
 counts = pd.DataFrame(
     0,
-    index = lowercased.unique(),
-    columns = candidates.columns
+    index = mean_shap.index.get_level_values(1).unique(),
+    columns = mean_shap.columns
 )
 ```
 
@@ -806,26 +821,26 @@ the maximum SHAP value for each document, we add that information to the
 DataFrame above.
 
 ```{code-cell}
-for genre in candidates.columns:
+for genre in mean_shap.columns:
     # Get the token with the highest SHAP value in each document
-    max_tokens = candidates[genre].groupby(level = ["document_id"]).idxmax()
+    max_tokens = mean_shap[genre].groupby("document_id").idxmax()
 
     # Format into a Series and count the number of times each token appears. Be
     # sure to change the case!
     max_tokens = max_tokens.apply(pd.Series)
-    max_tokens.columns = ["document_id", "token_id", "text"]
+    max_tokens.columns = ["document_id", "text"]
     max_tokens["text"] = max_tokens["text"].str.lower()
     token_counts = max_tokens.value_counts("text")
 
     # Set our values
-    counts.loc[token_counts.index, col] = token_counts.values
+    counts.loc[token_counts.index, genre] = token_counts.values
 ```
 
 Take the top-25 highest scoring tokens to produce an overview for each genre.
 
 ```{code-cell}
 k = 25
-topk = pd.DataFrame("", index = range(k), columns = candidates.columns)
+topk = pd.DataFrame("", index = range(k), columns = mean_shap.columns)
 for col in counts.columns:
     tokens = counts[col].nlargest(k).index.tolist()
     topk.loc[:, col] = tokens
