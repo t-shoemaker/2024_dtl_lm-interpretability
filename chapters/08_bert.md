@@ -825,11 +825,9 @@ for genre in mean_shap.columns:
     # Get the token with the highest SHAP value in each document
     max_tokens = mean_shap[genre].groupby("document_id").idxmax()
 
-    # Format into a Series and count the number of times each token appears. Be
-    # sure to change the case!
+    # Format into a Series and count the number of times each token appears
     max_tokens = max_tokens.apply(pd.Series)
     max_tokens.columns = ["document_id", "text"]
-    max_tokens["text"] = max_tokens["text"].str.lower()
     token_counts = max_tokens.value_counts("text")
 
     # Set our values
