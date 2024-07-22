@@ -283,7 +283,7 @@ chapter_token_count = np.sum(dtm, axis = 1).to_frame(name = "token_count")
 chapter_token_count.groupby("novel_name").sum()
 ```
 
-On average, which three chapters are the longest in James's novels?
+On average, which three chapters are the longest across all of James's novels?
 
 ```{code-cell}
 chapter_avg_tokens = chapter_token_count.groupby("chapter_num").mean()
@@ -386,7 +386,7 @@ generally they work like so:
 Term frequency is the relative frequency of a token $t$ in a document $d$.
 
 $$
-TF(t, d) = \frac{f_{t,d}}{\sum_{i=1}^nf_{i,d}}
+TF(t, d) = \frac{f_{t,d}}{\sum_{i=1}^n f_{i,d}}
 $$
 
 Where:
