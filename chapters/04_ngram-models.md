@@ -28,7 +28,7 @@ like probability, information, entropy, and perplexity. Using these measures as
 weighting for different sampling strategies, we implement a few simple text
 generators.
 
-+ **Data:**: 59 [Emily Dickinson poems][poems] collected from the Poetry
++ **Data:** 59 [Emily Dickinson poems][poems] collected from the Poetry
   Foundation
 + **Credits:** Portions of this chapter are adapted from Rafael Alvarado's
   [Exploratory Text Analytics][eta]
