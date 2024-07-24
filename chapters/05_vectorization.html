@@ -1,0 +1,4520 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>5. Vectorization &#8212; Introduction to Interpretability for Language Models</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/05_vectorization';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="4. N-gram Models" href="04_ngram-models.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Introduction to Interpretability for Language Models</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Overview
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Basics</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_getting-started.html">1. Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_python-basics.html">2. Python Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_data-analysis-basics.html">3. Data Analysis in Python</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Language Models</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="04_ngram-models.html">4. N-gram Models</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">5. Vectorization</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/t-shoemaker/2024_dtl_lm-interpretability" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/05_vectorization.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Vectorization</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">5.1. Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-document-term-matrix">5.2. The Document-Term Matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#document-term-matrix-analysis">5.2.1. Document-term matrix analysis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-masked-tokens">5.2.2. Using masked tokens</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#weighting-with-tf-idf">5.3. Weighting with TF–IDF</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#document-classification">5.4. Document Classification</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-multinomial-naive-bayes-classifier">5.4.1. The Multinomial Naive Bayes classifier</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#training-a-classifier">5.4.2. Training a classifier</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#model-diagnostics">5.4.3. Model diagnostics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#top-tokens-per-class">5.4.4. Top tokens per class</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization">5.5. Visualization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dimensionality-reduction">5.5.1. Dimensionality reduction</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-documents">5.5.2. Plotting documents</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="vectorization">
+<h1><span class="section-number">5. </span>Vectorization<a class="headerlink" href="#vectorization" title="Link to this heading">#</a></h1>
+<p>This chapter introduces vectorization, a technique for encoding qualitative
+data (like words) into numeric values. We will use a data structure, the
+document-term matrix, to work with vectorized texts, discuss weighting
+strategies for managing high-frequency tokens, and train a classification model
+to distinguish style.</p>
+<ul class="simple">
+<li><p><strong>Data:</strong> 20 Henry James novels, collected by <a class="reference external" href="https://github.com/JonathanReeve/james-sentence">Jonathan Reeve</a> and
+broken into chapters with Reeve’s <a class="reference external" href="https://github.com/JonathanReeve/chapterize">chapterization</a> tool. Labels
+are from David L. Hoover’s <a class="reference external" href="https://dlsanthology.mla.hcommons.org/textual-analysis">clustering</a> of James’s novels</p></li>
+<li><p><strong>Credits:</strong> Portions of this chapter are adapted from the UC Davis DataLab’s
+<a class="reference external" href="https://ucdavisdatalab.github.io/workshop_nlp_reader">Natural Language Processing for Data Science</a></p></li>
+</ul>
+<section id="preliminaries">
+<h2><span class="section-number">5.1. </span>Preliminaries<a class="headerlink" href="#preliminaries" title="Link to this heading">#</a></h2>
+<p>We will need the following libraries:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span><span class="p">,</span> <span class="n">TfidfVectorizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">MultinomialNB</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">classification_report</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">make_pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Normalizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Corpus documents are stored in a DataFrame alongside other metadata.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">corpus</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s2">&quot;data/datasets/james_chapters.parquet&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">corpus</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 563 entries, 0 to 562
+Data columns (total 9 columns):
+ #   Column     Non-Null Count  Dtype 
+---  ------     --------------  ----- 
+ 0   novel      563 non-null    object
+ 1   year       563 non-null    int64 
+ 2   directory  563 non-null    object
+ 3   file       563 non-null    object
+ 4   chapter    563 non-null    int64 
+ 5   style      563 non-null    int64 
+ 6   hoover     563 non-null    int64 
+ 7   tokens     563 non-null    object
+ 8   masked     563 non-null    object
+dtypes: int64(4), object(5)
+memory usage: 39.7+ KB
+None
+</pre></div>
+</div>
+</div>
+</div>
+<p>Novels are divided into their component chapters. Use <code class="docutils literal notranslate"><span class="pre">.groupby()</span></code> to count how
+many chapters there are for each novel.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grouped</span> <span class="o">=</span> <span class="n">corpus</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;novel&quot;</span><span class="p">)</span>
+<span class="n">chapters_per_novel</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s2">&quot;chapter&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">chapters_per_novel</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;chapters&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>chapters</th>
+    </tr>
+    <tr>
+      <th>novel</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Ambassadors</th>
+      <td>36</td>
+    </tr>
+    <tr>
+      <th>Awkward Age</th>
+      <td>32</td>
+    </tr>
+    <tr>
+      <th>Bostonians</th>
+      <td>42</td>
+    </tr>
+    <tr>
+      <th>Confidence</th>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>Golden Bowl</th>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>Ivory Tower</th>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>Outcry</th>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>Portrait Of A Lady</th>
+      <td>55</td>
+    </tr>
+    <tr>
+      <th>Princess Casamassima</th>
+      <td>49</td>
+    </tr>
+    <tr>
+      <th>Reverberator</th>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>Roderick Hudson</th>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>Sacred Found</th>
+      <td>14</td>
+    </tr>
+    <tr>
+      <th>Spoils Poynton</th>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>The American</th>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>The Europeans</th>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>Tragic Muse</th>
+      <td>51</td>
+    </tr>
+    <tr>
+      <th>Washington Square</th>
+      <td>35</td>
+    </tr>
+    <tr>
+      <th>Watch And Ward</th>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>What Maisie Knew</th>
+      <td>31</td>
+    </tr>
+    <tr>
+      <th>Wings Of The Dove</th>
+      <td>36</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">style</span></code> and <code class="docutils literal notranslate"><span class="pre">hoover</span></code> columns contain labels. The first demarcates early
+James from late with the publication of <em>What Maisie Knew</em> in 1897.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">style_counts</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[[</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="s2">&quot;style&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+<span class="n">style_counts</span> <span class="o">=</span> <span class="n">style_counts</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;chapters&quot;</span><span class="p">)</span>
+<span class="n">style_counts</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;style&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>chapters</th>
+    </tr>
+    <tr>
+      <th>novel</th>
+      <th>year</th>
+      <th>style</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Reverberator</th>
+      <th>1888</th>
+      <th>0</th>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>Watch And Ward</th>
+      <th>1871</th>
+      <th>0</th>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>Bostonians</th>
+      <th>1886</th>
+      <th>0</th>
+      <td>42</td>
+    </tr>
+    <tr>
+      <th>Confidence</th>
+      <th>1879</th>
+      <th>0</th>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>Washington Square</th>
+      <th>1880</th>
+      <th>0</th>
+      <td>35</td>
+    </tr>
+    <tr>
+      <th>Tragic Muse</th>
+      <th>1890</th>
+      <th>0</th>
+      <td>51</td>
+    </tr>
+    <tr>
+      <th>The Europeans</th>
+      <th>1878</th>
+      <th>0</th>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>Portrait Of A Lady</th>
+      <th>1881</th>
+      <th>0</th>
+      <td>55</td>
+    </tr>
+    <tr>
+      <th>Princess Casamassima</th>
+      <th>1886</th>
+      <th>0</th>
+      <td>49</td>
+    </tr>
+    <tr>
+      <th>The American</th>
+      <th>1877</th>
+      <th>0</th>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>Roderick Hudson</th>
+      <th>1875</th>
+      <th>0</th>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>Spoils Poynton</th>
+      <th>1897</th>
+      <th>1</th>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>Ambassadors</th>
+      <th>1903</th>
+      <th>1</th>
+      <td>36</td>
+    </tr>
+    <tr>
+      <th>What Maisie Knew</th>
+      <th>1897</th>
+      <th>1</th>
+      <td>31</td>
+    </tr>
+    <tr>
+      <th>Outcry</th>
+      <th>1911</th>
+      <th>1</th>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>Ivory Tower</th>
+      <th>1917</th>
+      <th>1</th>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>Golden Bowl</th>
+      <th>1904</th>
+      <th>1</th>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>Awkward Age</th>
+      <th>1899</th>
+      <th>1</th>
+      <td>32</td>
+    </tr>
+    <tr>
+      <th>Sacred Found</th>
+      <th>1901</th>
+      <th>1</th>
+      <td>14</td>
+    </tr>
+    <tr>
+      <th>Wings Of The Dove</th>
+      <th>1902</th>
+      <th>1</th>
+      <td>36</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The second uses Hoover’s grouping of James’s novels into four distinct phases.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hoover_counts</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[[</span><span class="s2">&quot;year&quot;</span><span class="p">,</span> <span class="s2">&quot;hoover&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+<span class="n">hoover_counts</span> <span class="o">=</span> <span class="n">hoover_counts</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;chapters&quot;</span><span class="p">)</span>
+<span class="n">hoover_counts</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;hoover&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>chapters</th>
+    </tr>
+    <tr>
+      <th>novel</th>
+      <th>year</th>
+      <th>hoover</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Confidence</th>
+      <th>1879</th>
+      <th>0</th>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>Watch And Ward</th>
+      <th>1871</th>
+      <th>0</th>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>Washington Square</th>
+      <th>1880</th>
+      <th>0</th>
+      <td>35</td>
+    </tr>
+    <tr>
+      <th>Portrait Of A Lady</th>
+      <th>1881</th>
+      <th>0</th>
+      <td>55</td>
+    </tr>
+    <tr>
+      <th>Roderick Hudson</th>
+      <th>1875</th>
+      <th>0</th>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>The Europeans</th>
+      <th>1878</th>
+      <th>0</th>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>The American</th>
+      <th>1877</th>
+      <th>0</th>
+      <td>30</td>
+    </tr>
+    <tr>
+      <th>Reverberator</th>
+      <th>1888</th>
+      <th>1</th>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>Bostonians</th>
+      <th>1886</th>
+      <th>1</th>
+      <td>42</td>
+    </tr>
+    <tr>
+      <th>Tragic Muse</th>
+      <th>1890</th>
+      <th>1</th>
+      <td>51</td>
+    </tr>
+    <tr>
+      <th>Princess Casamassima</th>
+      <th>1886</th>
+      <th>1</th>
+      <td>49</td>
+    </tr>
+    <tr>
+      <th>Awkward Age</th>
+      <th>1899</th>
+      <th>2</th>
+      <td>32</td>
+    </tr>
+    <tr>
+      <th>What Maisie Knew</th>
+      <th>1897</th>
+      <th>2</th>
+      <td>31</td>
+    </tr>
+    <tr>
+      <th>Spoils Poynton</th>
+      <th>1897</th>
+      <th>2</th>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>Ambassadors</th>
+      <th>1903</th>
+      <th>3</th>
+      <td>36</td>
+    </tr>
+    <tr>
+      <th>Outcry</th>
+      <th>1911</th>
+      <th>3</th>
+      <td>20</td>
+    </tr>
+    <tr>
+      <th>Ivory Tower</th>
+      <th>1917</th>
+      <th>3</th>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>Golden Bowl</th>
+      <th>1904</th>
+      <th>3</th>
+      <td>16</td>
+    </tr>
+    <tr>
+      <th>Sacred Found</th>
+      <th>1901</th>
+      <th>3</th>
+      <td>14</td>
+    </tr>
+    <tr>
+      <th>Wings Of The Dove</th>
+      <th>1902</th>
+      <th>3</th>
+      <td>36</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Tokens for each chapter are stored as strings in <code class="docutils literal notranslate"><span class="pre">tokens</span></code> and <code class="docutils literal notranslate"><span class="pre">masked</span></code>.
+Chapters have been tokenized with <code class="docutils literal notranslate"><span class="pre">nltk.word_tokenize()</span></code>. Why <code class="docutils literal notranslate"><span class="pre">masked</span></code>? That
+column has had its proper noun tokens masked out with <code class="docutils literal notranslate"><span class="pre">PN</span></code>. You will see why
+later on.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">See masking code</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">mask_proper_nouns</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="s2">&quot;PN&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mask proper nouns in a string.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    string : str</span>
+<span class="sd">        String to mask</span>
+<span class="sd">    mask : str</span>
+<span class="sd">        Masking label</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    masked : str</span>
+<span class="sd">        The masked string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># First, split the string into tokens</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+    <span class="c1"># Then assign part-of-speech tags to those tokens. The output of this</span>
+    <span class="c1"># tagger is a list of tuples, where the first element is the token and the</span>
+    <span class="c1"># second is the tag</span>
+    <span class="n">tagged</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">pos_tag</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+
+    <span class="c1"># Create a new list to hold the output</span>
+    <span class="n">masked</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tagged</span><span class="p">:</span>
+        <span class="c1"># If the tag is &quot;NNP&quot;, replace it with our mask</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">mask</span> <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;NNP&quot;</span> <span class="k">else</span> <span class="n">token</span>
+        <span class="c1"># Add the token to the output list</span>
+        <span class="n">masked</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+
+    <span class="c1"># Join the list and return</span>
+    <span class="n">masked</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">masked</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">masked</span>
+    
+</pre></div>
+</div>
+</div>
+</details></section>
+<section id="the-document-term-matrix">
+<h2><span class="section-number">5.2. </span>The Document-Term Matrix<a class="headerlink" href="#the-document-term-matrix" title="Link to this heading">#</a></h2>
+<p>So far we have worked with lists of tokens. That works for some tasks, but to
+compare documents with one another, it would be better to represent our corpus
+as a two-dimensional array, or matrix. In this matrix, each row is a document
+and each column is a token; cells record the number of times that token appears
+in a document. The resultant matrix is known as the <strong>document-term matrix</strong>,
+or DTM.</p>
+<p>It isn’t difficult to convert lists of tokens into a DTM, but <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>
+can do it. Unless you have a reason to convert your token lists manually, just
+rely on that.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">See function to create a document-term matrix by hand</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<div class="highlight-py notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">make_dtm</span><span class="p">(</span><span class="n">docs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Make a document-term matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    docs : list[str]</span>
+<span class="sd">        A list of strings</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dtm, vocabulary : tuple[list, set]</span>
+<span class="sd">        The document-term matrix and the corpus vocabulary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Split the documents into tokens</span>
+    <span class="n">docs</span> <span class="o">=</span> <span class="p">[</span><span class="n">doc</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">]</span>
+
+    <span class="c1"># Get the unique set of tokens for all documents in the corpus</span>
+    <span class="n">vocab</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">:</span>
+        <span class="c1"># A set union (`|=`) adds any new tokens from the current document to</span>
+        <span class="c1"># the running set of all tokens</span>
+        <span class="n">vocab</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+
+    <span class="c1"># Create a list of m dictionaries, where m is the number of corpus</span>
+    <span class="c1"># documents. Each dictionary will have every token in the vocabulary (key),</span>
+    <span class="c1"># which is initially assigned to 0 (value)</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">vocab</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">]</span>
+
+    <span class="c1"># Roll through each document</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">doc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">docs</span><span class="p">):</span>
+        <span class="c1"># For each token in a document...</span>
+        <span class="k">for</span> <span class="n">tok</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">:</span>
+            <span class="c1"># Access the document counts, then access the token stored in the</span>
+            <span class="c1"># dictionary. Increment the corresponding count by 1 </span>
+            <span class="n">counts</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">tok</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Extract the values from each dictionary</span>
+    <span class="n">dtm</span> <span class="o">=</span> <span class="p">[[</span><span class="n">count</span> <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">counts</span><span class="p">]</span>
+
+    <span class="c1"># Return the DTM and the vocabulary</span>
+    <span class="k">return</span> <span class="n">dtm</span><span class="p">,</span> <span class="n">vocab</span>
+</pre></div>
+</div>
+</div>
+</details><p>Many classes in <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> have the same use pattern: first, you initialize
+the class by assigning it to a variable (and optionally set parameters), then
+you <strong>fit</strong> it on your data. The <code class="docutils literal notranslate"><span class="pre">CountVectorizer</span></code>, which makes a DTM, does
+just this. It will even tokenize strings while it fits, though watch out: it
+has a simple tokenization pattern, so it’s often best to do this step yourself.</p>
+<p>Below, we initialize the <code class="docutils literal notranslate"><span class="pre">CountVectorizer</span></code> and set the following parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">token_pattern</span></code>: a regex pattern for which tokens to keep (here: any
+alphabetic characters of three or more characters)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stop_words</span></code>: remove function words in English</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">strip_accents</span></code>: normalize accents to ASCII</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cv_parameters</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;token_pattern&quot;</span><span class="p">:</span> <span class="sa">r</span><span class="s2">&quot;\b[a-zA-Z]{3,}\b&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;stop_words&quot;</span><span class="p">:</span> <span class="s2">&quot;english&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;strip_accents&quot;</span><span class="p">:</span> <span class="s2">&quot;ascii&quot;</span>
+<span class="p">}</span>
+
+<span class="n">count_vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="o">**</span><span class="n">cv_parameters</span><span class="p">)</span>
+<span class="n">count_vectorizer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style>#sk-container-id-1 {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: black;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
+  --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-icon: #696969;
+
+  @media (prefers-color-scheme: dark) {
+    /* Redefinition of color scheme for dark theme */
+    --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
+    --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-icon: #878787;
+  }
+}
+
+#sk-container-id-1 {
+  color: var(--sklearn-color-text);
+}
+
+#sk-container-id-1 pre {
+  padding: 0;
+}
+
+#sk-container-id-1 input.sk-hidden--visually {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+#sk-container-id-1 div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+#sk-container-id-1 div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+#sk-container-id-1 div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+#sk-container-id-1 div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+#sk-container-id-1 div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+#sk-container-id-1 div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#sk-container-id-1 div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+#sk-container-id-1 div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+#sk-container-id-1 div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+#sk-container-id-1 div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+#sk-container-id-1 div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+#sk-container-id-1 label.sk-toggleable__label {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#sk-container-id-1 label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+#sk-container-id-1 div.sk-toggleable__content {
+  max-height: 0;
+  max-width: 0;
+  overflow: hidden;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-1 div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-1 div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-1 div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  max-height: 200px;
+  max-width: 100%;
+  overflow: auto;
+}
+
+#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-1 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-1 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+#sk-container-id-1 div.sk-label label.sk-toggleable__label,
+#sk-container-id-1 div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+#sk-container-id-1 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+#sk-container-id-1 div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1.2em;
+}
+
+#sk-container-id-1 div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+#sk-container-id-1 div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-1 div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+#sk-container-id-1 div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-1 div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 1ex;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-1);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+#sk-container-id-1 a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+#sk-container-id-1 a.estimator_doc_link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+#sk-container-id-1 a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+#sk-container-id-1 a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>CountVectorizer(stop_words=&#x27;english&#x27;, strip_accents=&#x27;ascii&#x27;,
+                token_pattern=&#x27;\\b[a-zA-Z]{3,}\\b&#x27;)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked><label for="sk-estimator-id-1" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;CountVectorizer<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.5/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html">?<span>Documentation for CountVectorizer</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>CountVectorizer(stop_words=&#x27;english&#x27;, strip_accents=&#x27;ascii&#x27;,
+                token_pattern=&#x27;\\b[a-zA-Z]{3,}\\b&#x27;)</pre></div> </div></div></div></div></div></div>
+</div>
+<p>With the vectorizer fitted, <strong>transform</strong> the data you fitted it on.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dtm</span> <span class="o">=</span> <span class="n">count_vectorizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>DTMs are <strong>sparse</strong>. That is, they are mostly made up of zeros.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dtm</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Compressed Sparse Row sparse matrix of dtype &#39;int64&#39;
+	with 504302 stored elements and shape (563, 27822)&gt;
+</pre></div>
+</div>
+</div>
+</div>
+<p>This sparsity is significant. Comparing documents with each other requires
+taking into account all unique tokens in the corpus, not just those in a
+particular document. <em>This means we must count the number of times a token
+appears in a document even if that count is zero</em>. What those zero counts also
+mean is that the documents in a DTM are not strictly those documents that are
+in the corpus. They are potential texts: possible distributions of tokens
+across the corpus.</p>
+<p>The output of <code class="docutils literal notranslate"><span class="pre">CountVectorizer</span></code> is optimized for keeping the memory footprint
+of a DTM low. But for a small corpus like this, use <code class="docutils literal notranslate"><span class="pre">.toarray()</span></code> to convert the
+matrix into a NumPy array.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dtm</span> <span class="o">=</span> <span class="n">dtm</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, wrap this as a DataFrame and set the column names with the output of the
+vectorizer’s <code class="docutils literal notranslate"><span class="pre">.get_feature_names_out()</span></code> method.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dtm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">dtm</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">count_vectorizer</span><span class="o">.</span><span class="n">get_feature_names_out</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">dtm</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>aback</th>
+      <th>abandon</th>
+      <th>abandoned</th>
+      <th>abandoning</th>
+      <th>abandonment</th>
+      <th>abandons</th>
+      <th>abase</th>
+      <th>abased</th>
+      <th>abasement</th>
+      <th>abash</th>
+      <th>...</th>
+      <th>zero</th>
+      <th>zest</th>
+      <th>zigzags</th>
+      <th>zola</th>
+      <th>zone</th>
+      <th>zones</th>
+      <th>zoo</th>
+      <th>zoological</th>
+      <th>zouaves</th>
+      <th>zurich</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 27822 columns</p>
+</div></div></div>
+</div>
+<p>This DTM is indexed in the same order as the corpus documents. But for
+readability’s sake, set the index to the <code class="docutils literal notranslate"><span class="pre">novel</span></code> and <code class="docutils literal notranslate"><span class="pre">chapter</span></code> columns of our
+corpus DataFrame. Be sure to change the <code class="docutils literal notranslate"><span class="pre">.names</span></code> attribute of the index, or
+your index will conflict with possible column values in the DTM.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dtm</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;novel&quot;</span><span class="p">],</span> <span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;chapter&quot;</span><span class="p">]],</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;novel_name&quot;</span><span class="p">,</span> <span class="s2">&quot;chapter_num&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">dtm</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>aback</th>
+      <th>abandon</th>
+      <th>abandoned</th>
+      <th>abandoning</th>
+      <th>abandonment</th>
+      <th>abandons</th>
+      <th>abase</th>
+      <th>abased</th>
+      <th>abasement</th>
+      <th>abash</th>
+      <th>...</th>
+      <th>zero</th>
+      <th>zest</th>
+      <th>zigzags</th>
+      <th>zola</th>
+      <th>zone</th>
+      <th>zones</th>
+      <th>zoo</th>
+      <th>zoological</th>
+      <th>zouaves</th>
+      <th>zurich</th>
+    </tr>
+    <tr>
+      <th>novel_name</th>
+      <th>chapter_num</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">Watch And Ward</th>
+      <th>1</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 27822 columns</p>
+</div></div></div>
+</div>
+<section id="document-term-matrix-analysis">
+<h3><span class="section-number">5.2.1. </span>Document-term matrix analysis<a class="headerlink" href="#document-term-matrix-analysis" title="Link to this heading">#</a></h3>
+<p>Numeric operations across the DTM now work the same as they would for any other
+DataFrame. Here, total tokens per novel:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chapter_token_count</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dtm</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;token_count&quot;</span><span class="p">)</span>
+<span class="n">chapter_token_count</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;novel_name&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>token_count</th>
+    </tr>
+    <tr>
+      <th>novel_name</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Ambassadors</th>
+      <td>56551</td>
+    </tr>
+    <tr>
+      <th>Awkward Age</th>
+      <td>48957</td>
+    </tr>
+    <tr>
+      <th>Bostonians</th>
+      <td>63102</td>
+    </tr>
+    <tr>
+      <th>Confidence</th>
+      <td>29888</td>
+    </tr>
+    <tr>
+      <th>Golden Bowl</th>
+      <td>74098</td>
+    </tr>
+    <tr>
+      <th>Ivory Tower</th>
+      <td>23593</td>
+    </tr>
+    <tr>
+      <th>Outcry</th>
+      <td>21398</td>
+    </tr>
+    <tr>
+      <th>Portrait Of A Lady</th>
+      <td>86844</td>
+    </tr>
+    <tr>
+      <th>Princess Casamassima</th>
+      <td>79966</td>
+    </tr>
+    <tr>
+      <th>Reverberator</th>
+      <td>21043</td>
+    </tr>
+    <tr>
+      <th>Roderick Hudson</th>
+      <td>54094</td>
+    </tr>
+    <tr>
+      <th>Sacred Found</th>
+      <td>25920</td>
+    </tr>
+    <tr>
+      <th>Spoils Poynton</th>
+      <td>26696</td>
+    </tr>
+    <tr>
+      <th>The American</th>
+      <td>53494</td>
+    </tr>
+    <tr>
+      <th>The Europeans</th>
+      <td>24071</td>
+    </tr>
+    <tr>
+      <th>Tragic Muse</th>
+      <td>81287</td>
+    </tr>
+    <tr>
+      <th>Washington Square</th>
+      <td>24444</td>
+    </tr>
+    <tr>
+      <th>Watch And Ward</th>
+      <td>25583</td>
+    </tr>
+    <tr>
+      <th>What Maisie Knew</th>
+      <td>36369</td>
+    </tr>
+    <tr>
+      <th>Wings Of The Dove</th>
+      <td>66442</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>On average, which three chapters are the longest across all of James’s novels?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chapter_avg_tokens</span> <span class="o">=</span> <span class="n">chapter_token_count</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;chapter_num&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">chapter_avg_tokens</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;token_count&quot;</span><span class="p">,</span> <span class="n">ascending</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>token_count</th>
+    </tr>
+    <tr>
+      <th>chapter_num</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>5</th>
+      <td>2237.000000</td>
+    </tr>
+    <tr>
+      <th>46</th>
+      <td>2223.666667</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>2081.687500</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>What is the average chapter length?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chapter_avg_tokens</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>token_count    1610.572704
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<p>Top ten chapters with the highest type counts:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">dtm</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;num_types&quot;</span><span class="p">)</span>
+<span class="n">num_types</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;num_types&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>num_types</th>
+    </tr>
+    <tr>
+      <th>novel_name</th>
+      <th>chapter_num</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="4" valign="top">Golden Bowl</th>
+      <th>14</th>
+      <td>3991</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>3990</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>3565</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>3129</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">Roderick Hudson</th>
+      <th>3</th>
+      <td>2468</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2242</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>2242</td>
+    </tr>
+    <tr>
+      <th>Golden Bowl</th>
+      <th>7</th>
+      <td>2240</td>
+    </tr>
+    <tr>
+      <th>Roderick Hudson</th>
+      <th>10</th>
+      <td>2174</td>
+    </tr>
+    <tr>
+      <th>Golden Bowl</th>
+      <th>10</th>
+      <td>2085</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Most frequent word in each novel:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">token_freq</span> <span class="o">=</span> <span class="n">dtm</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;novel_name&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">token_freq</span><span class="o">.</span><span class="n">idxmax</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;most_frequent_token&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>most_frequent_token</th>
+    </tr>
+    <tr>
+      <th>novel_name</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Ambassadors</th>
+      <td>strether</td>
+    </tr>
+    <tr>
+      <th>Awkward Age</th>
+      <td>mrs</td>
+    </tr>
+    <tr>
+      <th>Bostonians</th>
+      <td>verena</td>
+    </tr>
+    <tr>
+      <th>Confidence</th>
+      <td>bernard</td>
+    </tr>
+    <tr>
+      <th>Golden Bowl</th>
+      <td>maggie</td>
+    </tr>
+    <tr>
+      <th>Ivory Tower</th>
+      <td>gray</td>
+    </tr>
+    <tr>
+      <th>Outcry</th>
+      <td>lord</td>
+    </tr>
+    <tr>
+      <th>Portrait Of A Lady</th>
+      <td>isabel</td>
+    </tr>
+    <tr>
+      <th>Princess Casamassima</th>
+      <td>hyacinth</td>
+    </tr>
+    <tr>
+      <th>Reverberator</th>
+      <td>francie</td>
+    </tr>
+    <tr>
+      <th>Roderick Hudson</th>
+      <td>rowland</td>
+    </tr>
+    <tr>
+      <th>Sacred Found</th>
+      <td>mrs</td>
+    </tr>
+    <tr>
+      <th>Spoils Poynton</th>
+      <td>fleda</td>
+    </tr>
+    <tr>
+      <th>The American</th>
+      <td>newman</td>
+    </tr>
+    <tr>
+      <th>The Europeans</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Tragic Muse</th>
+      <td>nick</td>
+    </tr>
+    <tr>
+      <th>Washington Square</th>
+      <td>catherine</td>
+    </tr>
+    <tr>
+      <th>Watch And Ward</th>
+      <td>roger</td>
+    </tr>
+    <tr>
+      <th>What Maisie Knew</th>
+      <td>mrs</td>
+    </tr>
+    <tr>
+      <th>Wings Of The Dove</th>
+      <td>kate</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>All are proper nouns, which often happens with fiction. In one way, this is
+valuable information: if you were modeling a corpus with different kinds of
+documents, you might use names’ frequency to distinguish fiction. But we only
+have James’s novels, and the high frequency of names can make it difficult to
+identify similarities across documents.</p>
+</section>
+<section id="using-masked-tokens">
+<h3><span class="section-number">5.2.2. </span>Using masked tokens<a class="headerlink" href="#using-masked-tokens" title="Link to this heading">#</a></h3>
+<p>This is where the text stored in <code class="docutils literal notranslate"><span class="pre">masked</span></code> comes in. That text masks over proper
+nouns and treats them all like the same token. More, due to the way we’ve
+currently configured our DTM generation, those masks will be dropped because
+they’re only two characters long. That’s perfectly fine for our purposes. But
+it again underscores the fact that documents in the DTM are not documents as
+they are in the corpus. Indeed, through these preprocessing decisions we have
+already constructed a model of our corpus.</p>
+<p>Time to rebuild the DTM with text in <code class="docutils literal notranslate"><span class="pre">masked</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">count_vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="o">**</span><span class="n">cv_parameters</span><span class="p">)</span>
+<span class="n">count_vectorizer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;masked&quot;</span><span class="p">])</span>
+<span class="n">dtm</span> <span class="o">=</span> <span class="n">count_vectorizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;masked&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Convert to a DataFrame.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dtm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">dtm</span><span class="o">.</span><span class="n">toarray</span><span class="p">(),</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">count_vectorizer</span><span class="o">.</span><span class="n">get_feature_names_out</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">dtm</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;novel&quot;</span><span class="p">],</span> <span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;chapter&quot;</span><span class="p">]],</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;novel_name&quot;</span><span class="p">,</span> <span class="s2">&quot;chapter_num&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We won’t step through the above metrics again, except we will look at top token
+counts to confirm that masking made a difference.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">token_freq</span> <span class="o">=</span> <span class="n">dtm</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;novel_name&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">token_freq</span><span class="o">.</span><span class="n">idxmax</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;most_frequent_token&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>most_frequent_token</th>
+    </tr>
+    <tr>
+      <th>novel_name</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Ambassadors</th>
+      <td>little</td>
+    </tr>
+    <tr>
+      <th>Awkward Age</th>
+      <td>know</td>
+    </tr>
+    <tr>
+      <th>Bostonians</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Confidence</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Golden Bowl</th>
+      <td>little</td>
+    </tr>
+    <tr>
+      <th>Ivory Tower</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Outcry</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Portrait Of A Lady</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Princess Casamassima</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Reverberator</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Roderick Hudson</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Sacred Found</th>
+      <td>little</td>
+    </tr>
+    <tr>
+      <th>Spoils Poynton</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>The American</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>The Europeans</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Tragic Muse</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Washington Square</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Watch And Ward</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>What Maisie Knew</th>
+      <td>little</td>
+    </tr>
+    <tr>
+      <th>Wings Of The Dove</th>
+      <td>said</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Names are gone but the output looks even worse. There’s no differentiation
+among the most frequent tokens in each novel, even when controlling for common
+deictic words with stopword removal. Given the nature of Zipfian distributions,
+this shouldn’t be surprising.</p>
+<p>One way to control for this would be to remove tokens from consideration when
+building the DTM using some cutoff metric. That would work okay but it may
+remove valuable information from the documents. Consider, for example, the fact
+that James’s penchant for extended psychological descriptions could be usefully
+counterposed with chapters with more dialogue. Removing “said” would make it
+difficult to do this. More, setting the cutoff point could take a fair bit of
+back and forth. A better strategy would be to <strong>re-weight</strong> token counts by
+some method so that frequent tokens have less impact in aggregate analyses like
+the above.</p>
+</section>
+</section>
+<section id="weighting-with-tf-idf">
+<h2><span class="section-number">5.3. </span>Weighting with TF–IDF<a class="headerlink" href="#weighting-with-tf-idf" title="Link to this heading">#</a></h2>
+<p>This is where TF–IDF, or <strong>term frequency–inverse document frequency</strong>, comes
+in. It re-weights tokens according to their specificity in a document. Tokens
+that frequently appear in many documents will have low TF–IDF scores, while
+those that are less frequent, or appear frequently in only a few documents,
+will have high TF–IDF scores.</p>
+<p>Scores are the product of two statistics: <strong>term frequency</strong> and <strong>inverse
+document frequency</strong>. There are several variations for calculating both but
+generally they work like so:</p>
+<p>Term frequency is the relative frequency of a token <span class="math notranslate nohighlight">\(t\)</span> in a document <span class="math notranslate nohighlight">\(d\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+TF(t, d) = \frac{f_{t,d}}{\sum_{i=1}^n f_{i,d}}
+\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(f_{t,d}\)</span> is the frequency of token <span class="math notranslate nohighlight">\(t\)</span> in document <span class="math notranslate nohighlight">\(d\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\sum_{i=1}^nf_{i,d}\)</span> is the sum of all token frequencies in document <span class="math notranslate nohighlight">\(d\)</span></p></li>
+</ul>
+<p>In code, that looks like the following:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">TF</span> <span class="o">=</span> <span class="n">dtm</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">dtm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Inverse document frequency measures how common or rare a token is.</p>
+<div class="math notranslate nohighlight">
+\[
+IDF(t, D) = log\left({\frac{N}{|\{d \in D : t \in d\}|}} \right)
+\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(N\)</span> is the total number of documents in a corpus <span class="math notranslate nohighlight">\(D\)</span></p></li>
+<li><p>For each document <span class="math notranslate nohighlight">\(d\)</span> in <span class="math notranslate nohighlight">\(D\)</span>, we count which ones contain token <span class="math notranslate nohighlight">\(t\)</span></p></li>
+</ul>
+<p>The code for this calculation is below. Note that we typically add one to the
+document frequency to avoid zero-division errors. Adding one outside the
+logarithm ensures that any terms that appear across all documents do not
+completely zero-out.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dtm</span><span class="p">)</span>
+<span class="n">DF</span> <span class="o">=</span> <span class="p">(</span><span class="n">dtm</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">IDF</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">N</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">DF</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The product of these two statistics is TF–IDF.</p>
+<div class="math notranslate nohighlight">
+\[
+TFIDF(t, d, D) = TF(t, d, D) \cdot IDF(t, D)
+\]</div>
+<p>Or, in code:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">TFIDF</span> <span class="o">=</span> <span class="n">TF</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">IDF</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Don’t want to go through all those steps? Use <code class="docutils literal notranslate"><span class="pre">TfidfVectorizer</span></code>. But note that
+<code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> has set some defaults for smoothing/normalizing TF–IDF scores
+that could make the result slightly different than your own calculations.</p>
+<p>Fitting <code class="docutils literal notranslate"><span class="pre">TfidfVectorizer</span></code> works with the same use pattern.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tfidf_vectorizer</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="o">**</span><span class="n">cv_parameters</span><span class="p">)</span>
+<span class="n">tfidf_vectorizer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;masked&quot;</span><span class="p">])</span>
+<span class="n">tfidf</span> <span class="o">=</span> <span class="n">tfidf_vectorizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;masked&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Convert to a DataFrame:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tfidf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">tfidf</span><span class="o">.</span><span class="n">toarray</span><span class="p">(),</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">tfidf_vectorizer</span><span class="o">.</span><span class="n">get_feature_names_out</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">tfidf</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;novel&quot;</span><span class="p">],</span> <span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;chapter&quot;</span><span class="p">]],</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;novel_name&quot;</span><span class="p">,</span> <span class="s2">&quot;chapter_num&quot;</span><span class="p">]</span>
+<span class="p">)</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<p>And now, finally, the highest scoring tokens for every novel. Again, these are
+the most specific tokens.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">max_tfidf_per_novel</span> <span class="o">=</span> <span class="n">tfidf</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;novel_name&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<span class="n">max_tfidf_per_novel</span><span class="o">.</span><span class="n">idxmax</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;top_token&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>top_token</th>
+    </tr>
+    <tr>
+      <th>novel_name</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Ambassadors</th>
+      <td>little</td>
+    </tr>
+    <tr>
+      <th>Awkward Age</th>
+      <td>know</td>
+    </tr>
+    <tr>
+      <th>Bostonians</th>
+      <td>policeman</td>
+    </tr>
+    <tr>
+      <th>Confidence</th>
+      <td>vivian</td>
+    </tr>
+    <tr>
+      <th>Golden Bowl</th>
+      <td>bowl</td>
+    </tr>
+    <tr>
+      <th>Ivory Tower</th>
+      <td>uncle</td>
+    </tr>
+    <tr>
+      <th>Outcry</th>
+      <td>outcry</td>
+    </tr>
+    <tr>
+      <th>Portrait Of A Lady</th>
+      <td>dance</td>
+    </tr>
+    <tr>
+      <th>Princess Casamassima</th>
+      <td>fiddler</td>
+    </tr>
+    <tr>
+      <th>Reverberator</th>
+      <td>germain</td>
+    </tr>
+    <tr>
+      <th>Roderick Hudson</th>
+      <td>prince</td>
+    </tr>
+    <tr>
+      <th>Sacred Found</th>
+      <td>grow</td>
+    </tr>
+    <tr>
+      <th>Spoils Poynton</th>
+      <td>negotiation</td>
+    </tr>
+    <tr>
+      <th>The American</th>
+      <td>marquis</td>
+    </tr>
+    <tr>
+      <th>The Europeans</th>
+      <td>said</td>
+    </tr>
+    <tr>
+      <th>Tragic Muse</th>
+      <td>boat</td>
+    </tr>
+    <tr>
+      <th>Washington Square</th>
+      <td>father</td>
+    </tr>
+    <tr>
+      <th>Watch And Ward</th>
+      <td>cousin</td>
+    </tr>
+    <tr>
+      <th>What Maisie Knew</th>
+      <td>ladyship</td>
+    </tr>
+    <tr>
+      <th>Wings Of The Dove</th>
+      <td>marian</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Top-scoring tokens for each chapter in <em>What Maisie Knew</em>. Use an empty <code class="docutils literal notranslate"><span class="pre">slice</span></code>
+to get all entries in the second of the two DataFrame indexes.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">maisie</span> <span class="o">=</span> <span class="n">tfidf</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="s2">&quot;What Maisie Knew&quot;</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))]</span>
+<span class="n">maisie_max</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="n">maisie</span><span class="o">.</span><span class="n">idxmax</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">&quot;tfidf&quot;</span><span class="p">:</span> <span class="n">maisie</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">})</span>
+<span class="n">maisie_max</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>token</th>
+      <th>tfidf</th>
+    </tr>
+    <tr>
+      <th>chapter_num</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1</th>
+      <td>nurse</td>
+      <td>0.186544</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>lies</td>
+      <td>0.204308</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>papa</td>
+      <td>0.285493</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>diadem</td>
+      <td>0.219282</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>brougham</td>
+      <td>0.173980</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>governess</td>
+      <td>0.239340</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>papa</td>
+      <td>0.196547</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>papa</td>
+      <td>0.238696</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>ladyship</td>
+      <td>0.364359</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>mamma</td>
+      <td>0.275737</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>ladyship</td>
+      <td>0.293165</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>ladyship</td>
+      <td>0.303566</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>child</td>
+      <td>0.153145</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>child</td>
+      <td>0.155951</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>papa</td>
+      <td>0.156633</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>mother</td>
+      <td>0.276220</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>squared</td>
+      <td>0.147945</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>papa</td>
+      <td>0.141638</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>father</td>
+      <td>0.161065</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>ladyship</td>
+      <td>0.194401</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>ladyship</td>
+      <td>0.209321</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>fishwife</td>
+      <td>0.134534</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>ladyship</td>
+      <td>0.143543</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>afraid</td>
+      <td>0.141128</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>pays</td>
+      <td>0.159513</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>sands</td>
+      <td>0.128149</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>come</td>
+      <td>0.149019</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>divorce</td>
+      <td>0.212882</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>salon</td>
+      <td>0.216161</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>waiter</td>
+      <td>0.223491</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>pupil</td>
+      <td>0.163950</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="document-classification">
+<h2><span class="section-number">5.4. </span>Document Classification<a class="headerlink" href="#document-classification" title="Link to this heading">#</a></h2>
+<p>Each document in the weighted DTM is now a <strong>feature vector</strong>: a sequence of
+values that encode information about token distributions. These vectors allow
+us to estimate joint probabilities between features, which enables
+classification tasks.</p>
+<section id="the-multinomial-naive-bayes-classifier">
+<h3><span class="section-number">5.4.1. </span>The Multinomial Naive Bayes classifier<a class="headerlink" href="#the-multinomial-naive-bayes-classifier" title="Link to this heading">#</a></h3>
+<p>We use a <strong>Multinomial Naive Bayes</strong> model to classify documents according to
+their assigned label, or class. The model trains by calculating the <strong>prior
+probability</strong> for each class. Then, it computes the <strong>posterior probability</strong>
+of each token given a class. The class with the highest posterior probability
+is selected as the label for a document.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Term</p></th>
+<th class="head"><p>Definition</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Naive Bayes</p></td>
+<td><p>Assumes conditionally independent features</p></td>
+</tr>
+<tr class="row-odd"><td><p>Multinomial distribution</p></td>
+<td><p>Models probabilities of counts across categories</p></td>
+</tr>
+<tr class="row-even"><td><p>Prior probability</p></td>
+<td><p>Probability of an event before observing new data</p></td>
+</tr>
+<tr class="row-odd"><td><p>Posterior probability</p></td>
+<td><p>Probability of an event after observing new data</p></td>
+</tr>
+<tr class="row-even"><td><p>Argmax (maximum likelihood estimation)</p></td>
+<td><p>Predicts class with highest posterior probability</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The formula for our classifier is as follows:</p>
+<div class="math notranslate nohighlight">
+\[
+P(C_k|x) \propto P(C_k) \prod_{i=1}^n P(x_i|C_k)
+\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(P(C_k)\)</span>: prior probability of class <span class="math notranslate nohighlight">\(C_k\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(P(x_i|C_k)\)</span>: posterior probability of feature <span class="math notranslate nohighlight">\(x_i\)</span> given class <span class="math notranslate nohighlight">\(C_k\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(P(C_k|x)\)</span>: probability of feature vector <span class="math notranslate nohighlight">\(x\)</span> being class <span class="math notranslate nohighlight">\(C_k\)</span></p></li>
+</ul>
+</section>
+<section id="training-a-classifier">
+<h3><span class="section-number">5.4.2. </span>Training a classifier<a class="headerlink" href="#training-a-classifier" title="Link to this heading">#</a></h3>
+<p>No need to do this math ourselves; <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> can do it. But first, we
+split our data and their corresponding labels into <strong>training</strong> and <strong>testing</strong>
+datasets. The model will train on the former, and we will validate that model
+on the latter (which is data it hasn’t yet seen).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">tfidf</span><span class="p">,</span> <span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;hoover&quot;</span><span class="p">],</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">357</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Train set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Train set size: 394
+Test set size: 169
+</pre></div>
+</div>
+</div>
+</div>
+<p>Train the model using the same initialization/fitting pattern from before.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">classifier</span> <span class="o">=</span> <span class="n">MultinomialNB</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.005</span><span class="p">)</span>
+<span class="n">classifier</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style>#sk-container-id-2 {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: black;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
+  --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-icon: #696969;
+
+  @media (prefers-color-scheme: dark) {
+    /* Redefinition of color scheme for dark theme */
+    --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
+    --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-icon: #878787;
+  }
+}
+
+#sk-container-id-2 {
+  color: var(--sklearn-color-text);
+}
+
+#sk-container-id-2 pre {
+  padding: 0;
+}
+
+#sk-container-id-2 input.sk-hidden--visually {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+#sk-container-id-2 div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+#sk-container-id-2 div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+#sk-container-id-2 div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+#sk-container-id-2 div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+#sk-container-id-2 div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+#sk-container-id-2 div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#sk-container-id-2 div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+#sk-container-id-2 div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+#sk-container-id-2 div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+#sk-container-id-2 div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+#sk-container-id-2 div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+#sk-container-id-2 label.sk-toggleable__label {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#sk-container-id-2 label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+#sk-container-id-2 label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+#sk-container-id-2 div.sk-toggleable__content {
+  max-height: 0;
+  max-width: 0;
+  overflow: hidden;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-2 div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-2 div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-2 div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-2 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  max-height: 200px;
+  max-width: 100%;
+  overflow: auto;
+}
+
+#sk-container-id-2 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+#sk-container-id-2 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-2 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+#sk-container-id-2 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-2 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+#sk-container-id-2 div.sk-label label.sk-toggleable__label,
+#sk-container-id-2 div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+#sk-container-id-2 div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+#sk-container-id-2 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+#sk-container-id-2 div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1.2em;
+}
+
+#sk-container-id-2 div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+#sk-container-id-2 div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-2 div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+#sk-container-id-2 div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-2 div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 1ex;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-1);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+#sk-container-id-2 a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+#sk-container-id-2 a.estimator_doc_link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+#sk-container-id-2 a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+#sk-container-id-2 a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+</style><div id="sk-container-id-2" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>MultinomialNB(alpha=0.005)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" checked><label for="sk-estimator-id-2" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;MultinomialNB<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.5/modules/generated/sklearn.naive_bayes.MultinomialNB.html">?<span>Documentation for MultinomialNB</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>MultinomialNB(alpha=0.005)</pre></div> </div></div></div></div></div></div>
+</div>
+</section>
+<section id="model-diagnostics">
+<h3><span class="section-number">5.4.3. </span>Model diagnostics<a class="headerlink" href="#model-diagnostics" title="Link to this heading">#</a></h3>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">.score()</span></code> method to return the mean accuracy for all labels given test
+data. This is the number of correct predictions divided by the total number of
+true labels.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model accuracy: </span><span class="si">{</span><span class="n">accuracy</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Model accuracy: 0.9645%
+</pre></div>
+</div>
+</div>
+</div>
+<p>Generate a classification report to get a class-by-class summary of the
+classifier’s performance. This requires you to make predictions on the test
+size, which you then compare against the true labels.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">preds</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now make and print the report.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">periods</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;1871-81&quot;</span><span class="p">,</span> <span class="s2">&quot;1886-90&quot;</span><span class="p">,</span> <span class="s2">&quot;1896-99&quot;</span><span class="p">,</span> <span class="s2">&quot;1901-17&quot;</span><span class="p">]</span>
+<span class="n">report</span> <span class="o">=</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">preds</span><span class="p">,</span> <span class="n">target_names</span> <span class="o">=</span> <span class="n">periods</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>              precision    recall  f1-score   support
+
+     1871-81       1.00      1.00      1.00        58
+     1886-90       0.98      1.00      0.99        51
+     1896-99       1.00      0.81      0.89        26
+     1901-17       0.87      0.97      0.92        34
+
+    accuracy                           0.96       169
+   macro avg       0.96      0.94      0.95       169
+weighted avg       0.97      0.96      0.96       169
+</pre></div>
+</div>
+</div>
+</div>
+<p>The above scores describe trade-offs between the following kinds of
+predictions:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Prediction</p></th>
+<th class="head"><p>Explanation</p></th>
+<th class="head"><p>Shorthand</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>True positive</p></td>
+<td><p>Correctly predicts class of interest</p></td>
+<td><p>TP</p></td>
+</tr>
+<tr class="row-odd"><td><p>True negative</p></td>
+<td><p>Correctly predicts all other classes</p></td>
+<td><p>TN</p></td>
+</tr>
+<tr class="row-even"><td><p>False positive</p></td>
+<td><p>Incorrectly predicts class of interest</p></td>
+<td><p>FP</p></td>
+</tr>
+<tr class="row-odd"><td><p>False negative</p></td>
+<td><p>Incorrectly predicts all other classes</p></td>
+<td><p>FN</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Here is a breakdown of score types:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Score</p></th>
+<th class="head"><p>Explanation</p></th>
+<th class="head"><p>Formula</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Precision</p></td>
+<td><p>Accuracy of positive predictions</p></td>
+<td><p><span class="math notranslate nohighlight">\(P = \frac{TP}{TP + FP}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>Recall</p></td>
+<td><p>Ability to find all relevant instances</p></td>
+<td><p><span class="math notranslate nohighlight">\(R = \frac{TP}{TP + FN}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>F1</p></td>
+<td><p>A balance of precision and recall</p></td>
+<td><p><span class="math notranslate nohighlight">\(F1 = 2\times \frac{P\times R}{P + R}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>A <strong>weighted</strong> average of these scores offsets each class by its proportion in
+the testing set; the <strong>macro</strong> average reports scores with no weighting. The
+<strong>support</strong> for each class is the number of documents labeled with that class.</p>
+<p>This model does extremely well. In fact, it may be a touch <strong>overfitted</strong>: too
+closely matched with its training data and therefore incapable of generalizing
+beyond that data. For our purposes this is less of a concern because the corpus
+and analysis are both constrained, but you might be suspicious of high-scoring
+results like this in other cases.</p>
+</section>
+<section id="top-tokens-per-class">
+<h3><span class="section-number">5.4.4. </span>Top tokens per class<a class="headerlink" href="#top-tokens-per-class" title="Link to this heading">#</a></h3>
+<p>Recall that the classifier makes its decisions based on the posterior
+probability of a feature vector. That means there are certain tokens in the
+corpus that are most likely to appear for each class. What are they?</p>
+<p>First, extract the feature names, the class labels, and the log probabilities
+for each feature.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">feature_names</span> <span class="o">=</span> <span class="n">tfidf_vectorizer</span><span class="o">.</span><span class="n">get_feature_names_out</span><span class="p">()</span>
+<span class="n">class_labels</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">classes_</span>
+<span class="n">log_probs</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">feature_log_prob_</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now iterate through every class and extract the <code class="docutils literal notranslate"><span class="pre">top_n</span></code> tokens (most probable
+tokens).</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">top_n</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">class_labels</span><span class="p">):</span>
+    <span class="c1"># Get the probabilities and sort them. Sorting is in ascending order, so</span>
+    <span class="c1"># flip the array</span>
+    <span class="n">probs</span> <span class="o">=</span> <span class="n">log_probs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">sorted_probs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">probs</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># The above array contains the indexes that would sort the probabilities.</span>
+    <span class="c1"># Take the `top_n` indices, then get the corresponding tokens by indexing</span>
+    <span class="c1"># `feature_names`</span>
+    <span class="n">top_probs</span> <span class="o">=</span> <span class="n">sorted_probs</span><span class="p">[:</span><span class="n">top_n</span><span class="p">]</span>
+    <span class="n">top_tokens</span> <span class="o">=</span> <span class="n">feature_names</span><span class="p">[</span><span class="n">top_probs</span><span class="p">]</span>
+
+    <span class="c1"># Print the results</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Top tokens for </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">top_tokens</span><span class="p">),</span> <span class="n">end</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Top tokens for 0:
+said
+little
+don
+know
+say
+think
+good
+young
+like
+great
+man
+come
+time
+moment
+father
+asked
+looked
+make
+girl
+went
+shall
+looking
+eyes
+vivian
+old
+
+Top tokens for 1:
+said
+little
+know
+like
+don
+young
+come
+say
+man
+didn
+time
+good
+think
+great
+way
+make
+moment
+old
+girl
+people
+want
+went
+lady
+thought
+mother
+
+Top tokens for 2:
+know
+said
+little
+don
+say
+mother
+time
+child
+just
+like
+come
+way
+quite
+mean
+think
+friend
+make
+really
+things
+moment
+dear
+good
+looked
+old
+thing
+
+Top tokens for 3:
+said
+know
+little
+time
+don
+quite
+come
+moment
+just
+really
+way
+mean
+say
+like
+friend
+question
+make
+man
+things
+fact
+didn
+thing
+good
+think
+want
+</pre></div>
+</div>
+</div>
+</div>
+<p>These are pretty general. Even with tf-idf, common tokens in fiction persist.
+But we can compute the difference between log probabilities for one class and
+the mean log probabilities of all other classes. That will give us more
+distinct tokens for each class.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">class_labels</span><span class="p">):</span>
+    <span class="c1"># Remove the current classes&#39;s log probabilities, then calculate their mean</span>
+    <span class="n">other_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">log_probs</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">mean_log_probs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">other_classes</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Find the difference between this mean and the current class&#39;s log</span>
+    <span class="c1"># probabilities</span>
+    <span class="n">difference</span> <span class="o">=</span> <span class="n">log_probs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">mean_log_probs</span>
+
+    <span class="c1"># Sort as before</span>
+    <span class="n">sorted_probs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">difference</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">top_probs</span> <span class="o">=</span> <span class="n">sorted_probs</span><span class="p">[:</span><span class="n">top_n</span><span class="p">]</span>
+    <span class="n">top_tokens</span> <span class="o">=</span> <span class="n">feature_names</span><span class="p">[</span><span class="n">top_probs</span><span class="p">]</span>
+
+    <span class="c1"># And print</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Distinctive tokens for </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">top_tokens</span><span class="p">),</span> <span class="n">end</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Distinctive tokens for 0:
+vivian
+osmond
+marquis
+honor
+favor
+recognized
+humor
+townsend
+color
+colored
+parlor
+catherine
+monsieur
+ardor
+countess
+evers
+chateau
+confectioner
+neighbors
+neighboring
+isabel
+misfortunes
+dishonor
+rowland
+bruises
+
+Distinctive tokens for 1:
+burrage
+agnes
+bookbinder
+univers
+abbey
+olive
+fiddler
+farrinder
+proberts
+embassy
+dressmaker
+millicent
+poppa
+tarrant
+plebeian
+canvases
+electors
+stile
+verena
+boulevard
+mediocrity
+intonations
+heroes
+comedian
+daresay
+
+Distinctive tokens for 2:
+straighteners
+farange
+maltese
+fleda
+negotiation
+diadem
+stepfather
+owen
+rolls
+avez
+hug
+banister
+vanderbank
+schoolroom
+pelisse
+pupil
+curate
+miser
+maisie
+wix
+profitably
+frightening
+tishy
+texts
+overmore
+
+Distinctive tokens for 3:
+strether
+crimble
+milly
+lowder
+connections
+chad
+pococks
+insistent
+clearance
+pounce
+enhance
+sagely
+entresol
+murmurous
+psychologic
+embroider
+reaffirmed
+intensified
+clues
+cessation
+tortoise
+densher
+disclaimed
+showily
+hillside
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="visualization">
+<h2><span class="section-number">5.5. </span>Visualization<a class="headerlink" href="#visualization" title="Link to this heading">#</a></h2>
+<p>Let’s visualize our documents in a scatterplot so we can inspect the corpus at
+scale.</p>
+<section id="dimensionality-reduction">
+<h3><span class="section-number">5.5.1. </span>Dimensionality reduction<a class="headerlink" href="#dimensionality-reduction" title="Link to this heading">#</a></h3>
+<p>To do this, we’ll need to transform our TF–IDF vectors into simplified
+representations. Right now, these vectors are extremely <strong>high dimensional</strong>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span><span class="p">,</span> <span class="n">num_dimensions</span> <span class="o">=</span> <span class="n">tfidf</span><span class="o">.</span><span class="n">shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of dimensions: </span><span class="si">{</span><span class="n">num_dimensions</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Number of dimensions: 26,053
+</pre></div>
+</div>
+</div>
+</div>
+<p>This number far exceeds the two or three dimensions of plots.</p>
+<p>We use <strong>principal component analysis</strong>, or PCA, to reduce the dimensionality
+of our vectors so we can plot them. PCA identifies axes (principal components)
+that maximize variance in data and then projects that data onto the components.
+This reduces the number of features in the data but retains important
+information about each vector. Take a look at Margaret Fleck’s <a class="reference external" href="https://courses.grainger.illinois.edu/cs440/fa2019/Lectures/lect38.html">lecture
+notes</a> if you’d like to see how this process works in detail.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="mi">357</span><span class="p">)</span>
+<span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">tfidf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><style>#sk-container-id-3 {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: black;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
+  --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-icon: #696969;
+
+  @media (prefers-color-scheme: dark) {
+    /* Redefinition of color scheme for dark theme */
+    --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
+    --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-icon: #878787;
+  }
+}
+
+#sk-container-id-3 {
+  color: var(--sklearn-color-text);
+}
+
+#sk-container-id-3 pre {
+  padding: 0;
+}
+
+#sk-container-id-3 input.sk-hidden--visually {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+#sk-container-id-3 div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+#sk-container-id-3 div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+#sk-container-id-3 div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+#sk-container-id-3 div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+#sk-container-id-3 div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+#sk-container-id-3 div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#sk-container-id-3 div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+#sk-container-id-3 div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+#sk-container-id-3 div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+#sk-container-id-3 div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+#sk-container-id-3 div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+#sk-container-id-3 label.sk-toggleable__label {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#sk-container-id-3 label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+#sk-container-id-3 label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+#sk-container-id-3 div.sk-toggleable__content {
+  max-height: 0;
+  max-width: 0;
+  overflow: hidden;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-3 div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-3 div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-3 div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-3 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  max-height: 200px;
+  max-width: 100%;
+  overflow: auto;
+}
+
+#sk-container-id-3 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+#sk-container-id-3 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-3 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+#sk-container-id-3 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-3 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+#sk-container-id-3 div.sk-label label.sk-toggleable__label,
+#sk-container-id-3 div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+#sk-container-id-3 div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+#sk-container-id-3 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+#sk-container-id-3 div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1.2em;
+}
+
+#sk-container-id-3 div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+#sk-container-id-3 div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-3 div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+#sk-container-id-3 div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-3 div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 1ex;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-1);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+#sk-container-id-3 a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+#sk-container-id-3 a.estimator_doc_link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+#sk-container-id-3 a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+#sk-container-id-3 a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+</style><div id="sk-container-id-3" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>PCA(n_components=0.95, random_state=357)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" checked><label for="sk-estimator-id-3" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;PCA<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.5/modules/generated/sklearn.decomposition.PCA.html">?<span>Documentation for PCA</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>PCA(n_components=0.95, random_state=357)</pre></div> </div></div></div></div></div></div>
+</div>
+<p>The PCA reducer’s <code class="docutils literal notranslate"><span class="pre">.explained_variance_ratio_</span></code> attribute contains the
+proportion of the total variance captured by each principal component. Their
+sum should equal the number we set above.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exp_variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Explained variance: </span><span class="si">{</span><span class="n">exp_variance</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Explained variance: 0.95%
+</pre></div>
+</div>
+</div>
+</div>
+<p>Slice out segments of these components to identify how much of the variance is
+explained by the <span class="math notranslate nohighlight">\(k\)</span>-th component. <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> sorts components
+automatically, so the first ones always contain the most variance..</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">exp_variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[:</span><span class="n">k</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Explained variance of </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> components: </span><span class="si">{</span><span class="n">exp_variance</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Explained variance of 25 components: 0.15%
+</pre></div>
+</div>
+</div>
+</div>
+<p>The first two components do not explain very much variance, but they will be
+enough for visualization.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">exp_variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">[:</span><span class="n">k</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Explained variance of </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> components: </span><span class="si">{</span><span class="n">exp_variance</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Explained variance of 2 components: 0.04%
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="plotting-documents">
+<h3><span class="section-number">5.5.2. </span>Plotting documents<a class="headerlink" href="#plotting-documents" title="Link to this heading">#</a></h3>
+<p>To plot, transform the TF–IDF scores and format the reduced data as a
+DataFrame.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">reduced</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">tfidf</span><span class="p">)</span>
+<span class="n">vis_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">reduced</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">])</span>
+<span class="n">vis_data</span><span class="p">[</span><span class="s2">&quot;label_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">corpus</span><span class="p">[</span><span class="s2">&quot;hoover&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">vis_data</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vis_data</span><span class="p">[</span><span class="s2">&quot;label_idx&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">periods</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Create a plot.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
+    <span class="n">hue</span> <span class="o">=</span> <span class="s2">&quot;label&quot;</span><span class="p">,</span>
+    <span class="n">palette</span> <span class="o">=</span> <span class="s2">&quot;tab10&quot;</span><span class="p">,</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">vis_data</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;James chapters&quot;</span><span class="p">,</span> <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;Dim. 1&quot;</span><span class="p">,</span> <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Dim. 2&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/5918829d5b0612e0d825c3c8580345e55d77c893a6a28d4575178f36c079436d.png" src="../_images/5918829d5b0612e0d825c3c8580345e55d77c893a6a28d4575178f36c079436d.png" />
+</div>
+</div>
+<p>There isn’t perfect separation here. Might some of the overlapping points be
+mis-classified documents? We run predictions across all documents and re-plot
+with those.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_preds</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">tfidf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Where are labels incorrect?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vis_data</span><span class="p">[</span><span class="s2">&quot;incorrect&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+    <span class="n">all_preds</span> <span class="o">==</span> <span class="n">vis_data</span><span class="p">[</span><span class="s2">&quot;label_idx&quot;</span><span class="p">],</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Re-plot.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
+    <span class="n">hue</span> <span class="o">=</span> <span class="s2">&quot;label&quot;</span><span class="p">,</span>
+    <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;incorrect&quot;</span><span class="p">,</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="s2">&quot;incorrect&quot;</span><span class="p">,</span>
+    <span class="n">sizes</span> <span class="o">=</span> <span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">35</span><span class="p">),</span>
+    <span class="n">palette</span> <span class="o">=</span> <span class="s2">&quot;tab10&quot;</span><span class="p">,</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">vis_data</span><span class="p">,</span>
+    <span class="n">legend</span> <span class="o">=</span> <span class="s2">&quot;full&quot;</span>
+<span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;James chapters&quot;</span><span class="p">,</span> <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;Dim. 1&quot;</span><span class="p">,</span> <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Dim. 2&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/65220a484bedbe740f66b2a2cf4c3bb12f9654524988f3abdfc5479da1e2a4f6.png" src="../_images/65220a484bedbe740f66b2a2cf4c3bb12f9654524988f3abdfc5479da1e2a4f6.png" />
+</div>
+</div>
+<p>It does indeed seem to be the case that mis-classified documents sit right
+along the border of two classes. Though keep in mind that dimensionality
+reduction often results in visual distortions, so looking at data might
+sometimes be misleading.</p>
+<p>Finally, which documents are these?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">idx</span> <span class="o">=</span> <span class="n">vis_data</span><span class="p">[</span><span class="n">vis_data</span><span class="p">[</span><span class="s2">&quot;incorrect&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+<span class="n">model_pred</span> <span class="o">=</span> <span class="n">all_preds</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+<span class="n">corpus</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;novel&quot;</span><span class="p">,</span> <span class="s2">&quot;chapter&quot;</span><span class="p">,</span> <span class="s2">&quot;hoover&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">model_pred</span> <span class="o">=</span> <span class="n">model_pred</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>novel</th>
+      <th>chapter</th>
+      <th>hoover</th>
+      <th>model_pred</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>355</th>
+      <td>Spoils Poynton</td>
+      <td>13</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>384</th>
+      <td>What Maisie Knew</td>
+      <td>20</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>400</th>
+      <td>Awkward Age</td>
+      <td>5</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>422</th>
+      <td>Awkward Age</td>
+      <td>27</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>424</th>
+      <td>Awkward Age</td>
+      <td>29</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>562</th>
+      <td>Ivory Tower</td>
+      <td>13</td>
+      <td>3</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="04_ngram-models.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>N-gram Models</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">5.1. Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-document-term-matrix">5.2. The Document-Term Matrix</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#document-term-matrix-analysis">5.2.1. Document-term matrix analysis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-masked-tokens">5.2.2. Using masked tokens</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#weighting-with-tf-idf">5.3. Weighting with TF–IDF</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#document-classification">5.4. Document Classification</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-multinomial-naive-bayes-classifier">5.4.1. The Multinomial Naive Bayes classifier</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#training-a-classifier">5.4.2. Training a classifier</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#model-diagnostics">5.4.3. Model diagnostics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#top-tokens-per-class">5.4.4. Top tokens per class</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization">5.5. Visualization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dimensionality-reduction">5.5.1. Dimensionality reduction</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-documents">5.5.2. Plotting documents</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Tyler Shoemaker
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

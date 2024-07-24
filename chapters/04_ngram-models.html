@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
   
@@ -62,6 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/04_ngram-models';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5. Vectorization" href="05_vectorization.html" />
     <link rel="prev" title="3. Data Analysis in Python" href="03_data-analysis-basics.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -183,6 +184,7 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Language Models</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">4. N-gram Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_vectorization.html">5. Vectorization</a></li>
 </ul>
 
     </div>
@@ -590,7 +592,7 @@ that, unlike with the obituaries, we are keeping the punctuation.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;my&#39;, &#39;life&#39;, &#39;had&#39;, &#39;stood&#39;, &#39;-&#39;, &#39;a&#39;, &#39;loaded&#39;, &#39;gun&#39;, &#39;-&#39;, &#39;in&#39;, &#39;corners&#39;, &#39;-&#39;, &#39;till&#39;, &#39;a&#39;, &#39;day&#39;, &#39;the&#39;, &#39;owner&#39;, &#39;passed&#39;, &#39;-&#39;, &#39;identified&#39;, &#39;-&#39;, &#39;and&#39;, &#39;carried&#39;, &#39;me&#39;, &#39;away&#39;, &#39;-&#39;, &#39;and&#39;, &#39;now&#39;, &#39;we&#39;, &#39;roam&#39;, &#39;in&#39;, &#39;sovreign&#39;, &#39;woods&#39;, &#39;-&#39;, &#39;and&#39;, &#39;now&#39;, &#39;we&#39;, &#39;hunt&#39;, &#39;the&#39;, &#39;doe&#39;, &#39;-&#39;, &#39;and&#39;, &#39;every&#39;, &#39;time&#39;, &#39;i&#39;, &#39;speak&#39;, &#39;for&#39;, &#39;him&#39;, &#39;the&#39;, &#39;mountains&#39;, &#39;straight&#39;, &#39;reply&#39;, &#39;-&#39;, &#39;and&#39;, &#39;do&#39;, &#39;i&#39;, &#39;smile&#39;, &#39;,&#39;, &#39;such&#39;, &#39;cordial&#39;, &#39;light&#39;, &#39;opon&#39;, &#39;the&#39;, &#39;valley&#39;, &#39;glow&#39;, &#39;-&#39;, &#39;it&#39;, &#39;is&#39;, &#39;as&#39;, &#39;a&#39;, &#39;vesuvian&#39;, &#39;face&#39;, &#39;had&#39;, &#39;let&#39;, &#39;it&#39;, &#39;’&#39;, &#39;s&#39;, &#39;pleasure&#39;, &#39;through&#39;, &#39;-&#39;, &#39;and&#39;, &#39;when&#39;, &#39;at&#39;, &#39;night&#39;, &#39;-&#39;, &#39;our&#39;, &#39;good&#39;, &#39;day&#39;, &#39;done&#39;, &#39;-&#39;, &#39;i&#39;, &#39;guard&#39;, &#39;my&#39;, &#39;master&#39;, &#39;’&#39;, &#39;s&#39;, &#39;head&#39;, &#39;-&#39;, &#39;’&#39;, &#39;tis&#39;, &#39;better&#39;, &#39;than&#39;, &#39;the&#39;, &#39;eider&#39;, &#39;duck&#39;, &#39;’&#39;, &#39;s&#39;, &#39;deep&#39;, &#39;pillow&#39;, &#39;-&#39;, &#39;to&#39;, &#39;have&#39;, &#39;shared&#39;, &#39;-&#39;, &#39;to&#39;, &#39;foe&#39;, &#39;of&#39;, &#39;his&#39;, &#39;-&#39;, &#39;i&#39;, &#39;’&#39;, &#39;m&#39;, &#39;deadly&#39;, &#39;foe&#39;, &#39;-&#39;, &#39;none&#39;, &#39;stir&#39;, &#39;the&#39;, &#39;second&#39;, &#39;time&#39;, &#39;-&#39;, &#39;on&#39;, &#39;whom&#39;, &#39;i&#39;, &#39;lay&#39;, &#39;a&#39;, &#39;yellow&#39;, &#39;eye&#39;, &#39;-&#39;, &#39;or&#39;, &#39;an&#39;, &#39;emphatic&#39;, &#39;thumb&#39;, &#39;-&#39;, &#39;though&#39;, &#39;i&#39;, &#39;than&#39;, &#39;he&#39;, &#39;-&#39;, &#39;may&#39;, &#39;longer&#39;, &#39;live&#39;, &#39;he&#39;, &#39;longer&#39;, &#39;must&#39;, &#39;-&#39;, &#39;than&#39;, &#39;i&#39;, &#39;-&#39;, &#39;for&#39;, &#39;i&#39;, &#39;have&#39;, &#39;but&#39;, &#39;the&#39;, &#39;power&#39;, &#39;to&#39;, &#39;kill&#39;, &#39;,&#39;, &#39;without&#39;, &#39;-&#39;, &#39;the&#39;, &#39;power&#39;, &#39;to&#39;, &#39;die&#39;, &#39;-&#39;]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;there&#39;, &quot;&#39;s&quot;, &#39;a&#39;, &#39;certain&#39;, &#39;slant&#39;, &#39;of&#39;, &#39;light&#39;, &#39;,&#39;, &#39;winter&#39;, &#39;afternoons&#39;, &#39;–&#39;, &#39;that&#39;, &#39;oppresses&#39;, &#39;,&#39;, &#39;like&#39;, &#39;the&#39;, &#39;heft&#39;, &#39;of&#39;, &#39;cathedral&#39;, &#39;tunes&#39;, &#39;–&#39;, &#39;heavenly&#39;, &#39;hurt&#39;, &#39;,&#39;, &#39;it&#39;, &#39;gives&#39;, &#39;us&#39;, &#39;–&#39;, &#39;we&#39;, &#39;can&#39;, &#39;find&#39;, &#39;no&#39;, &#39;scar&#39;, &#39;,&#39;, &#39;but&#39;, &#39;internal&#39;, &#39;difference&#39;, &#39;–&#39;, &#39;where&#39;, &#39;the&#39;, &#39;meanings&#39;, &#39;,&#39;, &#39;are&#39;, &#39;–&#39;, &#39;none&#39;, &#39;may&#39;, &#39;teach&#39;, &#39;it&#39;, &#39;–&#39;, &#39;any&#39;, &#39;–&#39;, &quot;&#39;tis&quot;, &#39;the&#39;, &#39;seal&#39;, &#39;despair&#39;, &#39;–&#39;, &#39;an&#39;, &#39;imperial&#39;, &#39;affliction&#39;, &#39;sent&#39;, &#39;us&#39;, &#39;of&#39;, &#39;the&#39;, &#39;air&#39;, &#39;–&#39;, &#39;when&#39;, &#39;it&#39;, &#39;comes&#39;, &#39;,&#39;, &#39;the&#39;, &#39;landscape&#39;, &#39;listens&#39;, &#39;–&#39;, &#39;shadows&#39;, &#39;–&#39;, &#39;hold&#39;, &#39;their&#39;, &#39;breath&#39;, &#39;–&#39;, &#39;when&#39;, &#39;it&#39;, &#39;goes&#39;, &#39;,&#39;, &quot;&#39;t&quot;, &#39;is&#39;, &#39;like&#39;, &#39;the&#39;, &#39;distance&#39;, &#39;on&#39;, &#39;the&#39;, &#39;look&#39;, &#39;of&#39;, &#39;death&#39;, &#39;–&#39;]
 </pre></div>
 </div>
 </div>
@@ -795,7 +797,7 @@ would simply choose tokens at random.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>of stranger , stanza too table – the shoes the
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>a that your – the processes men fame lap expectation
 </pre></div>
 </div>
 </div>
@@ -810,7 +812,7 @@ would simply choose tokens at random.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>through housewife truffled every yawning them nibbles because joy shared
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>pause held hid halves sabbath vibrations listless reminded chill being
 </pre></div>
 </div>
 </div>
@@ -893,7 +895,7 @@ probabilities in our corpus and repeat that value <code class="docutils literal 
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross-entropy: 0.07742022324595996
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross-entropy: 0.08074918565817739
 </pre></div>
 </div>
 </div>
@@ -935,8 +937,8 @@ over the average cross-entropy scores form the sampling run above.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>weighted      1.040726
-unweighted    1.056220
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>weighted      1.040616
+unweighted    1.056122
 dtype: float64
 </pre></div>
 </div>
@@ -978,7 +980,7 @@ Dickinson’s poetry.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(&#39;i&#39;, &#39;heard&#39;), (&#39;heard&#39;, &#39;a&#39;), (&#39;a&#39;, &#39;fly&#39;), (&#39;fly&#39;, &#39;buzz&#39;), (&#39;buzz&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;when&#39;), (&#39;when&#39;, &#39;i&#39;), (&#39;i&#39;, &#39;died&#39;), (&#39;died&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;stillness&#39;), (&#39;stillness&#39;, &#39;in&#39;), (&#39;in&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;room&#39;), (&#39;room&#39;, &#39;was&#39;), (&#39;was&#39;, &#39;like&#39;), (&#39;like&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;stillness&#39;), (&#39;stillness&#39;, &#39;in&#39;), (&#39;in&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;air&#39;), (&#39;air&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;between&#39;), (&#39;between&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;heaves&#39;), (&#39;heaves&#39;, &#39;of&#39;), (&#39;of&#39;, &#39;storm&#39;), (&#39;storm&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;eyes&#39;), (&#39;eyes&#39;, &#39;around&#39;), (&#39;around&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;had&#39;), (&#39;had&#39;, &#39;wrung&#39;), (&#39;wrung&#39;, &#39;them&#39;), (&#39;them&#39;, &#39;dry&#39;), (&#39;dry&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;breaths&#39;), (&#39;breaths&#39;, &#39;were&#39;), (&#39;were&#39;, &#39;gathering&#39;), (&#39;gathering&#39;, &#39;firm&#39;), (&#39;firm&#39;, &#39;for&#39;), (&#39;for&#39;, &#39;that&#39;), (&#39;that&#39;, &#39;last&#39;), (&#39;last&#39;, &#39;onset&#39;), (&#39;onset&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;when&#39;), (&#39;when&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;king&#39;), (&#39;king&#39;, &#39;be&#39;), (&#39;be&#39;, &#39;witnessed&#39;), (&#39;witnessed&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;in&#39;), (&#39;in&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;room&#39;), (&#39;room&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;i&#39;), (&#39;i&#39;, &#39;willed&#39;), (&#39;willed&#39;, &#39;my&#39;), (&#39;my&#39;, &#39;keepsakes&#39;), (&#39;keepsakes&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;signed&#39;), (&#39;signed&#39;, &#39;away&#39;), (&#39;away&#39;, &#39;what&#39;), (&#39;what&#39;, &#39;portion&#39;), (&#39;portion&#39;, &#39;of&#39;), (&#39;of&#39;, &#39;me&#39;), (&#39;me&#39;, &#39;be&#39;), (&#39;be&#39;, &#39;assignable&#39;), (&#39;assignable&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;then&#39;), (&#39;then&#39;, &#39;it&#39;), (&#39;it&#39;, &#39;was&#39;), (&#39;was&#39;, &#39;there&#39;), (&#39;there&#39;, &#39;interposed&#39;), (&#39;interposed&#39;, &#39;a&#39;), (&#39;a&#39;, &#39;fly&#39;), (&#39;fly&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;with&#39;), (&#39;with&#39;, &#39;blue&#39;), (&#39;blue&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;uncertain&#39;), (&#39;uncertain&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;stumbling&#39;), (&#39;stumbling&#39;, &#39;buzz&#39;), (&#39;buzz&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;between&#39;), (&#39;between&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;light&#39;), (&#39;light&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;me&#39;), (&#39;me&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;then&#39;), (&#39;then&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;windows&#39;), (&#39;windows&#39;, &#39;failed&#39;), (&#39;failed&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;then&#39;), (&#39;then&#39;, &#39;i&#39;), (&#39;i&#39;, &#39;could&#39;), (&#39;could&#39;, &#39;not&#39;), (&#39;not&#39;, &#39;see&#39;), (&#39;see&#39;, &#39;to&#39;), (&#39;to&#39;, &#39;see&#39;), (&#39;see&#39;, &#39;-&#39;)]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(&#39;the&#39;, &#39;morns&#39;), (&#39;morns&#39;, &#39;are&#39;), (&#39;are&#39;, &#39;meeker&#39;), (&#39;meeker&#39;, &#39;than&#39;), (&#39;than&#39;, &#39;they&#39;), (&#39;they&#39;, &#39;were&#39;), (&#39;were&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;nuts&#39;), (&#39;nuts&#39;, &#39;are&#39;), (&#39;are&#39;, &#39;getting&#39;), (&#39;getting&#39;, &#39;brown&#39;), (&#39;brown&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;berry&#39;), (&#39;berry&#39;, &#39;’&#39;), (&#39;’&#39;, &#39;s&#39;), (&#39;s&#39;, &#39;cheek&#39;), (&#39;cheek&#39;, &#39;is&#39;), (&#39;is&#39;, &#39;plumper&#39;), (&#39;plumper&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;rose&#39;), (&#39;rose&#39;, &#39;is&#39;), (&#39;is&#39;, &#39;out&#39;), (&#39;out&#39;, &#39;of&#39;), (&#39;of&#39;, &#39;town&#39;), (&#39;town&#39;, &#39;.&#39;), (&#39;.&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;maple&#39;), (&#39;maple&#39;, &#39;wears&#39;), (&#39;wears&#39;, &#39;a&#39;), (&#39;a&#39;, &#39;gayer&#39;), (&#39;gayer&#39;, &#39;scarf&#39;), (&#39;scarf&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;field&#39;), (&#39;field&#39;, &#39;a&#39;), (&#39;a&#39;, &#39;scarlet&#39;), (&#39;scarlet&#39;, &#39;gown&#39;), (&#39;gown&#39;, &#39;-&#39;), (&#39;-&#39;, &#39;lest&#39;), (&#39;lest&#39;, &#39;i&#39;), (&#39;i&#39;, &#39;sh&#39;), (&#39;sh&#39;, &quot;&#39;d&quot;), (&quot;&#39;d&quot;, &#39;be&#39;), (&#39;be&#39;, &#39;old-fashioned&#39;), (&#39;old-fashioned&#39;, &#39;i&#39;), (&#39;i&#39;, &#39;’&#39;), (&#39;’&#39;, &#39;ll&#39;), (&#39;ll&#39;, &#39;put&#39;), (&#39;put&#39;, &#39;a&#39;), (&#39;a&#39;, &#39;trinket&#39;), (&#39;trinket&#39;, &#39;on&#39;), (&#39;on&#39;, &#39;.&#39;)]
 </pre></div>
 </div>
 </div>
@@ -1384,11 +1386,11 @@ this new DataFrame will represent the conditional probability of moving from
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>the soul opon captivity – in lonely place — appalling
-book to foe - it has bandaged , the years
-word “ still ” in the scaffolds drop - she
-portion of shape fit its sides and tongue . it
-mine - it rail by the winds - shines the
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>feet , the soul - when terror were seated ,
+observe - to gather paradise the white election ! but
+but for freedom or celebrated days – just so foul
+dilapidation &#39;s occupant must - but we trust , when
+prig – i guard my bars - who fall -
 </pre></div>
 </div>
 </div>
@@ -1545,11 +1547,11 @@ performs a cutoff to the <code class="docutils literal notranslate"><span class=
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>–
--
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>from
+from
+with
 ,
--
--
+,
 </pre></div>
 </div>
 </div>
@@ -1656,29 +1658,31 @@ which will correspond to one of the above sampling strategies.</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Strategy: weighted
-+ in prose – glaze – too – just so safer – yet it &#39;s finer
-+ in the nests i knew i ’ twas like one it lap the grass divides
-+ feel as well to the came out their fine incisions stirs the rose - and
-+ so foul a seam , and laugh – i ’ s people i meet –
-+ madness is penury not the same but lamps — evokes so far ! mine -
++ eyes , with the chance of ground – and staples , if you not brayed
++ solid town – and uniforms of toll – and fitted to look at home –
++ to stun myself endued balloon by rail by noon , staying at noon have lodged
++ an imperial affliction sent us lands away nor fire , on — appalling ordnance ,
++ - and for our power to other latitudes – still — i thought belong to
 
 
 Strategy: greedy
 + the soul - and then the soul - and then the soul - and then
-+ stirred his - and then the soul - and then the soul - and then
-+ , and then the soul - and then the soul - and then the soul
-+ occupation – and then the soul - and then the soul - and then the
-+ at the soul - and then the soul - and then the soul - and
++ . it &#39;s a bird , and then the soul - and then the soul
++ as a bird , and then the soul - and then the soul - and
++ sands – and then the soul - and then the soul - and then the
++ i ’ s abyss , and then the soul - and then the soul -
 
 
 Strategy: topk
-+ from the truth &#39;s act a house support itself down - and then the day
-+ the grass occasionally rides - by but differed in the grass was it ’ s
-+ , the soul - to the soul has a bee . a fly - then
-+ ride – as a dew opon the truth must die - in the sea -
++ the sea ! but a star stop for an instant dead without a fly -
++ vision - and then know the air from anno dominies – but for a boy
++ ! to the house – the air - the soul with a bee – and
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+ sea – and then i felt - and then i know the day the day
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+ , a crumb , like a house than invest – i felt his - the
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+ no scar , and the stillness in the grass was breaking through villages for breakfast
 </pre></div>
 </div>
 </div>
@@ -1734,9 +1738,9 @@ the corpus.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>greedy      4298.547250
-topk        6007.670844
-weighted    6237.235474
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>greedy      4185.204393
+weighted    6188.373039
+topk        6313.108819
 dtype: float64
 </pre></div>
 </div>
@@ -1794,6 +1798,15 @@ with respect to metrics does not necessarily mean it is a good model</em>.</p>
         <p class="prev-next-subtitle">previous</p>
         <p class="prev-next-title"><span class="section-number">3. </span>Data Analysis in Python</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="05_vectorization.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">5. </span>Vectorization</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
