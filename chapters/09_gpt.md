@@ -18,11 +18,21 @@ from matplotlib.pyplot import rcParams
 
 os.chdir("..")
 warnings.filterwarnings("ignore")
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 rcParams["figure.dpi"] = 150
 ```
 
 Generative Pre-Trained Transformers (GPT)
 =========================================
+
+This chapter uses GPT-2 as an example of a generative large language model.
+After looking at how the model represents next token predictions, it overviews
+sampling strategies and discusses some approaches to investigate the sampling
+space. The second half of the chapter moves to mechanistic interpretability,
+using activation patching and model steering to isolate GPT-2's behavior in
+specific parts of the network architecture.
+
++ **Data:** A small dataset of sentence pairs with contrasting tokens
 
 
 ## Preliminaries
@@ -680,7 +690,7 @@ def prepend_prompt(
     )
 ```
 
-Let's see if we can build a for loop header, `for i in range(10):`.
+Let's see if we can build a Python for loop header, `for i in range(10):`.
 
 ```{code-cell}
 :tags: [output_scroll]
@@ -696,12 +706,12 @@ It doesn't quite get us what we want, but the reason why is probably clear:
 `n_samp` controls how many candidate sequences. If the ideal token isn't
 sampled from the tokenizer, then we'll never see it. That said, the output
 above does get us somewhat in the realm of code-like tokens. This could work.
-Coupled with the strategy of sampling from the entire vocabulary, we could very
-well get what we want.
+Were we to consider the entire vocabulary of tokens, we could very well get
+what we want.
 
 This [script][script] performs the same function above but with batching. That
 speeds up the process to some extent---enough so that we can try sampling from
-the entire model vocabulary. When we do, we'll see that we get to the correct
+the entire model vocabulary. When we do, we'll see that we get the expected
 answer.
 
 [script]: https://github.com/t-shoemaker/2024_dtl_lm-interpretability/blob/main/src/prompt_prepend_batched.py
@@ -723,7 +733,25 @@ be. Is minimizing perplexity actually the best goal for exploring the model's
 generation space?
 
 
-## The Circuit View
+## Mechanistic Interpretability
+
+So far we haven't considered LLMs' internal representations. SHAP values got us
+close, but even those are an abstraction from what goes on at every layer in a
+network. **Mechanistic interpretability** attempts to do the latter by "reverse
+engineering" model behavior. The predominant metaphor in this kind of work is
+the circuit: researchers envision neural networks as complex electrical
+circuits, which they modify---"patching," "pruning," an so on---to identify
+where and how the networks have learned to perform specific tasks.
+
+Mechanistic interpretability typically requires access to a network's
+**activations**. These are the outputs produced by its neurons as data passes
+through each layer. With PyTorch, it's possible to access these activations and
+store or modify them as the model runs. You do this with **hooks,** functions
+that you insert into a specific layer (or multiple layers). This can be a
+little tricky, but the [TransformerLens][tl] library offers several ways to
+hook models like GPT-2. We'll use that.
+
+[tl]: https://github.com/TransformerLensOrg/TransformerLens
 
 ```{code-cell}
 model = tl.HookedTransformer.from_pretrained(
@@ -736,7 +764,88 @@ model = tl.HookedTransformer.from_pretrained(
 ```
 
 
-### Preprocessing
+### Using a hooked model
+
+TransformerLens models are somewhat like a `pipeline`. They'll handle tasks
+like tokenization and embedding.
+
+```{code-cell}
+prompt = "Thrilled by quantity as language."
+tokens = model.to_tokens(prompt)
+```
+
+Use the `.run_with_cache()` method to embed these tokens. This will return two
+objects: the logits for the tokens, which we've seen above, and an activation
+cache. The cache contains all activations generated during a **forward pass**
+of the model, that is, everything generated while the model processes data (but
+not when it updates its own weights, as in training).
+
+```{code-cell}
+:tags: [output_scroll]
+cache
+```
+
+Above, you'll see that layers are composed of larger blocks. Layers perform
+specific computations like attention, while blocks group layers together into
+units.
+
+We've actually seen this kind of structure already. The cache above corresponds
+to the output below.
+
+```{code-cell}
+:tags: [output_scroll]
+model
+```
+
+
+### Processing sentence pairs
+
+For the rest of this chapter, we'll be working with the sentence pair dataset,
+which we loaded at the very beginning. It contains duplicate sentences in two
+columns, with the only difference between them being a period "." and an
+exclamation mark "!". Our task will be to see whether we can find where GPT-2
+has learned something about the difference between these two punctuation marks.
+
+```{code-cell}
+pairs.head()
+```
+
+The column names in this dataset will give you a sense of what's to come.
+Sentences in `clean` are baselines, which we "corrupt" into variants, stored in
+`corrupt`. After we've sent both to the model, we'll look for differences in
+behavior when the model processes baselines and corruptions.
+
+But first: some data preprocessing. We need to ensure that tokens in our
+sentence pairs correspond exactly. Otherwise we'll have trouble studying where
+they diverge in the model activations. To take one example, imagine that we
+were studying synonyms and had a pair of words:
+
+```{code-cell}
+car = model.to_tokens("car")
+vehicle = model.to_tokens("vehicle")
+```
+
+Subword tokenization causes these two sequences to become misaligned:
+
+```{code-cell}
+print(car)
+print(vehicle)
+```
+
+It would be difficult (though not impossible) to track model behavior across
+these two sequences.
+
+What we'll do, then, is validate our pairs so that we only take those which
+tokenize to the same length. Of course, this requires us to first tokenize
+clean and corrupt sentences.
+
+```{code-cell}
+clean = model.to_tokens(pairs["clean"])
+corrupted = model.to_tokens(pairs["corrupt"])
+```
+
+The following two functions perform the validation step. They pad all tokens in
+a batch and then remove any pairs that don't match.
 
 ```{code-cell}
 def pad_to_same_length(A, B, pad = 50256):
@@ -796,10 +905,21 @@ def filter_padded(A, B, pad = 50256):
     A_filtered, B_filtered = A[same.all(dim = 1)], B[same.all(dim = 1)]
 
     return A_filtered, B_filtered
+```
 
+Let's run them both.
 
+```{code-cell}
+clean, corrupted = pad_to_same_length(clean, corrupted)
+clean, corrupted = filter_padded(clean, corrupted)
+```
+
+A third and last preprocessing step identifies where, in each pair of
+sequences, the token IDs differ.
+
+```{code-cell}
 def find_variant_pairs(A, B, pad = 50256):
-    """Find where two pairs of token ID tensors vary.
+    """Find where two pairs of padded token ID tensors vary.
 
     Parameters
     ----------
@@ -812,9 +932,9 @@ def find_variant_pairs(A, B, pad = 50256):
 
     Returns
     -------
-    A, B, variants, indices : tuple
-        The two tensors, a (n_row, 2) size tensor of token IDs, and another
-        (n_row, 1) tensor of the indices where the variants occur
+    variants, indices : tuple
+        A (n_row, 2) size tensor of token IDs and a (n_row, 1) tensor of the
+        indices where the variants occur
     """
     # Find where the tensors to do not match
     indices = (A != B).nonzero()
@@ -832,30 +952,13 @@ def find_variant_pairs(A, B, pad = 50256):
         variants.append([A_id, B_id])
     variants = torch.tensor(variants, device = model.cfg.device)
 
-    return A, B, variants, indices[:, 1]
+    return variants, indices[:, 1]
 ```
 
-We separate clean from corrupted sentences and tokenize them.
+Let's run this as well.
 
 ```{code-cell}
-clean = model.to_tokens(pairs["clean"])
-corrupted = model.to_tokens(pairs["corrupt"])
-```
-
-Now, we need to pad our tokens IDs. Then, we must ensure that each sentence
-pair is the same length. Our calculations will be incorrect if we do not do
-this.
-
-```{code-cell}
-clean, corrupted = pad_to_same_length(clean, corrupted)
-clean, corrupted = filter_padded(clean, corrupted)
-```
-
-Finally, we identify which token IDs differ across the sentence pairs, and
-where those variations appear.
-
-```{code-cell}
-clean, corrupted, variants, indices = find_variant_pairs(clean, corrupted)
+variants, indices = find_variant_pairs(clean, corrupted)
 ```
 
 Here are the variant pairs. The token IDs are for "." and "!", respectively.
@@ -872,8 +975,7 @@ And here is where these variants appear in the token tensors.
 indices
 ```
 
-
-### Activation patching
+With all this preprocessing done, we can run our tokens through the model.
 
 ```{code-cell}
 clean_logits, clean_cache = model.run_with_cache(clean)
@@ -881,14 +983,29 @@ corrupted_logits, corrupted_cache = model.run_with_cache(corrupted)
 ```
 
 These caches contain all the different states of the model for our two
-collections of sentence pairs. For example, we can retrieve the output of the
-attention heads at the fourth layer in the model for clean sentences.
+collections of sentence pairs. For example, we can retrieve the activations
+from the attention layer in the fourth block of the model for clean sentences.
 
 ```{code-cell}}
 :tags: [output_scroll]
 name = tl.utils.get_act_name("attn_out", 4)
 clean_cache[name]
 ```
+
+
+### Activation patching
+
+From here, we'll study GPT-2 using **activation patching**. This technique
+involves modifying the activations at specific layers and analyzing the effects
+of those modifications. In our case, modifications will involve swapping clean
+tokens with their corrupted variants; we'll look at every layer. Ideally, there
+should be a noticeable difference between the two tokens reflected in the
+model's behavior---preferably at one particular layer, or set of layers, more
+than others.
+
+To quantify this difference, we define a function, `logit_diff()`. This
+function acts like a loss function, indicating how much difference swapping
+clean/corrupted tokens at a specific point makes to the model's output.
 
 ```{code-cell}
 def logit_diff(logits, variants = variants, indices = indices, dim = 0):
@@ -928,16 +1045,19 @@ def logit_diff(logits, variants = variants, indices = indices, dim = 0):
     return difference
 ```
 
-We define two baselines to normalize logit differences as the model runs. 
+Defining two baselines gives us the ability to normalize the output of
+`logit_diff()`.
 
 ```{code-cell}
 CLEAN_BASELINE = logit_diff(clean_logits, variants, indices).item()
 CORRUPT_BASELINE = logit_diff(corrupted_logits, variants, indices).item()
 ```
 
-Now, we define a function to compute a metric for the model. This is a loss
-function, which the patching process uses to determine whether a permutation at
-a given layer increases/decreases the likelihood of the correct outcome.
+With our baselines created, we wrap our loss function in another function,
+`metric()`. All it does is apply normalization to the output from
+`logit_diff()`. The result is what the patching process uses to determine
+whether a permutation at a given layer increases/decreases the likelihood of
+the correct outcome.
 
 ```{code-cell}
 def metric(logits, variants = variants, indices = indices):
@@ -964,7 +1084,7 @@ def metric(logits, variants = variants, indices = indices):
     return difference
 ```
 
-Time to run activation patching. This compares the corrupted tokens to the
+Time to run activation patching. Below, we compare the corrupted tokens to the
 clean cache's attention scores.
 
 ```{code-cell}
@@ -975,10 +1095,11 @@ patched = tl.patching.get_act_patch_attn_out(
 results = patched.cpu().numpy()
 ```
 
-Let's look at a heatmap of the results. That will show where, at a given
-position in our sentence pairs, making changes at a layer increases the
-likelihood of the correct outcome or decreases that likelihood. Positive
-numbers are increases, negative are decreases.
+Let's look at a heatmap of the results. This shows where, at a given position
+in our sentence pairs, making changes in the attention activations for each
+layer block increases the likelihood of the correct outcome, or decreases that
+likelihood. Positive numbers represent increased likelihood, negative numbers
+decreased. 
 
 ```{code-cell}
 plt.figure(figsize = (9, 4))
@@ -994,16 +1115,38 @@ g.set(title = "Patching outcomes", xlabel = "Token position", ylabel = "Layer")
 plt.show()
 ```
 
-From the looks of this heatmap, activation scores in the tenth layer of the
-model are most sensitive to changes between clean and corrupted tokens.
+By the looks of this heatmap, activations after attention scoring in the tenth
+layer of the model seem most sensitive to changes between clean and corrupted
+tokens. Might this be the location where the model has learned something about
+the difference between "." and "!"?
 
 
 ### Steering the model
+
+Let's investigate. Below, we'll attempt to modify the activations at this layer
+in hopes that we can alter the model's behavior. If we can **steer** the model
+towards generating text with one token or another, that would be further
+evidence that we've been able to isolate where it has learned a relationship
+between "." and "!".
+
+First, let's move the model back to a CPU. This isn't strictly necessary, but
+`TransformerLens` defaults to GPUs when it can find them, and not all of the
+following functionality works with that setup.
 
 ```{code-cell}
 :tags: [output_scroll]
 model.to("cpu")
 ```
+
+With this done, we define a function to produce a **steering vector**. The idea
+here is that, at a given point in the network, we access the model's
+activations for two tokens. Then, using these activations we make a new vector
+that represents the tokens' relationship. That vector is what we'll send to the
+model to alter its activations.
+
+You'll likely recognize the logic here. It's the first step in the analogy
+setup we used for static embeddings. Once we get the activations for each
+token, we simply subtract one from the other to define their relationship.
 
 ```{code-cell}
 def make_steering_vector(clean, corrupt, name = None, model = model):
@@ -1042,15 +1185,23 @@ def make_steering_vector(clean, corrupt, name = None, model = model):
     return steering_vector[:, 1, :]
 ```
 
+With this function defined, we isolate the layer we're interested in and send
+our two tokens as arguments.
+
 ```{code-cell}
 layer_id = 10
 name = tl.utils.get_act_name("attn_out", layer_id)
 steering_vector = make_steering_vector(".", "!", name = name)
 ```
 
-Finally, write a **hook** that will modify the activations at our specified
-layer using the steering vector. During a forward pass, the model calls this
-function when it reaches the layer.
+Finally, we write our own hook. During a forward pass, the model calls this
+function when it reaches the component stored at `name` above. What the
+function does is extremely simple: it adds the steering vector to the model
+activations. Again, this is just the second step in the analogy setup for
+static embeddings.
+
+We also supply an optional `coef` parameter. As we'll see below, this helps us
+control the effect our steering vector has on the activations.
 
 ```{code-cell}
 def steer(activations, hook, steering_vector = None, coef = 1.0):
@@ -1078,18 +1229,21 @@ def steer(activations, hook, steering_vector = None, coef = 1.0):
     return activations + steering_vector * coef
 ```
 
-Now, we define a **partial** function for the hook. All this does is set up
-some default arguments; the only arguments left to take are for activations and
-the hook, which the model takes care of itself. Using a negative coefficient
-will steer the model towards corrupted output.
+Now, we define a **partial** function for the hook. All this does is build a
+new function with some default arguments; the only arguments needed now are
+ones for activations and the hook, and the model takes care of both of them
+itself. When we instantiate this partial function, we'll also modify the
+coefficient argument. Using a negative coefficient will steer the model towards
+corrupted output. If we've isolated the relationship between "." and "!"
+correctly, we'll see more of the latter tokens.
 
 ```{code-cell}
 hook = partial(steer, steering_vector = steering_vector, coef = -3.5)
 ```
 
 Time to generate text. Below, we set up a for loop that covers two routines:
-hooking the model and running it without the hook. First, we'll run this
-without any sampling.
+hooking the model and running it without the hook. That is, we steer it, then
+we don't. First, we'll run this without any sampling.
 
 ```{code-cell}
 prompt = "The sky is blue"
@@ -1160,5 +1314,3 @@ outputs = model.generate(
 )
 print(outputs)
 ```
-
-Not only do we see more exclamation marks, but content changes as well.
