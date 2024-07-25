@@ -1315,9 +1315,10 @@ def shift_vector(vector, coef, glove = glove, k = 25):
     # Find the vector's k-nearest neighbors
     vector_knn = glove.most_similar(vector, k)
 
-    # Now shift it by adding the coefficient. Then find the k-nearest neighbors
-    # of this new vector
+    # Now shift it by adding the coefficient. Then normalize and find the
+    # k-nearest neighbors of this new vector
     shifted = vector + coef
+    shifted /= np.linalg.norm(shifted)
     shifted_knn = glove.most_similar(shifted, k)
 
     # Extract the tokens and put them into a DataFrame
