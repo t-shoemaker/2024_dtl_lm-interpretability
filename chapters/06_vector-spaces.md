@@ -519,7 +519,7 @@ def calculate_cosine_similarity(A, B):
     norm_by = np.linalg.norm(A) * np.linalg.norm(B)
     cos_sim = dot / norm_by
 
-    return np.round(cos_sim, 8)
+    return np.round(cos_sim, 4)
 ```
 
 Scores are between $[-1, 1]$, where:
@@ -827,7 +827,7 @@ With the wrapper defined, we load the embeddings.
 ```{code-cell}
 glove = WordEmbeddings("data/models/glove.6B.200d.parquet")
 n_vocab, n_dim = glove.embeddings.shape
-print(f"Embeddings size and shape: {n_vocab:,}, {n_dim}")
+print(f"Embeddings size and shape: {n_vocab:,} vectors, {n_dim} dimensions")
 ```
 
 And here's an example embedding:
@@ -909,16 +909,17 @@ concepts = {
 
 Let's iterate through the concepts.
 
-```
+```{code-cell}
 k = 10
 for concept in concepts:
     # Build the concept by adding the two component vectors
     A, B = concepts[concept]
     vector = glove[A] + glove[B]
 
-    # Query the embeddings
+    # Query the embeddings, print the results
     neighbors = glove.most_similar(vector, k = k)
     table = tabulate(neighbors, headers = ["Token", "Score"])
+    print("Target:", concept, end = "\n\n")
     print(table, end = "\n\n")
 ```
 
