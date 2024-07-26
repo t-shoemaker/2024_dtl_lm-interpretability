@@ -93,22 +93,22 @@ def scatter_2d(matrix, norm = True, highlight = None, figsize = (5, 5)):
     """
     # Find a way to reduce the matrix to two dimensions with PCA, adding
     # optional normalization along the way
-    parts = (Normalizer(), PCA(2)) if norm else (PCA(2), )
-    pipeline = make_pipeline(*parts)
+    if norm:
+        pipeline = make_pipeline(Normalizer(), PCA(n_components = 2))
+    else:
+        pipeline = make_pipeline(PCA(n_components = 2))
     reduced = pipeline.fit_transform(matrix)
     vis_data = pd.DataFrame(reduced, columns = ["x", "y"])
 
     # Plot
-    fig, ax = plt.subplots(figsize = figsize)
-    g = sns.scatterplot(
-        x = "x", y = "y", alpha = 0.8, data = vis_data, ax = ax
-    )
+    plt.figure(figsize = figsize)
+    g = sns.scatterplot(x = "x", y = "y", alpha = 0.8, data = vis_data)
 
     # Highlight markers, if applicable
     if highlight:
         selected = vis_data.iloc[highlight]
         sns.scatterplot(
-            x = "x", y = "y", color = "red", data = selected, ax = ax
+            x = "x", y = "y", color = "red", data = selected
         )
 
     g.set(xlabel = "Dim. 1", ylabel = "Dim. 2")
