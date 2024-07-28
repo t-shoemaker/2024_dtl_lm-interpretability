@@ -441,13 +441,15 @@ Where:
 The following function implements this equation.
 
 ```py
-def scaled_dot_product_attention(Q, K, V):
+def scaled_dot_product_attention(Q, K, V, mask = None):
     """Calculate scaled dot-product attention.
 
     Parameters
     ----------
     Q, K, V : torch.Tensor
         Query, key, and value matrices
+    mask : None or torch.Tensor
+        A triangular masking matrix
 
     Returns
     -------
@@ -464,6 +466,10 @@ def scaled_dot_product_attention(Q, K, V):
     # gradients during back propagation)
     d_k = K.size(-1)
     scores = scores / torch.sqrt(torch.tensor(d_k, dtype = torch.float32))
+
+    # Are we masking tokens to the right?
+    if mask is not None:
+        scores = scores.masked_fill(mask == 0, float("-inf"))
 
     # Compute softmax to convert attention scores into probabilities. Every row
     # in `probs` is a probability distribution across every token in the model
@@ -486,6 +492,19 @@ entire input sequence.
 Q = K = V = embeddings
 attention_scores = scaled_dot_product_attention(Q, K, V)
 ```
+
+The above calculates attention in a **bi-directional** manner, meaning tokens
+to the left and right of a token are taken into account. This is what models
+like BERT use. Calculating attention in a **uni-directional** manner, which is
+what models like GPT use, requires masking out tokens to the right.
+
+```py
+mask = torch.tril(torch.ones(Q.size(-2), K.size(-2)), diagonal = 1).bool()
+attention_scores = scaled_dot_product_attention(Q, K, V, mask)
+```
+
+You will often see the above referred to as **causal-attention**. Note however
+that it is still technically self-attention.
 
 **Cross-attention** takes an external set of embeddings for the query matrix.
 In translation models, for example, these are embeddings for a target language
