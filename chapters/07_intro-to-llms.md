@@ -424,15 +424,8 @@ it captures complex patterns, local contexts, and long-range dependencies among
 the tokens.
 
 You will often see different forms of attention described in the context of
-Transformers. **Self-attention** means that each token in an input sequence is
-compared with every other token. This enables the model to capture
-relationships across the entire input sequence. **Multi-head attention**
-involves using multiple attention mechanisms in parallel, which are then
-concatenated together when they are passed elsewhere in the network. During
-training, each head learns to focus on different kinds of relationships in the
-text data.
-
-At core, however, attention is expressed as the following:
+Transformers. We will walk through the three main ones. At score, however,
+attention is expressed as the following:
 
 $$
 Attention(Q, K, V) = softmax(\frac{QK^T}{\sqrt{d_k}})V
@@ -448,36 +441,29 @@ Where:
 The following function implements this equation.
 
 ```py
-def scaled_dot_product_attention(embeddings):
-    """Calculate scaled dot-product attention across word embeddings.
+def scaled_dot_product_attention(Q, K, V):
+    """Calculate scaled dot-product attention.
 
     Parameters
     ----------
-    embeddings : torch.Tensor
-        Word embeddings of (n_tokens, n_dimensions)
+    Q, K, V : torch.Tensor
+        Query, key, and value matrices
 
     Returns
     -------
     weighted : torch.Tensor
         Word embeddings weighted by attention
     """
-    # Find the shape of the embeddings
-    n_tokens, n_dimensions = embeddings.shape
+    # Perform matrix multiplication to query the keys (dot product of i-th and
+    # j-th scores of `Q` and `K`). Note the transpose of `K`
+    scores = torch.matmul(Q, K.transpose(-2, -1))
 
-    # Make the Key, Query, and Value matrices, all of which begin as copies of
-    # the original embeddings
-    K = Q = V = embeddings
-
-    # Perform matrix multiplication to query keys (dot product of the i-th 
-    # and j-th rows of `Q`, `K`). Note the transpose of `K`
-    scores = torch.matmul(Q, K.T)
-
-    # Normalize the scores with the square root of `n_dimensions`. This reduces
-    # the magnitude of the scores, thereby preventing them from becoming too
-    # large (which would in turn create vanishingly small gradients during back
-    # propagation)
-    norm_by = torch.sqrt(torch.tensor(n_dimensions, dtype = torch.float32))
-    scores = scores / norm_by
+    # Normalize the scores with the square root of the dimensionality of `K`.
+    # This reduces the magnitude of the scores, thereby preventing them from
+    # becoming too large (which would in turn create vanishingly small
+    # gradients during back propagation)
+    d_k = K.size(-1)
+    scores = scores / torch.sqrt(torch.tensor(d_k, dtype = torch.float32))
 
     # Compute softmax to convert attention scores into probabilities. Every row
     # in `probs` is a probability distribution across every token in the model
@@ -492,14 +478,54 @@ def scaled_dot_product_attention(embeddings):
     return weighted
 ```
 
-We could call the above function like so:
+**Self-attention** means that each token in an input sequence is compared with
+every other token. This enables the model to capture relationships across the
+entire input sequence.
 
 ```py
-attention_scores = scaled_dot_product_attention(embeddings)
+Q = K = V = embeddings
+attention_scores = scaled_dot_product_attention(Q, K, V)
 ```
 
-Or, we can use the PyTorch implementation for multi-head attention. First, we
-initialize the layer.
+**Cross-attention** takes an external set of embeddings for the query matrix.
+In translation models, for example, these are embeddings for a target language
+into which a model is transforming sentences from a source language. We
+simulate the external embeddings with random ones below.
+
+```py
+K_source = V_source = embeddings
+Q_target = torch.rand_like(embeddings)
+attention_scores = scaled_dot_product_attention(Q_target, K_source, V_source)
+```
+
+**Multi-head attention** involves using multiple attention mechanisms, or
+**heads**, in parallel, which are then concatenated together when they are
+passed elsewhere in the network. During training, each head learns to focus on
+different kinds of relationships in the text data.
+
+This is what a head split looks like:
+
+```py
+n_heads = 12
+n_tokens, n_dim = embeddings.shape
+head_dim = n_dim // n_heads
+heads = embeddings.view(n_tokens, n_heads, head_dim).transpose(0, 1)
+```
+
+Then, you perform attention for each one, concatenate them all, and reshape.
+
+```py
+head_outputs = []
+for i in range(n_heads):
+    Q, K, V = heads[i]
+    scores = scaled_dot_product_attention(Q, K, V)
+    head_outputs.append(scores)
+
+attention_scores = torch.cat(head_outputs, dim = -1).view(n_tokens, n_dim)
+```
+
+All of the above, however, is implemented in PyTorch. First, we initialize the
+layer.
 
 ```py
 attention_layer = nn.MultiHeadAttention(embed_dim = 768, num_heads = 12)
