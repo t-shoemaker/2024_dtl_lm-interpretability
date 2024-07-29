@@ -42,14 +42,19 @@ To render this reader, follow these steps:
 1. Download the data (instructions above) and place the unzipped directory in
    the root of this repository
 2. Create the `conda`/`mamba` environment:
+
    ```sh
    <conda/mamba/micromamba> env create --file env.yml
    ```
+
 3. Build the book:
-   ```sh
+
+    ```sh
    jupyter-book build .
    ```
+
 4. Push to the `gh-pages` branch:
+
    ```sh
    ghp-import -n -p -f _build/html
    ```
