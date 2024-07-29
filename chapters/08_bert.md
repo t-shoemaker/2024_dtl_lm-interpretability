@@ -44,14 +44,21 @@ tokens.
 We will need several imports for this chapter.
 
 ```{code-cell}
+import unicodedata
+
 import torch
 import numpy as np
 import pandas as pd
 from datasets import Dataset
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from transformers import DataCollatorWithPadding
-from transformers import TrainingArguments, Trainer, EarlyStoppingCallback
-from transformers import pipeline
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSequenceClassification,
+    DataCollatorWithPadding,
+    TrainingArguments,
+    Trainer,
+    EarlyStoppingCallback,
+    pipeline
+)
 import evaluate
 from sklearn.metrics import classification_report, confusion_matrix
 import shap
@@ -765,8 +772,8 @@ We'll see this if we take the maximum SHAP value for each class in a blurb.
 shap_values.loc[(500,)].idxmax(axis = 0)
 ```
 
-See the subwords? And note, too, the integers before each token: those are a
-token's index position in the blurb.
+You may see subwords here. And note, too, the integers before each token: those
+are a token's index position in the blurb.
 
 We'll address this information later on, but first, let's think a little more
 high-level. Below, we find tokens that consistently have the highest SHAP
@@ -779,7 +786,7 @@ the casing so variants are counted together. This drops some information about
 the tokens, but the variants may otherwise clutter the final output.
 
 ```{code-cell}
-mean_shap = shap.reset_index().copy()
+mean_shap = shap_values.reset_index().copy()
 mean_shap["text"] = mean_shap["text"].str.lower()
 mean_shap.set_index(["document_id", "token_id", "text"], inplace = True)
 ```
@@ -795,8 +802,15 @@ punctuation. As with casing, we are trying to reduce clutter. So, in the code
 block below, we set up a mask with which to drop unwanted tokens.
 
 ```{code-cell}
+# Stop word list
 drop = list(stopwords.words("english"))
-drop += list('!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~“”‘’„‟«»‹›—–…')
+
+# Add Unicode punctuation characters
+unicode = [chr(i) for i in range(1114111)]
+punct = [c for c in unicode if unicodedata.category(c).startswith("P")]
+drop += punct
+
+# Mask
 mask = mean_shap.index.get_level_values(1).isin(drop)
 ```
 
@@ -903,8 +917,8 @@ Is there any correlation between label and location?
 locations[["label_id", "location"]].corr()
 ```
 
-Unfortunately, no. However, you might keep such an analysis in mind if, for
-example, you were studying something like suspense and had an annotated
+Unfortunately, there isn't. However, you might keep such an analysis in mind
+if, for example, you were studying something like suspense and had an annotated
 collection of suspenseful sentences and those that aren't. Perhaps those
 suspenseful sentences would reflect a meaningful correlation for token
 position. Generally speaking, analyses of narrativity seem like they would
