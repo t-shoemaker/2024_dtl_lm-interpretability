@@ -627,49 +627,30 @@ specially designed cutoffs to determine how input values are transformed into
 outputs.
 
 There are several different kinds of activation functions. We'll demonstrate a
-few below. First, we create a set of input values.
+few below. First, we create a set of linear input values $[-5, 5]$ and
+initialize a dictionary of our functions.
 
 ```{code-cell}
-:tags: [output_scroll]
-x = np.linspace(-5, 5, 100)
-x
-```
-
-Now create a dictionary of functions and a buffer to store outputs.
-
-```{code-cell}
-activations = {
+x = torch.linspace(-5, 5, 100, dtype = torch.float32)
+activation_functions = {
+    "original": lambda data: data,
     "tanh": nn.Tanh(),
     "sigmoid": nn.Sigmoid(),
     "ReLU": nn.ReLU(),
     "GELU": nn.GELU()
 }
-x_activated = []
 ```
 
-Add the original values to the buffer.
+We put our values through every activation function and format the results as a
+DataFrame.
 
 ```{code-cell}
-for value in x:
-    x_activated.append({
-        "activation": "original", "input": value, "output": value
-    })
-```
+activated = []
+for name, func in activation_functions.items():
+    y = func(x).numpy()
+    activated.extend([(name, xi, yi) for xi, yi in zip(x.numpy(), y)])
 
-Go through each function, transform the original values, and append the outputs
-to the buffer. Then format into a DataFrame.
-
-```{code-cell}
-for name, func in activations.items():
-    x_inputs = torch.tensor(x, dtype = torch.float32)
-    x_transformed = func(x_inputs).numpy()
-
-    for input_value, output_value in zip(x, x_transformed):
-        x_activated.append({
-            "activation": name, "input": input_value, "output": output_value
-        })
-
-df = pd.DataFrame(x_activated)
+activated = pd.DataFrame(activated, columns = ["activation", "x", "y"])
 ```
 
 Now plot.
@@ -677,13 +658,13 @@ Now plot.
 ```{code-cell}
 plt.figure(figsize = (4, 4))
 g = sns.lineplot(
-    x = "input",
-    y = "output",
+    x = "x",
+    y = "y",
     hue = "activation",
     style = "activation",
     dashes = [(2, 2), "", "", "", ""],
     alpha = 0.8,
-    data = df
+    data = activated
 )
 g.set(
     title = "Activation Functions",
