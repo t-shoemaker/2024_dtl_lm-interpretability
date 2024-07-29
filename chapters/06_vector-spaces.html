@@ -62,6 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/06_vector-spaces';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="7. Large Language Models: An Introduction" href="07_intro-to-llms.html" />
     <link rel="prev" title="5. Vectorization" href="05_vectorization.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -185,6 +186,10 @@
 <li class="toctree-l1"><a class="reference internal" href="04_ngram-models.html">4. N-gram Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="05_vectorization.html">5. Vectorization</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">6. Vector Space Semantics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Large Language Models</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="07_intro-to-llms.html">7. Large Language Models: An Introduction</a></li>
 </ul>
 
     </div>
@@ -496,7 +501,7 @@ scatter plot. We can do the same with our DTM using the function below.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/9ae4e864e647c6c0c2dbb31867e5137255492ac7f16ae0171366b5d70d282836.png" src="../_images/9ae4e864e647c6c0c2dbb31867e5137255492ac7f16ae0171366b5d70d282836.png" />
+<img alt="../_images/26eba517930734f7693bba04ddb677f84eb44396bd7a7fe22d83799d35c8a46d.png" src="../_images/26eba517930734f7693bba04ddb677f84eb44396bd7a7fe22d83799d35c8a46d.png" />
 </div>
 </div>
 <p>Doing so projects our matrix into a two-dimensional <strong>vector space</strong>. In the
@@ -514,7 +519,7 @@ clear.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/93100656fb92256a750c5e05b35c49dcbd30e88b972460c59e95ed63a09371ed.png" src="../_images/93100656fb92256a750c5e05b35c49dcbd30e88b972460c59e95ed63a09371ed.png" />
+<img alt="../_images/f8d3995b8a4c76597e4f5778a72a2260c7f05f755de2132b085affe96b685084.png" src="../_images/f8d3995b8a4c76597e4f5778a72a2260c7f05f755de2132b085affe96b685084.png" />
 </div>
 </div>
 <p>Let’s add in a third that we’d expect to be less similar.</p>
@@ -527,7 +532,7 @@ clear.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/800e0df9d76c48671bcf1cb261650c040d879a632a0d7c419cfdae9bb1b7a81d.png" src="../_images/800e0df9d76c48671bcf1cb261650c040d879a632a0d7c419cfdae9bb1b7a81d.png" />
+<img alt="../_images/0a7d043d56daed7e8534da2de9720881bc4685964c03cec48c9791136e76e448.png" src="../_images/0a7d043d56daed7e8534da2de9720881bc4685964c03cec48c9791136e76e448.png" />
 </div>
 </div>
 <p>While we can only visualize these similarities in two- or three-dimensional
@@ -1193,7 +1198,7 @@ Scott Fitzgerald     0.396
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/57accaf5047266d42ccfe5181d67ef43bb52335ec0332f175701225d1432d8b8.png" src="../_images/57accaf5047266d42ccfe5181d67ef43bb52335ec0332f175701225d1432d8b8.png" />
+<img alt="../_images/6bf1647c88900ed67058bbe09d113be5de84e55c8c0f0b184b0a520c7945146c.png" src="../_images/6bf1647c88900ed67058bbe09d113be5de84e55c8c0f0b184b0a520c7945146c.png" />
 </div>
 </div>
 </section>
@@ -1253,68 +1258,44 @@ derive cosine similarity scores between tokens.</p>
   </thead>
   <tbody>
     <tr>
-      <th>strain</th>
+      <th>capt</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>0.000000</td>
-      <td>0.127</td>
       <td>0.0</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
       <td>0.0</td>
-      <td>0.127</td>
-      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>...</td>
       <td>0.0</td>
-      <td>0.000000</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.127000</td>
-      <td>0.034926</td>
+      <td>0.0</td>
+      <td>0.566947</td>
+      <td>0.034648</td>
       <td>0.0</td>
       <td>0.0</td>
     </tr>
     <tr>
-      <th>egyptians</th>
+      <th>tombeau</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>0.000000</td>
-      <td>0.000</td>
       <td>0.0</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
       <td>0.0</td>
-      <td>0.000</td>
-      <td>0.085126</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>...</td>
       <td>0.0</td>
-      <td>0.000000</td>
       <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.0</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
-      <td>0.0</td>
-      <td>0.0</td>
-    </tr>
-    <tr>
-      <th>hoc</th>
-      <td>0.0</td>
-      <td>0.000000</td>
-      <td>0.000</td>
-      <td>0.0</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
-      <td>0.0</td>
-      <td>0.000</td>
-      <td>0.000000</td>
-      <td>0.0</td>
-      <td>...</td>
-      <td>0.0</td>
-      <td>0.000000</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -1325,20 +1306,20 @@ derive cosine similarity scores between tokens.</p>
       <td>0.0</td>
     </tr>
     <tr>
-      <th>deterrent</th>
+      <th>savoy</th>
       <td>0.0</td>
-      <td>0.000000</td>
-      <td>0.000</td>
       <td>0.0</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
       <td>0.0</td>
-      <td>0.000</td>
-      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.306186</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>...</td>
       <td>0.0</td>
-      <td>0.000000</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
@@ -1349,26 +1330,50 @@ derive cosine similarity scores between tokens.</p>
       <td>0.0</td>
     </tr>
     <tr>
-      <th>perform</th>
+      <th>blindness</th>
       <td>0.0</td>
-      <td>0.053606</td>
-      <td>0.000</td>
       <td>0.0</td>
-      <td>0.263068</td>
-      <td>0.053606</td>
       <td>0.0</td>
-      <td>0.000</td>
+      <td>0.0</td>
       <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
       <td>0.0</td>
       <td>...</td>
       <td>0.0</td>
-      <td>0.053606</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>0.053606</td>
-      <td>0.019656</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>code</th>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.055556</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.017642</td>
       <td>0.0</td>
       <td>0.0</td>
     </tr>
@@ -1445,7 +1450,7 @@ Note that we turn off normalization; cosine similarity is already normed.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/f74be5761341033999f9d852e7799337ea720c22f7e2f9c0d02f774f39cc58e2.png" src="../_images/f74be5761341033999f9d852e7799337ea720c22f7e2f9c0d02f774f39cc58e2.png" />
+<img alt="../_images/e2a20027fe6e9fc23d6106d1519485dbb2dd285ba85f23c45443f427dac9e259.png" src="../_images/e2a20027fe6e9fc23d6106d1519485dbb2dd285ba85f23c45443f427dac9e259.png" />
 </div>
 </div>
 <p>Technically, one could call these vectors definitions of each token. But they
@@ -1842,7 +1847,7 @@ we’ll add together to create that concept.</p>
 </div>
 </div>
 <p>Let’s iterate through the concepts.</p>
-<div class="cell docutils container">
+<div class="cell tag_output_scroll docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="k">for</span> <span class="n">concept</span> <span class="ow">in</span> <span class="n">concepts</span><span class="p">:</span>
@@ -2219,9 +2224,9 @@ will unfairly benefit from dropping duplicates).</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>label
-N    27114
-A    12526
-V     4536
+N    27090
+A    12554
+V     4532
 Name: count, dtype: int64
 </pre></div>
 </div>
@@ -2725,13 +2730,13 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>              precision    recall  f1-score   support
 
-           A       0.81      0.54      0.65      1254
-           N       0.76      0.94      0.84      2698
-           V       0.91      0.46      0.61       466
+           A       0.81      0.56      0.66      1253
+           N       0.77      0.94      0.85      2732
+           V       0.86      0.47      0.61       433
 
     accuracy                           0.78      4418
-   macro avg       0.83      0.65      0.70      4418
-weighted avg       0.79      0.78      0.76      4418
+   macro avg       0.81      0.66      0.71      4418
+weighted avg       0.79      0.78      0.77      4418
 </pre></div>
 </div>
 </div>
@@ -2787,33 +2792,33 @@ to the class decreases</p></li>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0.006959</td>
-      <td>-0.098547</td>
-      <td>0.053178</td>
+      <td>-0.187848</td>
+      <td>0.078032</td>
+      <td>0.066151</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>-0.828055</td>
-      <td>0.487943</td>
-      <td>0.567890</td>
+      <td>-0.788494</td>
+      <td>0.415407</td>
+      <td>0.663606</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>0.261314</td>
-      <td>-0.117754</td>
-      <td>-0.324717</td>
+      <td>0.232837</td>
+      <td>-0.164166</td>
+      <td>-0.314376</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>0.067804</td>
-      <td>-0.149918</td>
-      <td>-0.014595</td>
+      <td>-0.009017</td>
+      <td>-0.020257</td>
+      <td>-0.003290</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>-0.461152</td>
-      <td>0.380840</td>
-      <td>0.346538</td>
+      <td>-0.415840</td>
+      <td>0.347783</td>
+      <td>0.376017</td>
     </tr>
   </tbody>
 </table>
@@ -2856,7 +2861,7 @@ the model’s coefficients.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/d90d635812cd4dd3835b9e5409f31656a17b5dbde1abd557fff5da25154af3a3.png" src="../_images/d90d635812cd4dd3835b9e5409f31656a17b5dbde1abd557fff5da25154af3a3.png" />
+<img alt="../_images/dd622e8f498eb571e9713efa09c4fd8127e4745b6c864b9754ffdf63a8d7b8c7.png" src="../_images/dd622e8f498eb571e9713efa09c4fd8127e4745b6c864b9754ffdf63a8d7b8c7.png" />
 </div>
 </div>
 <p>No one single dimension stands out as the indicator for a POS tag; rather,
@@ -3316,7 +3321,7 @@ corresponding coefficients.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/c4ad81c91f606bd6aecc1310d34d4bace66b91a5a15117504446718dc58bf9c9.png" src="../_images/c4ad81c91f606bd6aecc1310d34d4bace66b91a5a15117504446718dc58bf9c9.png" />
+<img alt="../_images/bbad2a6217b658309adcace574c6f7c6e4bd13196299f229ae2a6b448596d586.png" src="../_images/bbad2a6217b658309adcace574c6f7c6e4bd13196299f229ae2a6b448596d586.png" />
 </div>
 </div>
 </section>
@@ -3369,39 +3374,39 @@ ground the above graphs in specific tokens.</p>
   </thead>
   <tbody>
     <tr>
-      <th>submergence</th>
+      <th>truce</th>
       <th>N</th>
-      <td>1.033428</td>
-      <td>0.498676</td>
-      <td>-1.443687</td>
+      <td>0.883685</td>
+      <td>-1.058964</td>
+      <td>0.006463</td>
     </tr>
     <tr>
-      <th>rickshaw</th>
-      <th>N</th>
-      <td>-0.280646</td>
-      <td>0.695401</td>
-      <td>-0.180076</td>
+      <th>outflowing</th>
+      <th>A</th>
+      <td>1.428225</td>
+      <td>-0.561238</td>
+      <td>-1.257100</td>
     </tr>
     <tr>
-      <th>tetracycline</th>
-      <th>N</th>
-      <td>-0.253678</td>
-      <td>1.380571</td>
-      <td>-1.712091</td>
+      <th>accusing</th>
+      <th>A</th>
+      <td>0.163804</td>
+      <td>0.509371</td>
+      <td>-1.542552</td>
     </tr>
     <tr>
-      <th>segregation</th>
-      <th>N</th>
-      <td>0.754374</td>
-      <td>-0.030319</td>
-      <td>-0.031695</td>
+      <th>randy</th>
+      <th>A</th>
+      <td>-2.387918</td>
+      <td>0.701006</td>
+      <td>0.974234</td>
     </tr>
     <tr>
-      <th>fingertip</th>
+      <th>salpinx</th>
       <th>N</th>
-      <td>0.495399</td>
-      <td>-0.391366</td>
-      <td>-0.037297</td>
+      <td>0.778599</td>
+      <td>0.091281</td>
+      <td>-1.459301</td>
     </tr>
   </tbody>
 </table>
@@ -3438,9 +3443,9 @@ one POS.</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>token  label
-good   A        A
-goad   V        V
-great  N        N
+good   N        A
+goad   N        V
+great  A        N
 dtype: object
 </pre></div>
 </div>
@@ -3465,13 +3470,13 @@ doesn’t always perform well very likely has to do with this as well.</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Predictions for &#39;good&#39;:
-  A: 0.40%
-  N: 0.59%
+  A: 0.36%
+  N: 0.63%
   V: 0.01%
 Predictions for &#39;goad&#39;:
   A: 0.04%
-  N: 0.34%
-  V: 0.62%
+  N: 0.37%
+  V: 0.60%
 Predictions for &#39;great&#39;:
   A: 0.01%
   N: 0.99%
@@ -3561,19 +3566,19 @@ salad       pastries
 dish        cakes
 salads      salads
 tasting     savory
-dishes      concoctions
-pastries    baked
+dishes      baked
+pastries    concoctions
 baked       wines
-menu        delectable
+menu        concoction
 pudding     flavors
-entree      concoction
+entree      delectable
 cream       chocolate
-wine        recipes
-meal        dish
-sorbet      confection
+wine        dish
+meal        confection
+sorbet      recipes
 cookies     cake
 flavors     meals
-tiramisu    entrees
+tiramisu    spiced
 </pre></div>
 </div>
 </div>
@@ -3604,17 +3609,17 @@ desolate     rugged
 coastal      inhospitable
 sahara       vast
 negev        remote
-dunes        areas
-taklamakan   sonoran
-terrain      populated
-southern     oases
+dunes        populated
+taklamakan   areas
+terrain      sonoran
+southern     dunes
 mountain     chihuahuan
-cholistan    dunes
-plains       expanse
-vast         namib
-mountainous  isolated
-taklimakan   parched
-remote       beaches
+cholistan    oases
+plains       namib
+vast         surrounded
+mountainous  beaches
+taklimakan   expanse
+remote       parched
 </pre></div>
 </div>
 </div>
@@ -3637,25 +3642,25 @@ arabic       speak
 word         arabic
 english      word
 spoken       english
-words        learn
-speak        words
+words        words
+speak        learn
 vocabulary   translate
 meaning      teach
 translation  write
-speaking     meaning
-literature   describe
+speaking     vocabulary
+literature   meaning
 dialect      understand
-bilingual    vocabulary
-hindi        read
+bilingual    describe
+hindi        dialects
 writing      spoken
-urdu         speakers
-dialects     dialects
-programming  refer
-text         translation
-hebrew       hindi
-speakers     dialect
-learning     bilingual
-means        define
+urdu         read
+dialects     dialect
+programming  speakers
+text         hindi
+hebrew       refer
+speakers     translation
+learning     define
+means        to
 </pre></div>
 </div>
 </div>
@@ -3687,19 +3692,19 @@ effort      vehicle
 hard        push
 off         stop
 way         wheel
-run         runs
-back        driver
+run         driver
+back        runs
 end         off
 vehicle     end
-go          speed
+go          a
 trying      running
-stop        hard
-pull        a
-move        effort
-attempt     back
-just        another
-cars        front
-get         takes
+stop        speed
+pull        effort
+move        hard
+attempt     another
+just        back
+cars        is
+get         front
 </pre></div>
 </div>
 </div>
@@ -3746,6 +3751,15 @@ get         takes
         <p class="prev-next-subtitle">previous</p>
         <p class="prev-next-title"><span class="section-number">5. </span>Vectorization</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="07_intro-to-llms.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">7. </span>Large Language Models: An Introduction</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>

@@ -910,6 +910,7 @@ concepts = {
 Let's iterate through the concepts.
 
 ```{code-cell}
+:tags: [output_scroll]
 k = 10
 for concept in concepts:
     # Build the concept by adding the two component vectors
