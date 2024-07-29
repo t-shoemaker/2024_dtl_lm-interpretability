@@ -414,7 +414,7 @@ bert.embeddings.token_type_embeddings
 ### Attention
 
 If you look back to the encoder part of the model, you'll see that first
-component in the layer is an attention mechanism. This mechanism enables
+component in a layer block is an attention mechanism. This mechanism enables
 the model to draw many-to-many relationships between tokens. During training,
 attention helps the model form strong (or weak) relationships between certain
 tokens, which in turn allows it to focus on different parts of input sequences
@@ -619,12 +619,13 @@ dropped = dropout_layer(normalized)
 
 ### Activation layer
 
-Finally, the model passes the data through an **activation layer**. This layer
-introduces non-linearity in the model, which in turn allows it to learn more
-complex patterns that cannot be approximated through simple, linear
-relationships. You can think of linear layers as filters of a sort: they use
-specially designed cutoffs to determine how input values are transformed into
-outputs.
+Finally, after the model runs through blocks of attention, linear
+transformation, and normalization/dropout, it passes the data through an
+**activation layer**. This layer introduces non-linearity in the model, which
+in turn allows it to learn more complex patterns that cannot be approximated
+through simple, linear relationships. You can think of linear layers as filters
+of a sort: they use specially designed cutoffs to determine how input values
+are transformed into outputs.
 
 There are several different kinds of activation functions. We'll demonstrate a
 few below. First, we create a set of linear input values $[-5, 5]$ and
@@ -904,13 +905,13 @@ highest_attention_tokens = []
 for layer in attentions:
     # Drop `[CLS]` and `[SEP]`, then take the max over the heads
     layer = layer[:, 1:-1, 1:-1]
-    avg_attention = layer.max(axis = 0)
+    max_attention = layer.max(axis = 0)
 
     # March through each token and find the maximum value in the attention
     # layer
     layer_result = []
     for idx, token in enumerate(tokens):
-        highest_idx = np.argmax(avg_attention[idx, :])
+        highest_idx = np.argmax(max_attention[idx, :])
         highest_token = tokens[highest_idx]
         layer_result.append((token, highest_token))
 
@@ -918,7 +919,7 @@ for layer in attentions:
     highest_attention_tokens.append(layer_result)
 ```
 
-Now, for the three layers above, we print out every token in the input sequence
+For the three layers above, we now print out every token in the input sequence
 along with the token that scores highest in the attention matrix.
 
 ```{code-cell}
