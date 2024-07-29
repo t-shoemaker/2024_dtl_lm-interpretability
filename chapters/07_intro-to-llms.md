@@ -45,9 +45,10 @@ We need the following libraries:
 :tags: [remove-output]
 import torch
 import torch.nn as nn
-from transformers import AutoTokenizer, AutoModel
+import torch.nn.functional as F
 import numpy as np
 import pandas as pd
+from transformers import AutoTokenizer, AutoModel
 from sklearn.metrics.pairwise import cosine_similarity
 import circuitsvis as cv
 import matplotlib.pyplot as plt
@@ -1071,27 +1072,24 @@ for idx, layer in enumerate(outputs.hidden_states[1:]):
     # Pool the layer
     layer = mean_pool(layer, attention_mask)
 
-    layer_scores = []
+    scores = []
     for static, dynamic in zip(original_embeddings, layer):
         # Compute cosine similarity
         similarities = cosine_similarity([static, dynamic])
 
-        # `similarities` is a (2, 2) square matrix. We get the lower left value
+        # `similarities` is a (2, 2) square matrix. We get the lower left
+        # value, then append the layer and the score
         score = similarities[np.tril_indices(2, k = -1)].item()
-        layer_scores.append(score)
+        scores.append((idx + 1, score))
 
-    emb2layer.append({"layer": idx + 1, "cosine_similarity": layer_scores})
+    # Add the layer's scores to our running list
+    emb2layer.extend(scores)
 ```
 
 Reformat into a DataFrame.
 
 ```{code-cell}
-emb2layer = pd.DataFrame(emb2layer)
-emb2layer = (
-    emb2layer
-    .explode("cosine_similarity")
-    .reset_index(drop = True)
-)
+emb2layer = pd.DataFrame(emb2layer, columns = ["layer", "cosine_similarity"])
 ```
 
 Now we plot the document-level cosine similarity scores for each layer.
@@ -1130,18 +1128,19 @@ for idx, layer in enumerate(outputs.hidden_states[1:]):
     # Pool the layer
     layer = mean_pool(layer, attention_mask)
 
-    layer_scores = []
+    scores = []
     for static, dynamic in zip(previous, layer):
         # Compute cosine similarity
         similarities = cosine_similarity([static, dynamic])
 
-        # `similarities` is a (2, 2) square matrix. We get the lower left value
+        # `similarities` is a (2, 2) square matrix. We get the lower left
+        # value, set up a step tracker, and append both
         score = similarities[np.tril_indices(2, k = -1)].item()
-        layer_scores.append(score)
+        step = f"({idx + 1}, {idx + 2})"
+        scores.append((step, score))
 
-    # Track step
-    step = f"({idx + 1}, {idx + 2})"
-    layer2layer.append({"step": step, "cosine_similarity": layer_scores})
+    # Add the layer transition scores to our running list
+    layer2layer.extend(scores)
 
     # Set the current layer to `previous`
     previous = layer
@@ -1150,11 +1149,8 @@ for idx, layer in enumerate(outputs.hidden_states[1:]):
 Reformat.
 
 ```{code-cell}
-layer2layer = pd.DataFrame(layer2layer)
-layer2layer = (
-    layer2layer
-    .explode("cosine_similarity")
-    .reset_index(drop = True)
+layer2layer = pd.DataFrame(
+    layer2layer, columns = ["step", "cosine_similarity"]
 )
 ```
 
