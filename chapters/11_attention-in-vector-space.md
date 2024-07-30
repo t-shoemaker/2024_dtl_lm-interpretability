@@ -206,18 +206,69 @@ def plot_vectors(
 ## Visualizing Self-Attention
 
 With all of the above defined, we can now plot our attention scores in a
-two-dimensional vector space. Remember that, in this space, proximity means
+two-dimensional vector space. Remember: in this space, proximity means
 similarity. During our vector space semantics session we derived this
 information using the dot product, which tells us how much of one vector is
 projected along another vector.
 
 If you look back to the `scaled_dot_product_attention()` function in chapter 7,
 you'll see that calculating attention is a souped-up version of the dot
-product. Those matrix multiplication calls are dot product operations. So,
+product. Those matrix multiplication calls are effectively dot product
+operations, e.g. in the example below.
+
+For a query matrix $Q$:
+
+$$
+Q = \begin{bmatrix}
+    1 & 2 \\
+    3 & 4 \\
+    5 & 6 \\
+    \end{bmatrix}
+$$
+
+A key matrix $K$:
+
+$$
+K = \begin{bmatrix}
+    7 & 8 \\
+    9 & 10 \\
+    \end{bmatrix}
+$$
+
+...and its transpose $K^T$:
+
+$$
+K^T = \begin{bmatrix}
+    7 & 9 \\
+    8 & 10 \\
+    \end{bmatrix}
+$$
+
+Multiplying the two together creates a scores matrix $S$:
+
+$$
+S = \begin{bmatrix}
+    (1 \cdot 7 + 2 \cdot 8) & (1 \cdot 9 + 2 \cdot 10) \\
+    (3 \cdot 7 + 4 \cdot 8) & (3 \cdot 9 + 4 \cdot 10) \\
+    (5 \cdot 7 + 6 \cdot 8) & (5 \cdot 9 + 6 \cdot 10) \\
+    \end{bmatrix}
+$$
+
+Or:
+
+$$
+S = \begin{bmatrix}
+    23 & 29 \\
+    53 & 67 \\
+    83 & 105 \\
+    \end{bmatrix}
+$$
+
+For pairs of query and key vectors, we get a dot product score. That means
 attention is just capturing information about how much the query vectors are
-project along the key vectors. For a given token in the input, attention
+projected along the key vectors. For a given token in the input, attention
 determines the orientation of that token to all other tokens. Then, it applies
-that information to the value matrix.
+that information to the value matrix as a weighting.
 
 ```{code-cell}
 # Set up a plot and roll through the attention layers
@@ -260,8 +311,9 @@ plt.show()
 Using the dot product, we can take two vectors, `A` and `B`, and create a third
 "projection" vector, which shows how much of `A` sits along the direction of
 `B`. Attention is capturing this kind of information as it runs, but it's
-helpful to see the projection. Let's define a function to create this vector
-below.
+helpful to see the projection ourselves.
+
+Let's define a function to create this vector below.
 
 ```{code-cell}
 def vector_projection(A, B):
@@ -287,10 +339,10 @@ def vector_projection(A, B):
     return projection
 ```
 
-Let's use the above function to project the attention vector for "it" onto the
-one for "book." This will create a new projection vector whose orientation in
-vector space represents the amount of "it" along "book." Keep the following in
-mind as you look at the result:
+With the function defined, we project the attention vector for "it" onto the
+one for "book" across every layer in BERT. This will create a new projection
+vector whose orientation in vector space represents the amount of "it" along
+"book." Keep the following in mind as you inspect the result:
 
 + If the projection vector tends toward the vector for "book," this means more
   of "it" is captured along "book"
@@ -299,17 +351,17 @@ mind as you look at the result:
 
 Given the nature of attention, what we would expect is that, at certain layer,
 or set of layers, BERT will be able to determine that "book" and "it" refer to
-the same thing. The big goal in mechanistic interpretability is to find out the
+the same thing. A major goal in mechanistic interpretability is to find out the
 location of this behavior.
 
-But for model training, the goal is simpler: the model should be better able to
-capture the relationship between two tokens. How does it do this? It furnishes
-vectors for each token, captures their relationship via the dot product to
-weight the vectors on the basis of that relationship (i.e., it calculates
-attention), and uses the weighted vectors to make a prediction. Then, based on
-how well it has made this prediction, the model makes adjustments to the
-initial vectors it uses to represent the tokens as well as the amount of
-weighting it uses to change those vectors when it calculates attention.
+But for model training, the goal is this: the model should be better able to
+capture the relationship between two tokens. How? It furnishes vectors for each
+token, captures their relationship via the dot product to weight the vectors on
+the basis of that relationship (i.e., it calculates attention), and uses the
+weighted vectors to make a prediction. Then, based on how well it has made this
+prediction, the model makes adjustments to the initial vectors it uses to
+represent the tokens as well as the amount of weighting it uses to change those
+vectors when it calculates attention.
 
 ```{code-cell}
 # Get the index positions for "book" and "it"
