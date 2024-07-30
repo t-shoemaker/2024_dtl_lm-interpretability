@@ -45,9 +45,10 @@ We need the following libraries:
 :tags: [remove-output]
 import torch
 import torch.nn as nn
-from transformers import AutoTokenizer, AutoModel
+import torch.nn.functional as F
 import numpy as np
 import pandas as pd
+from transformers import AutoTokenizer, AutoModel
 from sklearn.metrics.pairwise import cosine_similarity
 import circuitsvis as cv
 import matplotlib.pyplot as plt
@@ -414,7 +415,7 @@ bert.embeddings.token_type_embeddings
 ### Attention
 
 If you look back to the encoder part of the model, you'll see that first
-component in the layer is an attention mechanism. This mechanism enables
+component in a layer block is an attention mechanism. This mechanism enables
 the model to draw many-to-many relationships between tokens. During training,
 attention helps the model form strong (or weak) relationships between certain
 tokens, which in turn allows it to focus on different parts of input sequences
@@ -619,12 +620,13 @@ dropped = dropout_layer(normalized)
 
 ### Activation layer
 
-Finally, the model passes the data through an **activation layer**. This layer
-introduces non-linearity in the model, which in turn allows it to learn more
-complex patterns that cannot be approximated through simple, linear
-relationships. You can think of linear layers as filters of a sort: they use
-specially designed cutoffs to determine how input values are transformed into
-outputs.
+Finally, after the model runs through blocks of attention, linear
+transformation, and normalization/dropout, it passes the data through an
+**activation layer**. This layer introduces non-linearity in the model, which
+in turn allows it to learn more complex patterns that cannot be approximated
+through simple, linear relationships. You can think of linear layers as filters
+of a sort: they use specially designed cutoffs to determine how input values
+are transformed into outputs.
 
 There are several different kinds of activation functions. We'll demonstrate a
 few below. First, we create a set of linear input values $[-5, 5]$ and
@@ -904,13 +906,13 @@ highest_attention_tokens = []
 for layer in attentions:
     # Drop `[CLS]` and `[SEP]`, then take the max over the heads
     layer = layer[:, 1:-1, 1:-1]
-    avg_attention = layer.max(axis = 0)
+    max_attention = layer.max(axis = 0)
 
     # March through each token and find the maximum value in the attention
     # layer
     layer_result = []
     for idx, token in enumerate(tokens):
-        highest_idx = np.argmax(avg_attention[idx, :])
+        highest_idx = np.argmax(max_attention[idx, :])
         highest_token = tokens[highest_idx]
         layer_result.append((token, highest_token))
 
@@ -918,7 +920,7 @@ for layer in attentions:
     highest_attention_tokens.append(layer_result)
 ```
 
-Now, for the three layers above, we print out every token in the input sequence
+For the three layers above, we now print out every token in the input sequence
 along with the token that scores highest in the attention matrix.
 
 ```{code-cell}
@@ -1070,27 +1072,24 @@ for idx, layer in enumerate(outputs.hidden_states[1:]):
     # Pool the layer
     layer = mean_pool(layer, attention_mask)
 
-    layer_scores = []
+    scores = []
     for static, dynamic in zip(original_embeddings, layer):
         # Compute cosine similarity
         similarities = cosine_similarity([static, dynamic])
 
-        # `similarities` is a (2, 2) square matrix. We get the lower left value
+        # `similarities` is a (2, 2) square matrix. We get the lower left
+        # value, then append the layer and the score
         score = similarities[np.tril_indices(2, k = -1)].item()
-        layer_scores.append(score)
+        scores.append((idx + 1, score))
 
-    emb2layer.append({"layer": idx + 1, "cosine_similarity": layer_scores})
+    # Add the layer's scores to our running list
+    emb2layer.extend(scores)
 ```
 
 Reformat into a DataFrame.
 
 ```{code-cell}
-emb2layer = pd.DataFrame(emb2layer)
-emb2layer = (
-    emb2layer
-    .explode("cosine_similarity")
-    .reset_index(drop = True)
-)
+emb2layer = pd.DataFrame(emb2layer, columns = ["layer", "cosine_similarity"])
 ```
 
 Now we plot the document-level cosine similarity scores for each layer.
@@ -1129,18 +1128,19 @@ for idx, layer in enumerate(outputs.hidden_states[1:]):
     # Pool the layer
     layer = mean_pool(layer, attention_mask)
 
-    layer_scores = []
+    scores = []
     for static, dynamic in zip(previous, layer):
         # Compute cosine similarity
         similarities = cosine_similarity([static, dynamic])
 
-        # `similarities` is a (2, 2) square matrix. We get the lower left value
+        # `similarities` is a (2, 2) square matrix. We get the lower left
+        # value, set up a step tracker, and append both
         score = similarities[np.tril_indices(2, k = -1)].item()
-        layer_scores.append(score)
+        step = f"({idx + 1}, {idx + 2})"
+        scores.append((step, score))
 
-    # Track step
-    step = f"({idx + 1}, {idx + 2})"
-    layer2layer.append({"step": step, "cosine_similarity": layer_scores})
+    # Add the layer transition scores to our running list
+    layer2layer.extend(scores)
 
     # Set the current layer to `previous`
     previous = layer
@@ -1149,11 +1149,8 @@ for idx, layer in enumerate(outputs.hidden_states[1:]):
 Reformat.
 
 ```{code-cell}
-layer2layer = pd.DataFrame(layer2layer)
-layer2layer = (
-    layer2layer
-    .explode("cosine_similarity")
-    .reset_index(drop = True)
+layer2layer = pd.DataFrame(
+    layer2layer, columns = ["step", "cosine_similarity"]
 )
 ```
 

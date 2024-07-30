@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
   
@@ -190,6 +190,12 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Large Language Models</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="07_intro-to-llms.html">7. Large Language Models: An Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_bert.html">8. Bidirectional Encoder Representations from Transformers (BERT)</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendices</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="10_cross-entropy.html">9. Cross Entropy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11_attention-in-vector-space.html">10. Attention in Vector Space</a></li>
 </ul>
 
     </div>
@@ -597,7 +603,7 @@ that, unlike with the obituaries, we are keeping the punctuation.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;success&#39;, &#39;is&#39;, &#39;counted&#39;, &#39;sweetest&#39;, &#39;by&#39;, &#39;those&#39;, &#39;who&#39;, &quot;ne&#39;er&quot;, &#39;succeed&#39;, &#39;.&#39;, &#39;to&#39;, &#39;comprehend&#39;, &#39;a&#39;, &#39;nectar&#39;, &#39;requires&#39;, &#39;sorest&#39;, &#39;need&#39;, &#39;.&#39;, &#39;not&#39;, &#39;one&#39;, &#39;of&#39;, &#39;all&#39;, &#39;the&#39;, &#39;purple&#39;, &#39;host&#39;, &#39;who&#39;, &#39;took&#39;, &#39;the&#39;, &#39;flag&#39;, &#39;today&#39;, &#39;can&#39;, &#39;tell&#39;, &#39;the&#39;, &#39;definition&#39;, &#39;so&#39;, &#39;clear&#39;, &#39;of&#39;, &#39;victory&#39;, &#39;as&#39;, &#39;he&#39;, &#39;defeated&#39;, &#39;–&#39;, &#39;dying&#39;, &#39;–&#39;, &#39;on&#39;, &#39;whose&#39;, &#39;forbidden&#39;, &#39;ear&#39;, &#39;the&#39;, &#39;distant&#39;, &#39;strains&#39;, &#39;of&#39;, &#39;triumph&#39;, &#39;burst&#39;, &#39;agonized&#39;, &#39;and&#39;, &#39;clear&#39;, &#39;!&#39;]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;publication&#39;, &#39;–&#39;, &#39;is&#39;, &#39;the&#39;, &#39;auction&#39;, &#39;of&#39;, &#39;the&#39;, &#39;mind&#39;, &#39;of&#39;, &#39;man&#39;, &#39;–&#39;, &#39;poverty&#39;, &#39;–&#39;, &#39;be&#39;, &#39;justifying&#39;, &#39;for&#39;, &#39;so&#39;, &#39;foul&#39;, &#39;a&#39;, &#39;thing&#39;, &#39;possibly&#39;, &#39;–&#39;, &#39;but&#39;, &#39;we&#39;, &#39;–&#39;, &#39;would&#39;, &#39;rather&#39;, &#39;from&#39;, &#39;our&#39;, &#39;garret&#39;, &#39;go&#39;, &#39;white&#39;, &#39;–&#39;, &#39;unto&#39;, &#39;the&#39;, &#39;white&#39;, &#39;creator&#39;, &#39;–&#39;, &#39;than&#39;, &#39;invest&#39;, &#39;–&#39;, &#39;our&#39;, &#39;snow&#39;, &#39;–&#39;, &#39;thought&#39;, &#39;belong&#39;, &#39;to&#39;, &#39;him&#39;, &#39;who&#39;, &#39;gave&#39;, &#39;it&#39;, &#39;–&#39;, &#39;then&#39;, &#39;–&#39;, &#39;to&#39;, &#39;him&#39;, &#39;who&#39;, &#39;bear&#39;, &#39;it&#39;, &quot;&#39;s&quot;, &#39;corporeal&#39;, &#39;illustration&#39;, &#39;–&#39;, &#39;sell&#39;, &#39;the&#39;, &#39;royal&#39;, &#39;air&#39;, &#39;–&#39;, &#39;in&#39;, &#39;the&#39;, &#39;parcel&#39;, &#39;–&#39;, &#39;be&#39;, &#39;the&#39;, &#39;merchant&#39;, &#39;of&#39;, &#39;the&#39;, &#39;heavenly&#39;, &#39;grace&#39;, &#39;–&#39;, &#39;but&#39;, &#39;reduce&#39;, &#39;no&#39;, &#39;human&#39;, &#39;spirit&#39;, &#39;to&#39;, &#39;disgrace&#39;, &#39;of&#39;, &#39;price&#39;, &#39;–&#39;]
 </pre></div>
 </div>
 </div>
@@ -802,7 +808,7 @@ would simply choose tokens at random.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>frightened in midnight yet the resumption took , heart star
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>the emphatic a wild and - and they in –
 </pre></div>
 </div>
 </div>
@@ -817,7 +823,7 @@ would simply choose tokens at random.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>admitting because fit consecutive hunt strains right philosophy tis harvests
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>philosophy resign right themself brave empty members rush counts offered
 </pre></div>
 </div>
 </div>
@@ -900,7 +906,7 @@ probabilities in our corpus and repeat that value <code class="docutils literal 
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross-entropy: 0.07967390580694188
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Cross-entropy: 0.08210603776129816
 </pre></div>
 </div>
 </div>
@@ -942,8 +948,8 @@ over the average cross-entropy scores form the sampling run above.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>weighted      1.040421
-unweighted    1.056285
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>weighted      1.040025
+unweighted    1.056197
 dtype: float64
 </pre></div>
 </div>
@@ -985,7 +991,7 @@ Dickinson’s poetry.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(&#39;some&#39;, &#39;keep&#39;), (&#39;keep&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;sabbath&#39;), (&#39;sabbath&#39;, &#39;going&#39;), (&#39;going&#39;, &#39;to&#39;), (&#39;to&#39;, &#39;church&#39;), (&#39;church&#39;, &#39;–&#39;), (&#39;–&#39;, &#39;i&#39;), (&#39;i&#39;, &#39;keep&#39;), (&#39;keep&#39;, &#39;it&#39;), (&#39;it&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;staying&#39;), (&#39;staying&#39;, &#39;at&#39;), (&#39;at&#39;, &#39;home&#39;), (&#39;home&#39;, &#39;–&#39;), (&#39;–&#39;, &#39;with&#39;), (&#39;with&#39;, &#39;a&#39;), (&#39;a&#39;, &#39;bobolink&#39;), (&#39;bobolink&#39;, &#39;for&#39;), (&#39;for&#39;, &#39;a&#39;), (&#39;a&#39;, &#39;chorister&#39;), (&#39;chorister&#39;, &#39;–&#39;), (&#39;–&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;an&#39;), (&#39;an&#39;, &#39;orchard&#39;), (&#39;orchard&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;for&#39;), (&#39;for&#39;, &#39;a&#39;), (&#39;a&#39;, &#39;dome&#39;), (&#39;dome&#39;, &#39;–&#39;), (&#39;–&#39;, &#39;some&#39;), (&#39;some&#39;, &#39;keep&#39;), (&#39;keep&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;sabbath&#39;), (&#39;sabbath&#39;, &#39;in&#39;), (&#39;in&#39;, &#39;surplice&#39;), (&#39;surplice&#39;, &#39;–&#39;), (&#39;–&#39;, &#39;i&#39;), (&#39;i&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;just&#39;), (&#39;just&#39;, &#39;wear&#39;), (&#39;wear&#39;, &#39;my&#39;), (&#39;my&#39;, &#39;wings&#39;), (&#39;wings&#39;, &#39;–&#39;), (&#39;–&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;instead&#39;), (&#39;instead&#39;, &#39;of&#39;), (&#39;of&#39;, &#39;tolling&#39;), (&#39;tolling&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;bell&#39;), (&#39;bell&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;for&#39;), (&#39;for&#39;, &#39;church&#39;), (&#39;church&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;our&#39;), (&#39;our&#39;, &#39;little&#39;), (&#39;little&#39;, &#39;sexton&#39;), (&#39;sexton&#39;, &#39;–&#39;), (&#39;–&#39;, &#39;sings&#39;), (&#39;sings&#39;, &#39;.&#39;), (&#39;.&#39;, &#39;god&#39;), (&#39;god&#39;, &#39;preaches&#39;), (&#39;preaches&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;a&#39;), (&#39;a&#39;, &#39;noted&#39;), (&#39;noted&#39;, &#39;clergyman&#39;), (&#39;clergyman&#39;, &#39;–&#39;), (&#39;–&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;sermon&#39;), (&#39;sermon&#39;, &#39;is&#39;), (&#39;is&#39;, &#39;never&#39;), (&#39;never&#39;, &#39;long&#39;), (&#39;long&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;so&#39;), (&#39;so&#39;, &#39;instead&#39;), (&#39;instead&#39;, &#39;of&#39;), (&#39;of&#39;, &#39;getting&#39;), (&#39;getting&#39;, &#39;to&#39;), (&#39;to&#39;, &#39;heaven&#39;), (&#39;heaven&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;at&#39;), (&#39;at&#39;, &#39;last&#39;), (&#39;last&#39;, &#39;–&#39;), (&#39;–&#39;, &#39;i&#39;), (&#39;i&#39;, &#39;’&#39;), (&#39;’&#39;, &#39;m&#39;), (&#39;m&#39;, &#39;going&#39;), (&#39;going&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;all&#39;), (&#39;all&#39;, &#39;along&#39;), (&#39;along&#39;, &#39;.&#39;)]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(&#39;i&#39;, &#39;have&#39;), (&#39;have&#39;, &#39;never&#39;), (&#39;never&#39;, &#39;seen&#39;), (&#39;seen&#39;, &#39;``&#39;), (&#39;``&#39;, &#39;volcanoes&#39;), (&#39;volcanoes&#39;, &quot;&#39;&#39;&quot;), (&quot;&#39;&#39;&quot;, &#39;—&#39;), (&#39;—&#39;, &#39;but&#39;), (&#39;but&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;when&#39;), (&#39;when&#39;, &#39;travellers&#39;), (&#39;travellers&#39;, &#39;tell&#39;), (&#39;tell&#39;, &#39;how&#39;), (&#39;how&#39;, &#39;those&#39;), (&#39;those&#39;, &#39;old&#39;), (&#39;old&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;phlegmatic&#39;), (&#39;phlegmatic&#39;, &#39;mountains&#39;), (&#39;mountains&#39;, &#39;usually&#39;), (&#39;usually&#39;, &#39;so&#39;), (&#39;so&#39;, &#39;still&#39;), (&#39;still&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;bear&#39;), (&#39;bear&#39;, &#39;within&#39;), (&#39;within&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;appalling&#39;), (&#39;appalling&#39;, &#39;ordnance&#39;), (&#39;ordnance&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;fire&#39;), (&#39;fire&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;smoke&#39;), (&#39;smoke&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;gun&#39;), (&#39;gun&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;taking&#39;), (&#39;taking&#39;, &#39;villages&#39;), (&#39;villages&#39;, &#39;for&#39;), (&#39;for&#39;, &#39;breakfast&#39;), (&#39;breakfast&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;appalling&#39;), (&#39;appalling&#39;, &#39;men&#39;), (&#39;men&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;if&#39;), (&#39;if&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;stillness&#39;), (&#39;stillness&#39;, &#39;is&#39;), (&#39;is&#39;, &#39;volcanic&#39;), (&#39;volcanic&#39;, &#39;in&#39;), (&#39;in&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;human&#39;), (&#39;human&#39;, &#39;face&#39;), (&#39;face&#39;, &#39;when&#39;), (&#39;when&#39;, &#39;upon&#39;), (&#39;upon&#39;, &#39;a&#39;), (&#39;a&#39;, &#39;pain&#39;), (&#39;pain&#39;, &#39;titanic&#39;), (&#39;titanic&#39;, &#39;features&#39;), (&#39;features&#39;, &#39;keep&#39;), (&#39;keep&#39;, &#39;their&#39;), (&#39;their&#39;, &#39;place&#39;), (&#39;place&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;if&#39;), (&#39;if&#39;, &#39;at&#39;), (&#39;at&#39;, &#39;length&#39;), (&#39;length&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;smouldering&#39;), (&#39;smouldering&#39;, &#39;anguish&#39;), (&#39;anguish&#39;, &#39;will&#39;), (&#39;will&#39;, &#39;not&#39;), (&#39;not&#39;, &#39;overcome&#39;), (&#39;overcome&#39;, &#39;—&#39;), (&#39;—&#39;, &#39;and&#39;), (&#39;and&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;palpitating&#39;), (&#39;palpitating&#39;, &#39;vineyard&#39;), (&#39;vineyard&#39;, &#39;in&#39;), (&#39;in&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;dust&#39;), (&#39;dust&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;be&#39;), (&#39;be&#39;, &#39;thrown&#39;), (&#39;thrown&#39;, &#39;?&#39;), (&#39;?&#39;, &#39;if&#39;), (&#39;if&#39;, &#39;some&#39;), (&#39;some&#39;, &#39;loving&#39;), (&#39;loving&#39;, &#39;antiquary&#39;), (&#39;antiquary&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;on&#39;), (&#39;on&#39;, &#39;resumption&#39;), (&#39;resumption&#39;, &#39;morn&#39;), (&#39;morn&#39;, &#39;,&#39;), (&#39;,&#39;, &#39;will&#39;), (&#39;will&#39;, &#39;not&#39;), (&#39;not&#39;, &#39;cry&#39;), (&#39;cry&#39;, &#39;with&#39;), (&#39;with&#39;, &#39;joy&#39;), (&#39;joy&#39;, &#39;``&#39;), (&#39;``&#39;, &#39;pompeii&#39;), (&#39;pompeii&#39;, &quot;&#39;&#39;&quot;), (&quot;&#39;&#39;&quot;, &#39;!&#39;), (&#39;!&#39;, &#39;to&#39;), (&#39;to&#39;, &#39;the&#39;), (&#39;the&#39;, &#39;hills&#39;), (&#39;hills&#39;, &#39;return&#39;), (&#39;return&#39;, &#39;!&#39;)]
 </pre></div>
 </div>
 </div>
@@ -1391,11 +1397,11 @@ this new DataFrame will represent the conditional probability of moving from
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>observing others when i did not stay — but the
-- by those old — henceforth to know - by
-hurried all were a route of storm - first a
-– and swings opon captivity – the setting sun through
-him a vane , it is a shifting plate whose
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>amber road . it is a degree – remove the
+never hear the fields of victory as i know -
+he – in vision - caress her — evokes so
+the nerves sit ceremonious , like one it beckons ,
+i felt his flower , and easy as if the
 </pre></div>
 </div>
 </div>
@@ -1453,7 +1459,7 @@ the token/bigram is sampled more frequently than ones with lower probabilities.<
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>from
 </pre></div>
 </div>
 </div>
@@ -1552,11 +1558,11 @@ performs a cutoff to the <code class="docutils literal notranslate"><span class=
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>–
-with
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-
+from
 –
-–
--
+from
+,
 </pre></div>
 </div>
 </div>
@@ -1663,29 +1669,29 @@ which will correspond to one of the above sampling strategies.</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Strategy: weighted
-+ have the chart ! mine - the tender carpenter perpetual nail it – stiff –
-+ window - but reduce no frigate like a tighter breathing and then – he stirred
-+ of nature an imperial affliction sent us of mine – till a privilege so far
-+ we demand the maple wears a spotted shaft is penury not at morning ’ s
-+ on resumption morn , nor any see it to her - then it comes just
++ the setting sun until eternity and stack - here - but most , as music
++ sight of glory not who win , a riddle , it – then they grew
++ like them all along , and zero at last - all abroad - titled -
++ the amber road . elements unaltered — it reaches to have crawled too – or
++ own the stillness in the germ of escape - he did you left me –
 
 
 Strategy: greedy
-+ bashful – and then the soul - and then the soul - and then the
-+ drop - and then the soul - and then the soul - and then the
-+ a bird , and then the soul - and then the soul - and then
-+ the soul - and then the soul - and then the soul - and then
-+ the soul - and then the soul - and then the soul - and then
++ from the soul - and then the soul - and then the soul - and
++ eternity – and then the soul - and then the soul - and then the
++ - and then the soul - and then the soul - and then the soul
++ in the soul - and then the soul - and then the soul - and
++ haworth ” is the soul - and then the soul - and then the soul
 
 
 Strategy: topk
-+ my life from the grass occasionally rides - it , and every blossom on whom
-+ when everything that all the stillness is counted sweetest by noon , and then ,
-+ win , in this hock at me - it &#39;s corporeal illustration – i ’
-+ great pain , as if outlived , with amber hands to the stillness is the
++ door - by but i never a boy – we hunt the grass divides as
++ , with alabaster chambers - and me . elements unaltered — i felt his rose
++ and then hopped sidewise to have been - and then - to the day i
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+ too – and then it – and yet feels shorter than oars divide the truth
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>+ - and i know no frigate like the soul opon a boy and then –
++ it ’ s empty room was like the truth &#39;s own surprise ! might have
 </pre></div>
 </div>
 </div>
@@ -1741,9 +1747,9 @@ the corpus.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>greedy      4335.632653
-topk        6147.740481
-weighted    7023.165946
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>greedy      4439.210567
+weighted    5053.615127
+topk        5999.727841
 dtype: float64
 </pre></div>
 </div>
