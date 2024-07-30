@@ -19,3 +19,8 @@ parts:
       - file: chapters/07_intro-to-llms
       - file: chapters/08_bert
       - file: chapters/09_gpt
+  - caption: Appendices
+    numbered: true
+    chapters:
+      - file: chapters/10_cross-entropy
+      - file: chapters/11_attention-in-vector-space
