@@ -33,6 +33,10 @@ using activation patching and model steering to isolate GPT-2's behavior in
 specific parts of the network architecture.
 
 + **Data:** A small dataset of sentence pairs with contrasting tokens
++ **Credits:** Portions of this chapter are adapted from Neel Nanda's
+  [Activation Patching in TransformerLens Demo][demo]
+
+[demo]: https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/Activation_Patching_in_TL_Demo.ipynb#scrollTo=vPo31ZtqYxNO
 
 
 ## Preliminaries
@@ -740,7 +744,7 @@ close, but even those are an abstraction from what goes on at every layer in a
 network. **Mechanistic interpretability** attempts to do the latter by "reverse
 engineering" model behavior. The predominant metaphor in this kind of work is
 the circuit: researchers envision neural networks as complex electrical
-circuits, which they modify---"patching," "pruning," an so on---to identify
+circuits, which they modify---"patching," "pruning," and so on---to identify
 where and how the networks have learned to perform specific tasks.
 
 Mechanistic interpretability typically requires access to a network's
@@ -776,12 +780,13 @@ tokens = model.to_tokens(prompt)
 
 Use the `.run_with_cache()` method to embed these tokens. This will return two
 objects: the logits for the tokens, which we've seen above, and an activation
-cache. The cache contains all activations generated during a **forward pass**
-of the model, that is, everything generated while the model processes data (but
-not when it updates its own weights, as in training).
+**cache**. The cache contains all activations generated during a **forward
+pass** of the model, that is, everything generated while the model processes
+data (but not when it updates its own weights, as in training).
 
 ```{code-cell}
 :tags: [output_scroll]
+logits, cache = model.run_with_cache(tokens)
 cache
 ```
 
