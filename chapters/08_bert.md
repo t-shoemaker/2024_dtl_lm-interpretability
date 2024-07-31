@@ -739,7 +739,7 @@ and their corresponding base values for a sampling of 1,000 blurbs from the
 dataset. With these, we'll look at SHAP values in the aggregate.
 
 :::{tip}
-This [script][script] shows you how to compute SHAP at scale.
+This [script][script] shows you how to compute SHAP values at scale.
 
 [script]: https://github.com/t-shoemaker/2024_dtl_lm-interpretability/blob/main/src/compute_shap_values.py
 :::
