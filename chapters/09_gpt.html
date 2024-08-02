@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
   
@@ -391,12 +391,12 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="generative-pre-trained-transformers-gpt">
 <h1><span class="section-number">9. </span>Generative Pre-Trained Transformers (GPT)<a class="headerlink" href="#generative-pre-trained-transformers-gpt" title="Link to this heading">#</a></h1>
-<p>This chapter uses GPT-2 as an example of a generative large language model.
-After looking at how the model represents next token predictions, it overviews
-sampling strategies and discusses some approaches to investigate the sampling
-space. The second half of the chapter moves to mechanistic interpretability,
-using activation patching and model steering to isolate GPT-2’s behavior in
-specific parts of the network architecture.</p>
+<p>This chapter discusses text generation with GPT-2. After looking at how the
+model represents next token predictions, it overviews sampling strategies and
+discusses some approaches to investigate the sampling space. The second half of
+the chapter moves to mechanistic interpretability, using activation patching
+and model steering to isolate GPT-2’s behavior in specific parts of the network
+architecture.</p>
 <ul class="simple">
 <li><p><strong>Data:</strong> A small dataset of sentence pairs with contrasting tokens</p></li>
 <li><p><strong>Credits:</strong> Portions of this chapter are adapted from Neel Nanda’s
@@ -423,7 +423,7 @@ specific parts of the network architecture.</p>
 </div>
 </div>
 </div>
-<p>Later on, we will use a small dataset of sentence pairs. Let’s load them now.</p>
+<p>Later on we will use a small dataset of sentence pairs. Let’s load them now.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pairs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s2">&quot;data/datasets/exclamations.parquet&quot;</span><span class="p">)</span>
@@ -616,7 +616,7 @@ equal <span class="math notranslate nohighlight">\(1\)</span>.</p>
 </div>
 </div>
 </div>
-<p>That said, there’s no need for a custom function when <code class="docutils literal notranslate"><span class="pre">torch</span></code> can do it for us.
+<p>However, there’s no need for a custom function when <code class="docutils literal notranslate"><span class="pre">torch</span></code> can do it for us.
 Below, we run our last token logits through softmax.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -640,8 +640,7 @@ Below, we run our last token logits through softmax.</p>
 </div>
 </div>
 <p>The model’s <code class="docutils literal notranslate"><span class="pre">.generate()</span></code> method will do all of the above. It will also
-recursively build a new input sequence so that you can have it return multiple
-new tokens.</p>
+recursively build a new input sequence to return multiple new tokens.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">,</span> <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
@@ -683,11 +682,15 @@ new tokens.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the best of times and
-It was the best of times, it was the hardest thing, because
-It was the best of times, it was the worst of times,
-It was the best of times, it was the greatest of times.
-It was the best of times, it was the best of times...&quot;
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the worst.&quot;
+
+
+It was the best of times, it was the worst.&quot;
+
+
+It was the best of times, it was the first time in my
+It was the best of times, it was the best of times because
+It was the best of times, it was the worst of times,&quot;
 </pre></div>
 </div>
 </div>
@@ -735,11 +738,11 @@ diverse than in greedy sampling, though it requires hard coding a value for
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the best of times,
-It was the best of times, it was the best of times as
-It was the best of times, it was the best of times.&quot;
-It was the best of times, it was the most wonderful of times
-It was the best of times, it was the worst of times.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the best of months.
+It was the best of times, it was the worst of times,&quot;
+It was the best of times, it was the worst of times,
+It was the best of times, it was the best of times,
+It was the best of times, it was the best of times -
 </pre></div>
 </div>
 </div>
@@ -763,10 +766,10 @@ hard-coded value for <code class="docutils literal notranslate"><span class="pre
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the worst of times.
-It was the best of times, it was the worst of times.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the worst, and I
+It was the best of times, it was the best of times.
+It was the best of times, it was the worst of times,&quot;
 It was the best of times, it was the best of times,&quot;
-It was the best of times, it was the worst of times,
 It was the best of times, it was the worst of times,
 </pre></div>
 </div>
@@ -794,11 +797,11 @@ distribution.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the best of times,&quot;
-It was the best of times, it was the worst of times,
-It was the best of times, it was the worst of times.
-It was the best of times, it was the worst of times.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the worst of times.
+It was the best of times, it was the worst. It was
+It was the best of times, it was the best of times,
 It was the best of times, it was the worst of times,&quot;
+It was the best of times, it was the best of times,
 </pre></div>
 </div>
 </div>
@@ -819,11 +822,11 @@ It was the best of times, it was the worst of times,&quot;
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the darkest to ever do
-It was the best of times, it was the hardest days…&quot; the
-It was the best of times, it was the closest match I was
-It was the best of times, it was the only other we left
-It was the best of times, it was the time for players from
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the truth&quot;. I could
+It was the best of times, it was the very pinnacle in this
+It was the best of times, it was the year they turned 15
+It was the best of times, it was the one good deal after
+It was the best of times, it was the closest experience since your
 </pre></div>
 </div>
 </div>
@@ -862,7 +865,7 @@ It was the best of times, it was the worst of times,&quot;
 </div>
 <p>The advantage of doing a beam search is that the model can navigate the
 probability space to find sequences that may be better overall choices for
-output than if it could only construct one sequence on the flight. Its
+output than if it could only construct one sequence on the fly. Its
 disadvantage: beam searches are computationally expensive.</p>
 <p>Mixing strategies together usually works best. Use a <code class="docutils literal notranslate"><span class="pre">GenerationConfig</span></code> to set
 up your pipeline. This will accept several different parameters, including an
@@ -899,15 +902,16 @@ once <code class="docutils literal notranslate"><span class="pre">num_beams</spa
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the best of places. You couldn&#39;t tell that in a game like mine, I thought I just went there and waited. When
-It was the best of times, it was the worst. But what&#39;s changed in recent years — with that first, most surprising drop in public attention in the eight years to
-It was the best of times, it was the worst of times, but it could get ugly,&quot; McInnes said.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the best of times. I think the game of the century.
+It was the best of times, it was the worst,&quot; he said.
+It was the best of times, it was the worst of times.
 
-When he asked why they took no action
-It was the best of times, it was the best of things in their hearts, they felt loved. It wasn&#39;t a great season in our lives, that one moment was
-It was the best of times, it was the worst. The good and sad and bad. It just left me in a very emotional place.&quot;
 
-As the team continues
+&quot;As it turned out I have to put things in. My dad told me to play for
+It was the best of times, it was the best of years,&quot; she recalls of being given an old school version of the new version, and then the new version that she
+It was the best of times, it was the worst of times, it wasn&#39;t really what I hoped and it didn&#39;t turn out that way&quot;.
+
+As far as
 </pre></div>
 </div>
 </div>
@@ -991,7 +995,7 @@ what best means here is “most probable according to the model.”</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the best of times, it was the best of times, but if he were at this moment the greatest thing was now coming and
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the first time I had the opportunity to come here and play with a team. I&#39;d have to say it&#39;s not bad.
 </pre></div>
 </div>
 </div>
@@ -1004,7 +1008,7 @@ what best means here is “most probable according to the model.”</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the worst. But the people that worked there never came, it really doesn&#39;t mean anything now,&quot; a former firefighter said.
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the worst.&quot; &quot;I feel like everyone who comes in this room is supposed to be like that,&quot; Kelly joked. The coach noted
 </pre></div>
 </div>
 </div>
@@ -1453,19 +1457,19 @@ how it works!</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> rc i in range(10): (86.7323)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Arg i in range(10): (98.4801)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> insert i in range(10): (59.6841)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Amount i in range(10): (77.0235)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> params i in range(10): (42.6199)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Connection i in range(10): (128.2665)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> Context i in range(10): (91.9952)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> identifiers i in range(10): (62.7259)
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> quantity i in range(10): (66.4418)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> BY i in range(10): (70.7789)
 </pre></div>
 </div>
 </div>
@@ -2114,9 +2118,11 @@ decreased.</p>
 </div>
 </div>
 <p>By the looks of this heatmap, activations after attention scoring in the tenth
-layer of the model seem most sensitive to changes between clean and corrupted
-tokens. Might this be the location where the model has learned something about
-the difference between “.” and “!”?</p>
+layer of the model seem particularly sensitive to changes between clean and
+corrupted tokens. Other layers also register this change and could therefore be
+worth investigating, but the tenth layer scores the highest. Might this be the
+location where the model has learned something about the difference between “.”
+and “!”?</p>
 </section>
 <section id="steering-the-model">
 <h3><span class="section-number">9.4.4. </span>Steering the model<a class="headerlink" href="#steering-the-model" title="Link to this heading">#</a></h3>
@@ -2348,7 +2354,7 @@ Output: The sky is blue,
     <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
     <span class="n">do_sample</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">temperature</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">,</span>
-    <span class="n">top_p</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">top_p</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">,</span>
     <span class="n">freq_penalty</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
     <span class="n">stop_at_eos</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">eos_token_id</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span><span class="p">,</span>
@@ -2359,9 +2365,9 @@ Output: The sky is blue,
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The sky is blue! The moon is in the clouds!
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The sky is blue and the moon is pink! You have arrived at your destination! Now let&#39;s get started.
 
-And you have a friend! So go ahead and try it out. Let&#39;s start with a quick quiz: what&#39;s your favorite color? Well, we&#39;re going to use this as an inspiration for
+Beware of Star Spangled Bodies!! The way you are greeted by a Star Spangled body will be a delight to behold, and they
 </pre></div>
 </div>
 </div>
@@ -2396,7 +2402,9 @@ And you have a friend! So go ahead and try it out. Let&#39;s start with a quick 
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>I had an okay time with this! I LOVE it! It&#39;s awesome! I just scooped it up and threw on the napkins and a cool little sparkle!! Thats all!!! Thanks again!! :) The car was fantastic!!!!!! I love what you did with
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>I had an okay time reading the book! It was awesome! I would recommend this to anyone that loves to read!!!!
+
+One of my favorite books for children and young adults! Amazing story, great art, and very well written!!! Great book!!! The illustrations are
 </pre></div>
 </div>
 </div>

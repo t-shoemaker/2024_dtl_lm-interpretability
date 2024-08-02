@@ -25,12 +25,12 @@ rcParams["figure.dpi"] = 150
 Generative Pre-Trained Transformers (GPT)
 =========================================
 
-This chapter uses GPT-2 as an example of a generative large language model.
-After looking at how the model represents next token predictions, it overviews
-sampling strategies and discusses some approaches to investigate the sampling
-space. The second half of the chapter moves to mechanistic interpretability,
-using activation patching and model steering to isolate GPT-2's behavior in
-specific parts of the network architecture.
+This chapter discusses text generation with GPT-2. After looking at how the
+model represents next token predictions, it overviews sampling strategies and
+discusses some approaches to investigate the sampling space. The second half of
+the chapter moves to mechanistic interpretability, using activation patching
+and model steering to isolate GPT-2's behavior in specific parts of the network
+architecture.
 
 + **Data:** A small dataset of sentence pairs with contrasting tokens
 + **Credits:** Portions of this chapter are adapted from Neel Nanda's
@@ -58,7 +58,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 ```
 
-Later on, we will use a small dataset of sentence pairs. Let's load them now.
+Later on we will use a small dataset of sentence pairs. Let's load them now.
 
 ```{code-cell}
 pairs = pd.read_parquet("data/datasets/exclamations.parquet")
@@ -169,7 +169,7 @@ equal $1$.
 np.round(np.sum(exponentiated / summed), 1)
 ```
 
-That said, there's no need for a custom function when `torch` can do it for us.
+However, there's no need for a custom function when `torch` can do it for us.
 Below, we run our last token logits through softmax.
 
 ```{code-cell}
@@ -184,8 +184,7 @@ print(f"Next predicted token: {tokenizer.decode(next_token_id).strip()}")
 ```
 
 The model's `.generate()` method will do all of the above. It will also
-recursively build a new input sequence so that you can have it return multiple
-new tokens.
+recursively build a new input sequence to return multiple new tokens.
 
 ```{code-cell}
 outputs = model.generate(**inputs, max_new_tokens = 4)
@@ -321,7 +320,7 @@ for sequence in outputs:
 
 The advantage of doing a beam search is that the model can navigate the
 probability space to find sequences that may be better overall choices for
-output than if it could only construct one sequence on the flight. Its
+output than if it could only construct one sequence on the fly. Its
 disadvantage: beam searches are computationally expensive.
 
 Mixing strategies together usually works best. Use a `GenerationConfig` to set
@@ -1121,9 +1120,11 @@ plt.show()
 ```
 
 By the looks of this heatmap, activations after attention scoring in the tenth
-layer of the model seem most sensitive to changes between clean and corrupted
-tokens. Might this be the location where the model has learned something about
-the difference between "." and "!"?
+layer of the model seem particularly sensitive to changes between clean and
+corrupted tokens. Other layers also register this change and could therefore be
+worth investigating, but the tenth layer scores the highest. Might this be the
+location where the model has learned something about the difference between "."
+and "!"?
 
 
 ### Steering the model
@@ -1285,7 +1286,7 @@ outputs = model.generate(
     max_new_tokens = 50,
     do_sample = True,
     temperature = 0.75,
-    top_p = 0.8,
+    top_p = 0.75,
     freq_penalty = 2,
     stop_at_eos = True,
     eos_token_id = model.tokenizer.eos_token_id,
