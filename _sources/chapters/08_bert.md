@@ -551,8 +551,8 @@ wrong = inspection_df[mask]
 ```
 
 Instances where the true label is Biography \& Memoir but the model predicts
-Politics are especially revealing. These are blurbs for memoirs written by
-political figures or by those who experienced significant political events.
+Politics are especially revealing. These are often blurbs for memoirs written
+by political figures or by those who experienced significant political events.
 
 ```{code-cell}
 :tags: [output_scroll]
@@ -608,7 +608,7 @@ Where:
 
 + $\phi_i(v)$ is the SHAP value for player $i$
 + $S$ is a subset of the set of all players $N$ excluding player $i$ $(N
-  \setminus {i})$
+  \setminus \{i\})$
 + $|S|$ is the number of players in subset $S$
 + $|N|$ is the total number of players
 + $v(S)$ is the value of a subset $S$
@@ -618,11 +618,13 @@ Where:
 
 ### Building an explainer
 
-Luckily, we needn't calculate these values by hand; we can use the SHAP
+Luckily, we needn't calculate these values by hand; we can use the [SHAP][shap]
 library instead. The logic of this library is to wrap a machine learning model
 with an `Explainer`, which, when called, will perform the above computations by
 permuting all features in each blurb and measuring the difference those
 permutations make for the final outcome.
+
+[shap]: https://shap.readthedocs.io/en/latest/
 
 We set up an `Explainer` below. It requires a few more defaults for the
 `pipeline` objection, so we will re-initialize that as well.
@@ -719,7 +721,7 @@ shap.plots.text(explanation)
 The output defaults to viewing SHAP values for the final prediction class, but
 click on other class names to see how the tokens interact with those as well.
 
-Below, we look at our mi-classified blurb from earlier, selecting only the two
+Below, we look at our mis-classified blurb from earlier, selecting only the two
 classes we targeted. This would be one way to compare (rather granularly) how
 the model has made its decisions. 
 
@@ -736,6 +738,11 @@ An `Explainer` can take multiple texts at time. Below, we load the SHAP values
 and their corresponding base values for a sampling of 1,000 blurbs from the
 dataset. With these, we'll look at SHAP values in the aggregate.
 
+:::{tip}
+This [script][script] shows you how to compute SHAP values at scale.
+
+[script]: https://github.com/t-shoemaker/2024_dtl_lm-interpretability/blob/main/src/compute_shap_values.py
+:::
 
 ```{code-cell}
 shap_values = pd.read_parquet("data/datasets/ltg_book_blurbs_1k-shap.parquet")
@@ -773,7 +780,8 @@ shap_values.loc[(500,)].idxmax(axis = 0)
 ```
 
 You may see subwords here. And note, too, the integers before each token: those
-are a token's index position in the blurb.
+are a token's index position in the blurb. The same string, "the," will have two
+different values.
 
 We'll address this information later on, but first, let's think a little more
 high-level. Below, we find tokens that consistently have the highest SHAP
@@ -791,7 +799,7 @@ mean_shap["text"] = mean_shap["text"].str.lower()
 mean_shap.set_index(["document_id", "token_id", "text"], inplace = True)
 ```
 
-On to calculating means.
+We move on to calculating means.
 
 ```{code-cell}
 mean_shap = mean_shap.groupby(["document_id", "text"]).mean()
@@ -866,7 +874,7 @@ summary listings of distant reading.
 topk
 ```
 
-That said, the Dataframe above glosses over what could be crucial,
+That said, the DataFrame above glosses over what could be crucial,
 context-sensitive information attached to each token. Remember: we have
 (potentially) different SHAP values for the 'same' two tokens because those
 tokens are at different index positions. More, our genre counts filter out

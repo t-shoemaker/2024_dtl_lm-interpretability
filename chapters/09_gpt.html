@@ -1,0 +1,2544 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>9. Generative Pre-Trained Transformers (GPT) &#8212; Introduction to Interpretability for Language Models</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/09_gpt';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="10. Cross Entropy" href="10_cross-entropy.html" />
+    <link rel="prev" title="8. Bidirectional Encoder Representations from Transformers (BERT)" href="08_bert.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Introduction to Interpretability for Language Models</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Overview
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Python Basics</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_getting-started.html">1. Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_python-basics.html">2. Python Basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_data-analysis-basics.html">3. Data Analysis in Python</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Language Models</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="04_ngram-models.html">4. N-gram Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_vectorization.html">5. Vectorization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_vector-spaces.html">6. Vector Space Semantics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Large Language Models</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="07_intro-to-llms.html">7. Large Language Models: An Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_bert.html">8. Bidirectional Encoder Representations from Transformers (BERT)</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">9. Generative Pre-Trained Transformers (GPT)</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="10_cross-entropy.html">10. Cross Entropy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11_attention-in-vector-space.html">11. Attention in Vector Space</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/t-shoemaker/2024_dtl_lm-interpretability" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/09_gpt.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Generative Pre-Trained Transformers (GPT)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">9.1. Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#text-generation">9.2. Text Generation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sampling-strategies">9.2.1. Sampling strategies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#probable-sequences">9.2.2. Probable sequences</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-candidate-pool">9.3. The Candidate Pool</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#going-forwards">9.3.1. Going forwards</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#going-backwards">9.3.2. Going backwards</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanistic-interpretability">9.4. Mechanistic Interpretability</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-a-hooked-model">9.4.1. Using a hooked model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#processing-sentence-pairs">9.4.2. Processing sentence pairs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#activation-patching">9.4.3. Activation patching</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#steering-the-model">9.4.4. Steering the model</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="generative-pre-trained-transformers-gpt">
+<h1><span class="section-number">9. </span>Generative Pre-Trained Transformers (GPT)<a class="headerlink" href="#generative-pre-trained-transformers-gpt" title="Link to this heading">#</a></h1>
+<p>This chapter uses GPT-2 as an example of a generative large language model.
+After looking at how the model represents next token predictions, it overviews
+sampling strategies and discusses some approaches to investigate the sampling
+space. The second half of the chapter moves to mechanistic interpretability,
+using activation patching and model steering to isolate GPT-2’s behavior in
+specific parts of the network architecture.</p>
+<ul class="simple">
+<li><p><strong>Data:</strong> A small dataset of sentence pairs with contrasting tokens</p></li>
+<li><p><strong>Credits:</strong> Portions of this chapter are adapted from Neel Nanda’s
+<a class="reference external" href="https://colab.research.google.com/github/TransformerLensOrg/TransformerLens/blob/main/demos/Activation_Patching_in_TL_Demo.ipynb#scrollTo=vPo31ZtqYxNO">Activation Patching in TransformerLens Demo</a></p></li>
+</ul>
+<section id="preliminaries">
+<h2><span class="section-number">9.1. </span>Preliminaries<a class="headerlink" href="#preliminaries" title="Link to this heading">#</a></h2>
+<p>Here are the libraries we will need.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">GenerationConfig</span><span class="p">,</span> <span class="n">pipeline</span>
+<span class="kn">import</span> <span class="nn">transformer_lens</span> <span class="k">as</span> <span class="nn">tl</span>
+<span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Later on, we will use a small dataset of sentence pairs. Let’s load them now.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pairs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="s2">&quot;data/datasets/exclamations.parquet&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now: the model. We’ll be using GPT-2, a precursor to models like ChatGPT
+released in 2019.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ckpt</span> <span class="o">=</span> <span class="s2">&quot;gpt2&quot;</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">ckpt</span><span class="p">,</span> <span class="n">use_fast</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">ckpt</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Once it’s loaded, put the model in evaluation mode. In addition to this step,
+we turn off gradient accumulation with a global value. This way we don’t need
+the context manager syntax.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">torch</span><span class="o">.</span><span class="n">set_grad_enabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GPT2LMHeadModel(
+  (transformer): GPT2Model(
+    (wte): Embedding(50257, 768)
+    (wpe): Embedding(1024, 768)
+    (drop): Dropout(p=0.1, inplace=False)
+    (h): ModuleList(
+      (0-11): 12 x GPT2Block(
+        (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (attn): GPT2SdpaAttention(
+          (c_attn): Conv1D()
+          (c_proj): Conv1D()
+          (attn_dropout): Dropout(p=0.1, inplace=False)
+          (resid_dropout): Dropout(p=0.1, inplace=False)
+        )
+        (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (mlp): GPT2MLP(
+          (c_fc): Conv1D()
+          (c_proj): Conv1D()
+          (act): NewGELUActivation()
+          (dropout): Dropout(p=0.1, inplace=False)
+        )
+      )
+    )
+    (ln_f): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  )
+  (lm_head): Linear(in_features=768, out_features=50257, bias=False)
+)
+</pre></div>
+</div>
+</div>
+</div>
+<p>A last setup step: GPT-2 didn’t have a padding token, which the <code class="docutils literal notranslate"><span class="pre">transformers</span></code>
+library requires. You can set one manually like so:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span> <span class="o">=</span> <span class="mi">50256</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pad token:&quot;</span><span class="p">,</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Pad token: &lt;|endoftext|&gt;
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="text-generation">
+<h2><span class="section-number">9.2. </span>Text Generation<a class="headerlink" href="#text-generation" title="Link to this heading">#</a></h2>
+<p>You’ll recognize the workflow for text generation: it works much like what we
+did with BERT. First, write out a prompt and tokenize it.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;It was the best of times, it was the&quot;</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">return_tensors</span> <span class="o">=</span> <span class="s2">&quot;pt&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>With that done, send the inputs to the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Just as with other inferences created with <code class="docutils literal notranslate"><span class="pre">transformers</span></code>, there are
+potentially a variety of outputs available to you. But we’ll only focus on
+logits. Whereas in logistic regression, logits are log-odds, here they are just
+raw scores from the model.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span><span class="o">.</span><span class="n">logits</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[ -37.0891,  -36.4551,  -40.3287,  ...,  -45.2598,  -43.0251,
+           -37.6606],
+         [-120.1124, -119.2538, -125.9656,  ..., -126.5557, -123.9600,
+          -123.0143],
+         [-102.5702,  -99.8013, -103.0988,  ..., -102.5064, -105.2243,
+          -101.2428],
+         ...,
+         [ -93.0438,  -92.8758, -100.0216,  ..., -104.6165,  -95.6839,
+           -96.1380],
+         [ -86.0976,  -86.6460,  -92.5250,  ...,  -94.8941,  -93.1199,
+           -89.9510],
+         [ -95.6606,  -94.0251,  -98.6485,  ...,  -98.9755, -100.9134,
+           -94.9694]]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Take a look at the shape of these logits. The model has assigned a big tensor
+of logits to every token in the prompt. The number of these tokens is the same
+as that of the input sequence, and the size of their tensors corresponds to the
+total vocabulary size of the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">outputs</span><span class="o">.</span><span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;Unmatched size&quot;</span>
+<span class="k">assert</span> <span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">vocab_size</span> <span class="o">==</span> <span class="n">outputs</span><span class="o">.</span><span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;Unmatched size&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>So far, we do not have a newly generated token. Instead, we have next token
+information for every token in our input sequence. Take the last of the logit
+tensors to get the one that corresponds to the final token in the input
+sequence. It’s from this tensor that we determine what the next token should
+be.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">last_token_logits</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">logits</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>To express these logits in terms of probabilities, we must run them through
+<strong>softmax</strong>. The formula for this function is below:</p>
+<div class="math notranslate nohighlight">
+\[
+\sigma(z_i) = \frac{e^{z_i}}{\sum_{j=1}^n e^{z_j}}
+\]</div>
+<p>Where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(e\)</span> is the base of the natural logarithm</p></li>
+<li><p><span class="math notranslate nohighlight">\(z_i\)</span> is the logit for class <span class="math notranslate nohighlight">\(i\)</span> (in the case, every possible token)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\sum_{j=1}^n e^{z_j}\)</span> is the sum of the exponentials of all logits</p></li>
+</ul>
+<p>This equation looks more intimidating than it is. A toy example implements it
+below:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.25</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.87</span><span class="p">]</span>
+<span class="n">exponentiated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">summed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">exponentiated</span><span class="p">)</span>
+
+<span class="n">exponentiated</span> <span class="o">/</span> <span class="n">summed</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0.52739573, 0.11193868, 0.36066559])
+</pre></div>
+</div>
+</div>
+</div>
+<p>Each of these logits is now a probability. The sum of these probabilities will
+equal <span class="math notranslate nohighlight">\(1\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">exponentiated</span> <span class="o">/</span> <span class="n">summed</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>That said, there’s no need for a custom function when <code class="docutils literal notranslate"><span class="pre">torch</span></code> can do it for us.
+Below, we run our last token logits through softmax.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">last_token_logits</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Take the highest value to determine the next predicted token.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">next_token_id</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Next predicted token: </span><span class="si">{</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">next_token_id</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Next predicted token: worst
+</pre></div>
+</div>
+</div>
+</div>
+<p>The model’s <code class="docutils literal notranslate"><span class="pre">.generate()</span></code> method will do all of the above. It will also
+recursively build a new input sequence so that you can have it return multiple
+new tokens.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">,</span> <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Full sequence: </span><span class="si">{</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Full sequence: It was the best of times, it was the worst of times.
+</pre></div>
+</div>
+</div>
+</div>
+<p>Or, just wrap everything in a <code class="docutils literal notranslate"><span class="pre">pipeline</span></code>.</p>
+<div class="cell tag_remove-stderr docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">generator</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="s2">&quot;text-generation&quot;</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="p">,</span> <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="p">,</span><span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;generated_text&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the worst of times.
+</pre></div>
+</div>
+</div>
+</div>
+<p>Supply an argument to <code class="docutils literal notranslate"><span class="pre">num_return_sequences</span></code> to get multiple output sequences.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">num_return_sequences</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="s2">&quot;generated_text&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the best of times and
+It was the best of times, it was the hardest thing, because
+It was the best of times, it was the worst of times,
+It was the best of times, it was the greatest of times.
+It was the best of times, it was the best of times...&quot;
+</pre></div>
+</div>
+</div>
+</div>
+<section id="sampling-strategies">
+<h3><span class="section-number">9.2.1. </span>Sampling strategies<a class="headerlink" href="#sampling-strategies" title="Link to this heading">#</a></h3>
+<p>Even with highly predictable sequences (like our prompt), we will not get the
+same output every time we generate a sequence. This is because GPT-2 samples
+from the softmax probabilities. It’s possible to turn that sampling off
+altogether, but there are also a number of different ways to perform this
+sampling.</p>
+<p><strong>Greedy sampling</strong> isn’t really sampling at all. It takes the most likely
+token every time. Setting <code class="docutils literal notranslate"><span class="pre">do_sample</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code> will cause GPT-2 to use this
+strategy. The outputs will be <strong>deterministic</strong>: great for reliable outputs,
+bad for scenarios in which you want varied responses.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="p">,</span><span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">do_sample</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;generated_text&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the worst of times.
+</pre></div>
+</div>
+</div>
+</div>
+<p>In an earlier chapter, we implemented <strong>top-k</strong> sampling. It limits the
+sampling pool to only the top <code class="docutils literal notranslate"><span class="pre">k</span></code>-most probable tokens. This makes outputs more
+diverse than in greedy sampling, though it requires hard coding a value for
+<code class="docutils literal notranslate"><span class="pre">k</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="p">,</span>
+    <span class="n">do_sample</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">top_k</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">num_return_sequences</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="s2">&quot;generated_text&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the best of times,
+It was the best of times, it was the best of times as
+It was the best of times, it was the best of times.&quot;
+It was the best of times, it was the most wonderful of times
+It was the best of times, it was the worst of times.
+</pre></div>
+</div>
+</div>
+</div>
+<p>Similar to top-k sampling is <strong>top-p</strong>, or <strong>nucleus sampling</strong>. Instead of
+fixing the size of the sampling pool to <code class="docutils literal notranslate"><span class="pre">k</span></code> tokens, this strategy considers the
+top tokens whose cumulative probability is at least <code class="docutils literal notranslate"><span class="pre">p</span></code>. Again, this requires a
+hard-coded value for <code class="docutils literal notranslate"><span class="pre">p</span></code>, but top-p sampling is more adaptive than top-k.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="p">,</span>
+    <span class="n">do_sample</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">top_p</span> <span class="o">=</span> <span class="mf">0.9</span><span class="p">,</span>
+    <span class="n">num_return_sequences</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="s2">&quot;generated_text&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the worst of times.
+It was the best of times, it was the worst of times.
+It was the best of times, it was the best of times,&quot;
+It was the best of times, it was the worst of times,
+It was the best of times, it was the worst of times,
+</pre></div>
+</div>
+</div>
+</div>
+<p>Adjust the <strong>temperature</strong> parameter to control the randomness of model
+predictions. The value you use for temperature scales the logits before
+applying softmax. Lower temperatures <span class="math notranslate nohighlight">\(&lt;1\)</span> make the model outputs more
+deterministic by sharpening the probability distribution, while higher
+temperatures <span class="math notranslate nohighlight">\(&gt;1\)</span> make model outputs more random by flattening the probability
+distribution.</p>
+<p>Low-temperature output looks like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="p">,</span>
+    <span class="n">do_sample</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">temperature</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">num_return_sequences</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="s2">&quot;generated_text&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the best of times,&quot;
+It was the best of times, it was the worst of times,
+It was the best of times, it was the worst of times.
+It was the best of times, it was the worst of times.
+It was the best of times, it was the worst of times,&quot;
+</pre></div>
+</div>
+</div>
+</div>
+<p>High-temperature like this:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="p">,</span>
+    <span class="n">do_sample</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">temperature</span> <span class="o">=</span> <span class="mf">50.0</span><span class="p">,</span>
+    <span class="n">num_return_sequences</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="s2">&quot;generated_text&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the darkest to ever do
+It was the best of times, it was the hardest days…&quot; the
+It was the best of times, it was the closest match I was
+It was the best of times, it was the only other we left
+It was the best of times, it was the time for players from
+</pre></div>
+</div>
+</div>
+</div>
+<p>Set temperature to <code class="docutils literal notranslate"><span class="pre">1</span></code> to use logits as they are.</p>
+<p><strong>Beam searching</strong> is the last strategy. It involves tracking multiple possible
+generation sequences simultaneously. During the generation process, the model
+retains a predetermined number of sequences, or <strong>beams</strong>, based on their
+cumulative probabilities; this number is called the <strong>beam width</strong>. The model
+iteratively expands each beam with a predicted token and prunes the beams to
+retain only the best ones. Finally, the sequence with the highest cumulative
+probability is selected as the output.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="p">,</span>
+    <span class="n">do_sample</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">num_beams</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">num_return_sequences</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="s2">&quot;generated_text&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the worst of times.
+It was the best of times, it was the best of times.
+It was the best of times, it was the worst of times,
+It was the best of times, it was the best of times,
+It was the best of times, it was the worst of times,&quot;
+</pre></div>
+</div>
+</div>
+</div>
+<p>The advantage of doing a beam search is that the model can navigate the
+probability space to find sequences that may be better overall choices for
+output than if it could only construct one sequence on the flight. Its
+disadvantage: beam searches are computationally expensive.</p>
+<p>Mixing strategies together usually works best. Use a <code class="docutils literal notranslate"><span class="pre">GenerationConfig</span></code> to set
+up your pipeline. This will accept several different parameters, including an
+<strong>early stopping</strong> value, which will cut generation off in beam-based searches
+once <code class="docutils literal notranslate"><span class="pre">num_beams</span></code> candidates have completed.</p>
+<div class="cell tag_remove-stderr docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">config</span> <span class="o">=</span> <span class="n">GenerationConfig</span><span class="p">(</span>
+    <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
+    <span class="n">do_sample</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
+    <span class="n">temperature</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
+    <span class="n">top_p</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span> 
+    <span class="n">num_return_sequences</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span>
+    <span class="s2">&quot;text-generation&quot;</span><span class="p">,</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="p">,</span>
+    <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">,</span>
+    <span class="n">generation_config</span> <span class="o">=</span> <span class="n">config</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>Let’s generate text with this configuration.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="s2">&quot;generated_text&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the best of places. You couldn&#39;t tell that in a game like mine, I thought I just went there and waited. When
+It was the best of times, it was the worst. But what&#39;s changed in recent years — with that first, most surprising drop in public attention in the eight years to
+It was the best of times, it was the worst of times, but it could get ugly,&quot; McInnes said.
+
+When he asked why they took no action
+It was the best of times, it was the best of things in their hearts, they felt loved. It wasn&#39;t a great season in our lives, that one moment was
+It was the best of times, it was the worst. The good and sad and bad. It just left me in a very emotional place.&quot;
+
+As the team continues
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="probable-sequences">
+<h3><span class="section-number">9.2.2. </span>Probable sequences<a class="headerlink" href="#probable-sequences" title="Link to this heading">#</a></h3>
+<p>There are of course any number of ways to evaluate the sequences above using
+methods developed in literary studies. But we can supplement said methods with
+some metrics that express sequences in terms of a model’s expectations.</p>
+<p>Let’s return to the first way we processed our prompt. Sending the token IDs to
+the <code class="docutils literal notranslate"><span class="pre">labels</span></code> parameter enables the model to calculate loss.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loss: </span><span class="si">{</span><span class="n">outputs</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loss: 2.2814
+</pre></div>
+</div>
+</div>
+</div>
+<p>This is <strong>cross-entropy loss</strong>. We saw it in our first language generation
+chapter. It measures the difference between the predicted probability
+distribution of the next token (according to the logits) and the actual token
+(what’s in the input sequence). Exponentiate it to express the loss in terms of
+<strong>perplexity</strong>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Perplexity: </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">loss</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Perplexity: 9.7907
+</pre></div>
+</div>
+</div>
+</div>
+<p>Recall that perplexity is the average number of guesses the model has to make
+to arrive at the full sequence.</p>
+<p>One way to think about sequence candidates is to calculate their perplexity.
+Below, we generate multiple sequences from our current <code class="docutils literal notranslate"><span class="pre">pipeline</span></code>, store the
+text, and send that text back to the model to calculate perplexity. Note that
+we need to run sequences in a for loop when sending them to a model, otherwise
+the model will calculate loss on the whole batch.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+<span class="n">sequences</span> <span class="o">=</span> <span class="p">[</span><span class="n">sequence</span><span class="p">[</span><span class="s2">&quot;generated_text&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here’s the for loop, which we cap off by formatting to a DataFrame:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;perplexity&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+<span class="k">for</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">:</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">return_tensors</span> <span class="o">=</span> <span class="s2">&quot;pt&quot;</span><span class="p">)</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">])</span>
+    <span class="n">perplexity</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">loss</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="n">results</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">[</span><span class="s2">&quot;perplexity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">perplexity</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s sort by perplexity and see which sequence is best—though, of course,
+what best means here is “most probable according to the model.”</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;perplexity&quot;</span><span class="p">)[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the best of times, it was the best of times, but if he were at this moment the greatest thing was now coming and
+</pre></div>
+</div>
+</div>
+</div>
+<p>And here’s the worst:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;perplexity&quot;</span><span class="p">,</span> <span class="n">ascending</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It was the best of times, it was the worst. But the people that worked there never came, it really doesn&#39;t mean anything now,&quot; a former firefighter said.
+</pre></div>
+</div>
+</div>
+</div>
+<p>What if, instead of mean perplexity for a sequence, we wanted token-by-token
+perplexity? That would give us average number of guesses the model would need
+to make to get the next token in a sequence. The function below will perform
+this calculation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">per_token_perplexity</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the perplexity of each token in a sequence.</span>
+<span class="sd">    </span>
+<span class="sd">    Reference: https://stackoverflow.com/a/77433933</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logits : torch.Tensor</span>
+<span class="sd">        Sequence logits</span>
+<span class="sd">    labels : torch.Tensor</span>
+<span class="sd">        Sequence token IDs</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    perplexities : torch.Tensor</span>
+<span class="sd">        Every token&#39;s perplexity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Shift the logits and labels by one position so we start from the</span>
+    <span class="c1"># transition of the first token to the second token</span>
+    <span class="n">logits</span> <span class="o">=</span> <span class="n">logits</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+
+    <span class="c1"># Sequeeze out the batch dimensions</span>
+    <span class="n">logits</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">labels</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+
+    <span class="c1"># Calculate the cross entropy loss and exponentiate it for token-by-token</span>
+    <span class="c1"># perplexity</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">reduction</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span><span class="p">)</span>
+    <span class="n">perplexities</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">perplexities</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s run it on the full version of original prompt.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;It was the best of times, it was the worst of times.&quot;</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">return_tensors</span> <span class="o">=</span> <span class="s2">&quot;pt&quot;</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
+<span class="n">perp_token</span> <span class="o">=</span> <span class="n">per_token_perplexity</span><span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">logits</span><span class="p">,</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And the results:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">decoded</span> <span class="o">=</span> <span class="p">[</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()]</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">perp</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">decoded</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">perp_token</span><span class="p">)):</span>
+    <span class="n">token</span><span class="p">,</span> <span class="n">next_token</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">decoded</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">token</span><span class="si">:</span><span class="s2">6</span><span class="si">}{</span><span class="n">next_token</span><span class="si">:</span><span class="s2">6</span><span class="si">}{</span><span class="n">perp</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>It    was   39.53
+was   the   20.62
+the   best  64.03
+best  of    13.94
+of    times 1.68
+times ,     6.51
+,     it    39.84
+it    was   1.42
+was   the   1.85
+the   worst 2.33
+worst of    1.33
+of    times 1.04
+times .     3.27
+</pre></div>
+</div>
+</div>
+</div>
+<p>What other famous sentences have this pattern? You could use such a strategy to
+answer this question, which may in turn tell you something about what GPT-2 has
+absorbed about famous quotes, stock phrases, and cultural memes.</p>
+</section>
+</section>
+<section id="the-candidate-pool">
+<h2><span class="section-number">9.3. </span>The Candidate Pool<a class="headerlink" href="#the-candidate-pool" title="Link to this heading">#</a></h2>
+<p>Let’s think now about candidate tokens. Which tokens are likely to be in
+consideration when GPT-2 generates text?</p>
+<section id="going-forwards">
+<h3><span class="section-number">9.3.1. </span>Going forwards<a class="headerlink" href="#going-forwards" title="Link to this heading">#</a></h3>
+<p>One way to look at this pool would be to look at the logit tensor for the final
+token in a sequence. Instead of picking just the maximum value, the function
+below selects <code class="docutils literal notranslate"><span class="pre">k</span></code> most likely tokens.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_top_candidates</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the top `k` most likely tokens from a tensor of logits.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logits : torch.Tensor</span>
+<span class="sd">        The logit tensor</span>
+<span class="sd">    k : int</span>
+<span class="sd">        Number of tokens</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    candidates : list[tuple]</span>
+<span class="sd">        Top `k` candidates and their probability scores</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert the logits to probabilities and squeeze out the batch dimension</span>
+    <span class="n">probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+    
+    <span class="c1"># Select the top `k` candidates. The function below returns the</span>
+    <span class="c1"># probabilities and the token IDs</span>
+    <span class="n">values</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">k</span><span class="p">)</span>
+
+    <span class="c1"># Decode the token IDs. Zip the result up in a list of tuples with the</span>
+    <span class="c1"># probabilities and return</span>
+    <span class="n">decoded</span> <span class="o">=</span> <span class="p">[</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">item</span><span class="p">())</span> <span class="k">for</span> <span class="n">token</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">decoded</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">candidates</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>One way to use this function would be to run it on complete sentences. For each
+token, we can get a list of candidates that the model would have generated.
+Often, this will conflict with what an author has written. Below, for example,
+we send GPT-2 the first line of Rosmarie Waldrop’s poem, “King Lear’s Nothing.”</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;Thrilled by quantity as language.&quot;</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">return_tensors</span> <span class="o">=</span> <span class="s2">&quot;pt&quot;</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we iterate through each token ID, get its corresponding logit tensor, and
+get the top <code class="docutils literal notranslate"><span class="pre">k</span></code> candidates for the token.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">decoded</span> <span class="o">=</span> <span class="p">[</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()]</span>
+<span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">decoded</span><span class="p">)):</span>
+    <span class="c1"># First, get the current token and the next token in the sequence</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">decoded</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">next_token</span> <span class="o">=</span> <span class="n">decoded</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">decoded</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;END&quot;</span>
+
+    <span class="c1"># Extract the corresponding logit and calculate the top candidates. Run</span>
+    <span class="c1"># `repr()` over the tokens to ensure whitespace characters print correctly</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="n">get_top_candidates</span><span class="p">(</span><span class="n">outputs</span><span class="o">.</span><span class="n">logits</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">repr</span><span class="p">(</span><span class="n">token</span><span class="p">),</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">]</span>
+    
+    <span class="c1"># Build a table and print to screen</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">tabulate</span><span class="p">(</span><span class="n">candidates</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;token&quot;</span><span class="p">,</span> <span class="s2">&quot;prob&quot;</span><span class="p">],</span> <span class="n">showindex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">next_token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Th -&gt; r
+    token         prob
+--  -------  ---------
+ 0  &#39;.&#39;      0.0398853
+ 1  &#39;,&#39;      0.0243819
+ 2  &#39;\n&#39;     0.0227934
+ 3  &#39;-&#39;      0.0144529
+ 4  &#39; of&#39;    0.0122214
+
+r -&gt; illed
+    token          prob
+--  --------  ---------
+ 0  &#39;iller&#39;   0.168743
+ 1  &#39;illing&#39;  0.105003
+ 2  &#39;ills&#39;    0.100085
+ 3  &#39;illed&#39;   0.0681699
+ 4  &#39;ash&#39;     0.0609181
+
+illed -&gt; by
+    token         prob
+--  -------  ---------
+ 0  &#39; by&#39;    0.0775288
+ 1  &#39;,&#39;      0.0575197
+ 2  &#39; and&#39;   0.0416333
+ 3  &#39; to&#39;    0.0318335
+ 4  &#39; with&#39;  0.0268405
+
+by -&gt; quantity
+    token         prob
+--  -------  ---------
+ 0  &#39; the&#39;   0.221262
+ 1  &#39; a&#39;     0.061908
+ 2  &#39; his&#39;   0.0319538
+ 3  &#39; an&#39;    0.0138029
+ 4  &#39; this&#39;  0.012655
+
+quantity -&gt; as
+    token         prob
+--  -------  ---------
+ 0  &#39; of&#39;    0.232849
+ 1  &#39;,&#39;      0.190326
+ 2  &#39; and&#39;   0.118346
+ 3  &#39;.&#39;      0.0538793
+ 4  &#39;\n&#39;     0.0376816
+
+as -&gt; language
+    token            prob
+--  ----------  ---------
+ 0  &#39; well&#39;     0.0478401
+ 1  &#39; a&#39;        0.0428395
+ 2  &#39; follows&#39;  0.0409114
+ 3  &#39; of&#39;       0.0401446
+ 4  &#39; the&#39;      0.0325692
+
+language -&gt; .
+    token         prob
+--  -------  ---------
+ 0  &#39;,&#39;      0.0958364
+ 1  &#39; is&#39;    0.0796764
+ 2  &#39;.&#39;      0.0448734
+ 3  &#39; and&#39;   0.0397875
+ 4  &#39; of&#39;    0.0295971
+
+. -&gt; END
+    token         prob
+--  -------  ---------
+ 0  &#39;\n&#39;     0.268972
+ 1  &#39; The&#39;   0.0409129
+ 2  &#39;\n\n&#39;   0.0235537
+ 3  &#39; It&#39;    0.0216826
+ 4  &#39; I&#39;     0.0202456
+</pre></div>
+</div>
+</div>
+</div>
+<p>This logic would work for completions as well. Jed Dobson gives the following
+two examples in <a class="reference external" href="https://github.com/jeddobson/blackbox-transformers/tree/main">this article</a>, which demonstrate differences in how the
+model responds to gendered pronouns.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prompts</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Dartmouth College, where she graduated last year with a degree in&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Dartmouth College, where he graduated last year with a degree in&quot;</span>
+<span class="p">]</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span> <span class="n">return_tensors</span> <span class="o">=</span> <span class="s2">&quot;pt&quot;</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s look at differences across the top-25 candidate completions for these two
+prompts.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">logits</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span> <span class="n">outputs</span><span class="o">.</span><span class="n">logits</span><span class="p">):</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="n">get_top_candidates</span><span class="p">(</span><span class="n">logits</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">25</span><span class="p">)</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">repr</span><span class="p">(</span><span class="n">token</span><span class="p">),</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">]</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">tabulate</span><span class="p">(</span><span class="n">candidates</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;token&quot;</span><span class="p">,</span> <span class="s2">&quot;prob&quot;</span><span class="p">],</span> <span class="n">showindex</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dartmouth College, where she graduated last year with a degree in
+    token                    prob
+--  -----------------  ----------
+ 0  &#39; English&#39;         0.0399187
+ 1  &#39; political&#39;       0.0307756
+ 2  &#39; social&#39;          0.0247362
+ 3  &#39; psychology&#39;      0.0244376
+ 4  &#39; business&#39;        0.0205188
+ 5  &#39; economics&#39;       0.0203776
+ 6  &#39; environmental&#39;   0.0195505
+ 7  &#39; public&#39;          0.0195308
+ 8  &#39; sociology&#39;       0.0160273
+ 9  &#39; computer&#39;        0.0156798
+10  &#39; history&#39;         0.0150229
+11  &#39; international&#39;   0.0134101
+12  &#39; communications&#39;  0.0123655
+13  &#39; biology&#39;         0.011762
+14  &#39; chemistry&#39;       0.0113085
+15  &#39; education&#39;       0.0110484
+16  &#39; journalism&#39;      0.0105896
+17  &#39; the&#39;             0.00922641
+18  &#39; philosophy&#39;      0.0085999
+19  &#39; mathematics&#39;     0.00809589
+20  &#39; electrical&#39;      0.00794439
+21  &#39; law&#39;             0.00775704
+22  &#39; anthropology&#39;    0.00640403
+23  &#39; music&#39;           0.00611613
+24  &#39; science&#39;         0.00590318
+
+Dartmouth College, where he graduated last year with a degree in
+    token                    prob
+--  -----------------  ----------
+ 0  &#39; English&#39;         0.0383863
+ 1  &#39; political&#39;       0.0345537
+ 2  &#39; economics&#39;       0.0344547
+ 3  &#39; business&#39;        0.0241869
+ 4  &#39; computer&#39;        0.0223832
+ 5  &#39; psychology&#39;      0.02205
+ 6  &#39; chemistry&#39;       0.0163346
+ 7  &#39; public&#39;          0.0161284
+ 8  &#39; environmental&#39;   0.015809
+ 9  &#39; history&#39;         0.0156231
+10  &#39; social&#39;          0.015187
+11  &#39; electrical&#39;      0.0144694
+12  &#39; international&#39;   0.0139948
+13  &#39; biology&#39;         0.0139237
+14  &#39; sociology&#39;       0.0130055
+15  &#39; mechanical&#39;      0.0116442
+16  &#39; communications&#39;  0.0111418
+17  &#39; mathematics&#39;     0.0106668
+18  &#39; journalism&#39;      0.00997044
+19  &#39; physics&#39;         0.00984016
+20  &#39; engineering&#39;     0.00982156
+21  &#39; philosophy&#39;      0.00896613
+22  &#39; the&#39;             0.00808497
+23  &#39; education&#39;       0.00795386
+24  &#39; law&#39;             0.00733242
+</pre></div>
+</div>
+</div>
+</div>
+<p>To study this further, you might imagine aggregating whole pools of these
+candidates for various prompts. How, at scale, do you see the model respond
+differently?</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Were you to do this experiment, you might consider <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.jaccard_score.html">Jaccard similarity</a>,
+which compares how similar two sets are by dividing their <a class="reference external" href="https://en.wikipedia.org/wiki/Intersection_(set_theory)">intersection</a>
+by their <a class="reference external" href="https://en.wikipedia.org/wiki/Union_(set_theory)">union</a>. This would give you a metric to represent similarity
+in top-<code class="docutils literal notranslate"><span class="pre">k</span></code> token results.</p>
+</div>
+</section>
+<section id="going-backwards">
+<h3><span class="section-number">9.3.2. </span>Going backwards<a class="headerlink" href="#going-backwards" title="Link to this heading">#</a></h3>
+<p>Here’s something more speculative. Earlier we were able to determine the
+perplexity of a sequence by having the model calculate loss. What if we used
+that functionality to think about prompting in reverse? Could that also tell us
+something about what the model “knows”?</p>
+<p>Below, the <code class="docutils literal notranslate"><span class="pre">prepend_prompt()</span></code> function takes an input sequence, <code class="docutils literal notranslate"><span class="pre">target</span></code>, and
+samples from all possible tokens in GPT-2. Then, it builds a series of
+candidate sequences by prepending those samples to the original sequence. With
+these candidate sequences built, it runs them through the model, asking the
+model to calculate loss along the way. From loss, we can get to perplexity, and
+we store that score along with its corresponding candidate sequence. The
+selected candidate sequence is the one with the lowest perplexity—that is,
+the sequence the model is most likely to guess.</p>
+<p>This function also uses recursion to prepend multiple tokens to a sequence.
+That requires some logic we haven’t covered yet, but see if you can figure out
+how it works!</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">prepend_prompt</span><span class="p">(</span>
+    <span class="n">target</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">n_samp</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">n_tokens</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">perplexity</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepend a target prompt with `n_tokens` that minimize the target&#39;s</span>
+<span class="sd">    perplexity.</span>
+
+<span class="sd">    Note: this function is meant for instructional purposes and does not</span>
+<span class="sd">    leverage batching. It should not be used at scale.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    target : str</span>
+<span class="sd">        The target prompt</span>
+<span class="sd">    tokenizer : GPT2TokenizerFast</span>
+<span class="sd">        The tokenizer</span>
+<span class="sd">    model : GPT2LMHeadModel</span>
+<span class="sd">        The model</span>
+<span class="sd">    n_samp : int</span>
+<span class="sd">        Number of candidate tokens to sample</span>
+<span class="sd">    n_tokens : int</span>
+<span class="sd">        Number of tokens to prepend to the prompt</span>
+<span class="sd">    perplexity : None or float</span>
+<span class="sd">        Full sequence&#39;s perplexity</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    prepended : tuple[str, float]</span>
+<span class="sd">        The prepended prompt and its perplexity</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># First, handle the recursive condition: if no more tokens to prepend,</span>
+    <span class="c1"># return the target string and perplexity</span>
+    <span class="k">if</span> <span class="n">n_tokens</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">target</span><span class="p">,</span> <span class="n">perplexity</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="c1"># Tokenize the target string and sample `n_samp` from the model&#39;s</span>
+    <span class="c1"># vocabulary</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">return_tensors</span> <span class="o">=</span> <span class="s2">&quot;pt&quot;</span><span class="p">)</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_samp</span><span class="p">))</span>
+
+    <span class="c1"># Ensure the target string tokens and sampled tokens are on the same</span>
+    <span class="c1"># device, then concatenate them to a (n_samp, len(inputs) + 1) batch</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">samples</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_samp</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">inputs</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">n_samp</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">dim</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="p">)</span>
+
+    <span class="c1"># For each candidate sequence in the batch, run it through the model and</span>
+    <span class="c1"># calculate the perplexity score. Append it to a buffer</span>
+    <span class="n">perplexities</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">input_ids</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">input_ids</span> <span class="o">=</span> <span class="n">input_ids</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">input_ids</span><span class="p">)</span>
+        <span class="n">perp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">loss</span><span class="p">)</span>
+        <span class="n">perplexities</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">perp</span><span class="p">))</span>
+
+    <span class="c1"># Sort the candidate sequences by perplexity, then select the lowest score.</span>
+    <span class="c1"># Convert the top candidate sequence to a string</span>
+    <span class="n">perplexities</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">target</span><span class="p">,</span> <span class="n">perplexity</span> <span class="o">=</span> <span class="n">perplexities</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">clean_up_tokenization_spaces</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Recurse. Be sure to decrement `n_tokens`!</span>
+    <span class="k">return</span> <span class="n">prepend_prompt</span><span class="p">(</span>
+        <span class="n">target</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">n_samp</span><span class="p">,</span> <span class="n">n_tokens</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">perplexity</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s see if we can build a Python for loop header, <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">i</span> <span class="pre">in</span> <span class="pre">range(10):</span></code>.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot; i in range(10):&quot;</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">prepended</span><span class="p">,</span> <span class="n">perp</span> <span class="o">=</span> <span class="n">prepend_prompt</span><span class="p">(</span>
+        <span class="n">prompt</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">n_samp</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span> <span class="n">n_tokens</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prepended</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">perp</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> rc i in range(10): (86.7323)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> insert i in range(10): (59.6841)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> params i in range(10): (42.6199)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> Context i in range(10): (91.9952)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> quantity i in range(10): (66.4418)
+</pre></div>
+</div>
+</div>
+</div>
+<p>It doesn’t quite get us what we want, but the reason why is probably clear:
+<code class="docutils literal notranslate"><span class="pre">n_samp</span></code> controls how many candidate sequences. If the ideal token isn’t
+sampled from the tokenizer, then we’ll never see it. That said, the output
+above does get us somewhat in the realm of code-like tokens. This could work.
+Were we to consider the entire vocabulary of tokens, we could very well get
+what we want.</p>
+<p>This <a class="reference external" href="https://github.com/t-shoemaker/2024_dtl_lm-interpretability/blob/main/src/prompt_prepend_batched.py">script</a> performs the same function above but with batching. That
+speeds up the process to some extent—enough so that we can try sampling from
+the entire model vocabulary. When we do, we’ll see that we get the expected
+answer.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>src/prompt_prepend_batched.py<span class="w"> </span><span class="s2">&quot; pandas as pd&quot;</span><span class="w"> </span>--n_samp<span class="w"> </span><span class="m">50257</span><span class="w"> </span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Prompt</span><span class="p">:</span> <span class="s1">&#39; pandas as pd&#39;</span>
+<span class="n">Output</span><span class="p">:</span> <span class="s1">&#39;import pandas as pd&#39;</span>
+<span class="n">Perplexity</span><span class="p">:</span> <span class="mf">27.4596</span>
+</pre></div>
+</div>
+<p>The problem? It takes several minutes to run on a consumer-grade laptop.
+Getting access to a GPU would ameliorate that problem to some extent, but even
+better would be to come up with a different, and smarter sampling strategy.
+Additionally, you might think about what an ideal outcome of prepending should
+be. Is minimizing perplexity actually the best goal for exploring the model’s
+generation space?</p>
+</section>
+</section>
+<section id="mechanistic-interpretability">
+<h2><span class="section-number">9.4. </span>Mechanistic Interpretability<a class="headerlink" href="#mechanistic-interpretability" title="Link to this heading">#</a></h2>
+<p>So far we haven’t considered LLMs’ internal representations. SHAP values got us
+close, but even those are an abstraction from what goes on at every layer in a
+network. <strong>Mechanistic interpretability</strong> attempts to do the latter by “reverse
+engineering” model behavior. The predominant metaphor in this kind of work is
+the circuit: researchers envision neural networks as complex electrical
+circuits, which they modify—“patching,” “pruning,” and so on—to identify
+where and how the networks have learned to perform specific tasks.</p>
+<p>Mechanistic interpretability typically requires access to a network’s
+<strong>activations</strong>. These are the outputs produced by its neurons as data passes
+through each layer. With PyTorch, it’s possible to access these activations and
+store or modify them as the model runs. You do this with <strong>hooks,</strong> functions
+that you insert into a specific layer (or multiple layers). This can be a
+little tricky, but the <a class="reference external" href="https://github.com/TransformerLensOrg/TransformerLens">TransformerLens</a> library offers several ways to
+hook models like GPT-2. We’ll use that.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">HookedTransformer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="s2">&quot;gpt2&quot;</span><span class="p">,</span>
+    <span class="n">center_unembed</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">center_writing_weights</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">fold_ln</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">refactor_factored_attn_matrices</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loaded pretrained model gpt2 into HookedTransformer
+</pre></div>
+</div>
+</div>
+</div>
+<section id="using-a-hooked-model">
+<h3><span class="section-number">9.4.1. </span>Using a hooked model<a class="headerlink" href="#using-a-hooked-model" title="Link to this heading">#</a></h3>
+<p>TransformerLens models are somewhat like a <code class="docutils literal notranslate"><span class="pre">pipeline</span></code>. They’ll handle tasks
+like tokenization and embedding.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;Thrilled by quantity as language.&quot;</span>
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to_tokens</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">.run_with_cache()</span></code> method to embed these tokens. This will return two
+objects: the logits for the tokens, which we’ve seen above, and an activation
+<strong>cache</strong>. The cache contains all activations generated during a <strong>forward
+pass</strong> of the model, that is, everything generated while the model processes
+data (but not when it updates its own weights, as in training).</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">logits</span><span class="p">,</span> <span class="n">cache</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run_with_cache</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+<span class="n">cache</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ActivationCache with keys [&#39;hook_embed&#39;, &#39;hook_pos_embed&#39;, &#39;blocks.0.hook_resid_pre&#39;, &#39;blocks.0.ln1.hook_scale&#39;, &#39;blocks.0.ln1.hook_normalized&#39;, &#39;blocks.0.attn.hook_q&#39;, &#39;blocks.0.attn.hook_k&#39;, &#39;blocks.0.attn.hook_v&#39;, &#39;blocks.0.attn.hook_attn_scores&#39;, &#39;blocks.0.attn.hook_pattern&#39;, &#39;blocks.0.attn.hook_z&#39;, &#39;blocks.0.hook_attn_out&#39;, &#39;blocks.0.hook_resid_mid&#39;, &#39;blocks.0.ln2.hook_scale&#39;, &#39;blocks.0.ln2.hook_normalized&#39;, &#39;blocks.0.mlp.hook_pre&#39;, &#39;blocks.0.mlp.hook_post&#39;, &#39;blocks.0.hook_mlp_out&#39;, &#39;blocks.0.hook_resid_post&#39;, &#39;blocks.1.hook_resid_pre&#39;, &#39;blocks.1.ln1.hook_scale&#39;, &#39;blocks.1.ln1.hook_normalized&#39;, &#39;blocks.1.attn.hook_q&#39;, &#39;blocks.1.attn.hook_k&#39;, &#39;blocks.1.attn.hook_v&#39;, &#39;blocks.1.attn.hook_attn_scores&#39;, &#39;blocks.1.attn.hook_pattern&#39;, &#39;blocks.1.attn.hook_z&#39;, &#39;blocks.1.hook_attn_out&#39;, &#39;blocks.1.hook_resid_mid&#39;, &#39;blocks.1.ln2.hook_scale&#39;, &#39;blocks.1.ln2.hook_normalized&#39;, &#39;blocks.1.mlp.hook_pre&#39;, &#39;blocks.1.mlp.hook_post&#39;, &#39;blocks.1.hook_mlp_out&#39;, &#39;blocks.1.hook_resid_post&#39;, &#39;blocks.2.hook_resid_pre&#39;, &#39;blocks.2.ln1.hook_scale&#39;, &#39;blocks.2.ln1.hook_normalized&#39;, &#39;blocks.2.attn.hook_q&#39;, &#39;blocks.2.attn.hook_k&#39;, &#39;blocks.2.attn.hook_v&#39;, &#39;blocks.2.attn.hook_attn_scores&#39;, &#39;blocks.2.attn.hook_pattern&#39;, &#39;blocks.2.attn.hook_z&#39;, &#39;blocks.2.hook_attn_out&#39;, &#39;blocks.2.hook_resid_mid&#39;, &#39;blocks.2.ln2.hook_scale&#39;, &#39;blocks.2.ln2.hook_normalized&#39;, &#39;blocks.2.mlp.hook_pre&#39;, &#39;blocks.2.mlp.hook_post&#39;, &#39;blocks.2.hook_mlp_out&#39;, &#39;blocks.2.hook_resid_post&#39;, &#39;blocks.3.hook_resid_pre&#39;, &#39;blocks.3.ln1.hook_scale&#39;, &#39;blocks.3.ln1.hook_normalized&#39;, &#39;blocks.3.attn.hook_q&#39;, &#39;blocks.3.attn.hook_k&#39;, &#39;blocks.3.attn.hook_v&#39;, &#39;blocks.3.attn.hook_attn_scores&#39;, &#39;blocks.3.attn.hook_pattern&#39;, &#39;blocks.3.attn.hook_z&#39;, &#39;blocks.3.hook_attn_out&#39;, &#39;blocks.3.hook_resid_mid&#39;, &#39;blocks.3.ln2.hook_scale&#39;, &#39;blocks.3.ln2.hook_normalized&#39;, &#39;blocks.3.mlp.hook_pre&#39;, &#39;blocks.3.mlp.hook_post&#39;, &#39;blocks.3.hook_mlp_out&#39;, &#39;blocks.3.hook_resid_post&#39;, &#39;blocks.4.hook_resid_pre&#39;, &#39;blocks.4.ln1.hook_scale&#39;, &#39;blocks.4.ln1.hook_normalized&#39;, &#39;blocks.4.attn.hook_q&#39;, &#39;blocks.4.attn.hook_k&#39;, &#39;blocks.4.attn.hook_v&#39;, &#39;blocks.4.attn.hook_attn_scores&#39;, &#39;blocks.4.attn.hook_pattern&#39;, &#39;blocks.4.attn.hook_z&#39;, &#39;blocks.4.hook_attn_out&#39;, &#39;blocks.4.hook_resid_mid&#39;, &#39;blocks.4.ln2.hook_scale&#39;, &#39;blocks.4.ln2.hook_normalized&#39;, &#39;blocks.4.mlp.hook_pre&#39;, &#39;blocks.4.mlp.hook_post&#39;, &#39;blocks.4.hook_mlp_out&#39;, &#39;blocks.4.hook_resid_post&#39;, &#39;blocks.5.hook_resid_pre&#39;, &#39;blocks.5.ln1.hook_scale&#39;, &#39;blocks.5.ln1.hook_normalized&#39;, &#39;blocks.5.attn.hook_q&#39;, &#39;blocks.5.attn.hook_k&#39;, &#39;blocks.5.attn.hook_v&#39;, &#39;blocks.5.attn.hook_attn_scores&#39;, &#39;blocks.5.attn.hook_pattern&#39;, &#39;blocks.5.attn.hook_z&#39;, &#39;blocks.5.hook_attn_out&#39;, &#39;blocks.5.hook_resid_mid&#39;, &#39;blocks.5.ln2.hook_scale&#39;, &#39;blocks.5.ln2.hook_normalized&#39;, &#39;blocks.5.mlp.hook_pre&#39;, &#39;blocks.5.mlp.hook_post&#39;, &#39;blocks.5.hook_mlp_out&#39;, &#39;blocks.5.hook_resid_post&#39;, &#39;blocks.6.hook_resid_pre&#39;, &#39;blocks.6.ln1.hook_scale&#39;, &#39;blocks.6.ln1.hook_normalized&#39;, &#39;blocks.6.attn.hook_q&#39;, &#39;blocks.6.attn.hook_k&#39;, &#39;blocks.6.attn.hook_v&#39;, &#39;blocks.6.attn.hook_attn_scores&#39;, &#39;blocks.6.attn.hook_pattern&#39;, &#39;blocks.6.attn.hook_z&#39;, &#39;blocks.6.hook_attn_out&#39;, &#39;blocks.6.hook_resid_mid&#39;, &#39;blocks.6.ln2.hook_scale&#39;, &#39;blocks.6.ln2.hook_normalized&#39;, &#39;blocks.6.mlp.hook_pre&#39;, &#39;blocks.6.mlp.hook_post&#39;, &#39;blocks.6.hook_mlp_out&#39;, &#39;blocks.6.hook_resid_post&#39;, &#39;blocks.7.hook_resid_pre&#39;, &#39;blocks.7.ln1.hook_scale&#39;, &#39;blocks.7.ln1.hook_normalized&#39;, &#39;blocks.7.attn.hook_q&#39;, &#39;blocks.7.attn.hook_k&#39;, &#39;blocks.7.attn.hook_v&#39;, &#39;blocks.7.attn.hook_attn_scores&#39;, &#39;blocks.7.attn.hook_pattern&#39;, &#39;blocks.7.attn.hook_z&#39;, &#39;blocks.7.hook_attn_out&#39;, &#39;blocks.7.hook_resid_mid&#39;, &#39;blocks.7.ln2.hook_scale&#39;, &#39;blocks.7.ln2.hook_normalized&#39;, &#39;blocks.7.mlp.hook_pre&#39;, &#39;blocks.7.mlp.hook_post&#39;, &#39;blocks.7.hook_mlp_out&#39;, &#39;blocks.7.hook_resid_post&#39;, &#39;blocks.8.hook_resid_pre&#39;, &#39;blocks.8.ln1.hook_scale&#39;, &#39;blocks.8.ln1.hook_normalized&#39;, &#39;blocks.8.attn.hook_q&#39;, &#39;blocks.8.attn.hook_k&#39;, &#39;blocks.8.attn.hook_v&#39;, &#39;blocks.8.attn.hook_attn_scores&#39;, &#39;blocks.8.attn.hook_pattern&#39;, &#39;blocks.8.attn.hook_z&#39;, &#39;blocks.8.hook_attn_out&#39;, &#39;blocks.8.hook_resid_mid&#39;, &#39;blocks.8.ln2.hook_scale&#39;, &#39;blocks.8.ln2.hook_normalized&#39;, &#39;blocks.8.mlp.hook_pre&#39;, &#39;blocks.8.mlp.hook_post&#39;, &#39;blocks.8.hook_mlp_out&#39;, &#39;blocks.8.hook_resid_post&#39;, &#39;blocks.9.hook_resid_pre&#39;, &#39;blocks.9.ln1.hook_scale&#39;, &#39;blocks.9.ln1.hook_normalized&#39;, &#39;blocks.9.attn.hook_q&#39;, &#39;blocks.9.attn.hook_k&#39;, &#39;blocks.9.attn.hook_v&#39;, &#39;blocks.9.attn.hook_attn_scores&#39;, &#39;blocks.9.attn.hook_pattern&#39;, &#39;blocks.9.attn.hook_z&#39;, &#39;blocks.9.hook_attn_out&#39;, &#39;blocks.9.hook_resid_mid&#39;, &#39;blocks.9.ln2.hook_scale&#39;, &#39;blocks.9.ln2.hook_normalized&#39;, &#39;blocks.9.mlp.hook_pre&#39;, &#39;blocks.9.mlp.hook_post&#39;, &#39;blocks.9.hook_mlp_out&#39;, &#39;blocks.9.hook_resid_post&#39;, &#39;blocks.10.hook_resid_pre&#39;, &#39;blocks.10.ln1.hook_scale&#39;, &#39;blocks.10.ln1.hook_normalized&#39;, &#39;blocks.10.attn.hook_q&#39;, &#39;blocks.10.attn.hook_k&#39;, &#39;blocks.10.attn.hook_v&#39;, &#39;blocks.10.attn.hook_attn_scores&#39;, &#39;blocks.10.attn.hook_pattern&#39;, &#39;blocks.10.attn.hook_z&#39;, &#39;blocks.10.hook_attn_out&#39;, &#39;blocks.10.hook_resid_mid&#39;, &#39;blocks.10.ln2.hook_scale&#39;, &#39;blocks.10.ln2.hook_normalized&#39;, &#39;blocks.10.mlp.hook_pre&#39;, &#39;blocks.10.mlp.hook_post&#39;, &#39;blocks.10.hook_mlp_out&#39;, &#39;blocks.10.hook_resid_post&#39;, &#39;blocks.11.hook_resid_pre&#39;, &#39;blocks.11.ln1.hook_scale&#39;, &#39;blocks.11.ln1.hook_normalized&#39;, &#39;blocks.11.attn.hook_q&#39;, &#39;blocks.11.attn.hook_k&#39;, &#39;blocks.11.attn.hook_v&#39;, &#39;blocks.11.attn.hook_attn_scores&#39;, &#39;blocks.11.attn.hook_pattern&#39;, &#39;blocks.11.attn.hook_z&#39;, &#39;blocks.11.hook_attn_out&#39;, &#39;blocks.11.hook_resid_mid&#39;, &#39;blocks.11.ln2.hook_scale&#39;, &#39;blocks.11.ln2.hook_normalized&#39;, &#39;blocks.11.mlp.hook_pre&#39;, &#39;blocks.11.mlp.hook_post&#39;, &#39;blocks.11.hook_mlp_out&#39;, &#39;blocks.11.hook_resid_post&#39;, &#39;ln_final.hook_scale&#39;, &#39;ln_final.hook_normalized&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Above, you’ll see that layers are composed of larger blocks. Layers perform
+specific computations like attention, while blocks group layers together into
+units.</p>
+<p>We’ve actually seen this kind of structure already. The cache above corresponds
+to the output below.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>HookedTransformer(
+  (embed): Embed()
+  (hook_embed): HookPoint()
+  (pos_embed): PosEmbed()
+  (hook_pos_embed): HookPoint()
+  (blocks): ModuleList(
+    (0-11): 12 x TransformerBlock(
+      (ln1): LayerNormPre(
+        (hook_scale): HookPoint()
+        (hook_normalized): HookPoint()
+      )
+      (ln2): LayerNormPre(
+        (hook_scale): HookPoint()
+        (hook_normalized): HookPoint()
+      )
+      (attn): Attention(
+        (hook_k): HookPoint()
+        (hook_q): HookPoint()
+        (hook_v): HookPoint()
+        (hook_z): HookPoint()
+        (hook_attn_scores): HookPoint()
+        (hook_pattern): HookPoint()
+        (hook_result): HookPoint()
+      )
+      (mlp): MLP(
+        (hook_pre): HookPoint()
+        (hook_post): HookPoint()
+      )
+      (hook_attn_in): HookPoint()
+      (hook_q_input): HookPoint()
+      (hook_k_input): HookPoint()
+      (hook_v_input): HookPoint()
+      (hook_mlp_in): HookPoint()
+      (hook_attn_out): HookPoint()
+      (hook_mlp_out): HookPoint()
+      (hook_resid_pre): HookPoint()
+      (hook_resid_mid): HookPoint()
+      (hook_resid_post): HookPoint()
+    )
+  )
+  (ln_final): LayerNormPre(
+    (hook_scale): HookPoint()
+    (hook_normalized): HookPoint()
+  )
+  (unembed): Unembed()
+)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="processing-sentence-pairs">
+<h3><span class="section-number">9.4.2. </span>Processing sentence pairs<a class="headerlink" href="#processing-sentence-pairs" title="Link to this heading">#</a></h3>
+<p>For the rest of this chapter, we’ll be working with the sentence pair dataset,
+which we loaded at the very beginning. It contains duplicate sentences in two
+columns, with the only difference between them being a period “.” and an
+exclamation mark “!”. Our task will be to see whether we can find where GPT-2
+has learned something about the difference between these two punctuation marks.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pairs</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>clean</th>
+      <th>corrupt</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>The sun sets in the west.</td>
+      <td>The sun sets in the west!</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Water freezes at 0 degrees.</td>
+      <td>Water freezes at 0 degrees!</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>A triangle has three sides.</td>
+      <td>A triangle has three sides!</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Seven days are in a week.</td>
+      <td>Seven days are in a week!</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>The children played in the yard.</td>
+      <td>The children played in the yard!</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The column names in this dataset will give you a sense of what’s to come.
+Sentences in <code class="docutils literal notranslate"><span class="pre">clean</span></code> are baselines, which we “corrupt” into variants, stored in
+<code class="docutils literal notranslate"><span class="pre">corrupt</span></code>. After we’ve sent both to the model, we’ll look for differences in
+behavior when the model processes baselines and corruptions.</p>
+<p>But first: some data preprocessing. We need to ensure that tokens in our
+sentence pairs correspond exactly. Otherwise we’ll have trouble studying where
+they diverge in the model activations. To take one example, imagine that we
+were studying synonyms and had a pair of words:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">car</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to_tokens</span><span class="p">(</span><span class="s2">&quot;car&quot;</span><span class="p">)</span>
+<span class="n">vehicle</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to_tokens</span><span class="p">(</span><span class="s2">&quot;vehicle&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Subword tokenization causes these two sequences to become misaligned:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">car</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">vehicle</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[50256,  7718]], device=&#39;mps:0&#39;)
+tensor([[50256, 33892,  1548]], device=&#39;mps:0&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<p>It would be difficult (though not impossible) to track model behavior across
+these two sequences.</p>
+<p>What we’ll do, then, is validate our pairs so that we only take those which
+tokenize to the same length. Of course, this requires us to first tokenize
+clean and corrupt sentences.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clean</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to_tokens</span><span class="p">(</span><span class="n">pairs</span><span class="p">[</span><span class="s2">&quot;clean&quot;</span><span class="p">])</span>
+<span class="n">corrupted</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to_tokens</span><span class="p">(</span><span class="n">pairs</span><span class="p">[</span><span class="s2">&quot;corrupt&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The following two functions perform the validation step. They pad all tokens in
+a batch and then remove any pairs that don’t match.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pad_to_same_length</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">pad</span> <span class="o">=</span> <span class="mi">50256</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pad two token ID tensors so they are the same length.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : torch.Tensor</span>
+<span class="sd">        First tensor</span>
+<span class="sd">    B : torch.Tensor</span>
+<span class="sd">        Second tensor</span>
+<span class="sd">    pad : int</span>
+<span class="sd">        Padding token ID</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    padded : tuple</span>
+<span class="sd">        Padded tensors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get shapes of both tensors and find the max dimensions</span>
+    <span class="p">(</span><span class="n">A0</span><span class="p">,</span> <span class="n">A1</span><span class="p">),</span> <span class="p">(</span><span class="n">B0</span><span class="p">,</span> <span class="n">B1</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">B</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">A0</span><span class="p">,</span> <span class="n">B0</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">B1</span><span class="p">))</span>
+
+    <span class="c1"># Pad each tensor to the max dimensions</span>
+    <span class="n">A_pad</span><span class="p">,</span> <span class="n">B_pad</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">pad</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">pad</span><span class="p">)</span>
+    <span class="n">A_pad</span><span class="p">[:</span><span class="n">A0</span><span class="p">,</span> <span class="p">:</span><span class="n">A1</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span>
+    <span class="n">B_pad</span><span class="p">[:</span><span class="n">B0</span><span class="p">,</span> <span class="p">:</span><span class="n">B1</span><span class="p">]</span> <span class="o">=</span> <span class="n">B</span>
+
+    <span class="k">return</span> <span class="n">A_pad</span><span class="p">,</span> <span class="n">B_pad</span>
+
+
+<span class="k">def</span> <span class="nf">filter_padded</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">pad</span> <span class="o">=</span> <span class="mi">50256</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter padded token ID tensors.</span>
+
+<span class="sd">    We do this to control for tensor pairs that may differ in length due to</span>
+<span class="sd">    subword tokenization. </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : torch.Tensor</span>
+<span class="sd">        First tensor</span>
+<span class="sd">    B : torch.Tensor</span>
+<span class="sd">        Second tensor</span>
+<span class="sd">    pad : int</span>
+<span class="sd">        Padding token ID</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    filtered : tuple</span>
+<span class="sd">        Filtered tensors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Find tensors that have the same number of padding tokens in the same</span>
+    <span class="c1"># positions</span>
+    <span class="n">same</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">==</span> <span class="n">pad</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">B</span> <span class="o">==</span> <span class="n">pad</span><span class="p">)</span>
+
+    <span class="c1"># Keep only those</span>
+    <span class="n">A_filtered</span><span class="p">,</span> <span class="n">B_filtered</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">same</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">B</span><span class="p">[</span><span class="n">same</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)]</span>
+
+    <span class="k">return</span> <span class="n">A_filtered</span><span class="p">,</span> <span class="n">B_filtered</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s run them both.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clean</span><span class="p">,</span> <span class="n">corrupted</span> <span class="o">=</span> <span class="n">pad_to_same_length</span><span class="p">(</span><span class="n">clean</span><span class="p">,</span> <span class="n">corrupted</span><span class="p">)</span>
+<span class="n">clean</span><span class="p">,</span> <span class="n">corrupted</span> <span class="o">=</span> <span class="n">filter_padded</span><span class="p">(</span><span class="n">clean</span><span class="p">,</span> <span class="n">corrupted</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>A third and last preprocessing step identifies where, in each pair of
+sequences, the token IDs differ.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">find_variant_pairs</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">pad</span> <span class="o">=</span> <span class="mi">50256</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find where two pairs of padded token ID tensors vary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A : torch.Tensor</span>
+<span class="sd">        First tensor</span>
+<span class="sd">    B : torch.Tensor</span>
+<span class="sd">        Second tensor</span>
+<span class="sd">    pad : int</span>
+<span class="sd">        Padding token ID</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    variants, indices : tuple</span>
+<span class="sd">        A (n_row, 2) size tensor of token IDs and a (n_row, 1) tensor of the</span>
+<span class="sd">        indices where the variants occur</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Find where the tensors to do not match</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span> <span class="o">!=</span> <span class="n">B</span><span class="p">)</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span>
+
+    <span class="c1"># Drop multi-token variants</span>
+    <span class="n">unique</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">return_counts</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">indices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">unique</span><span class="p">[(</span><span class="n">counts</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">counts</span> <span class="o">!=</span> <span class="n">pad</span><span class="p">)])</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+    <span class="c1"># Compile a variants tensor</span>
+    <span class="n">variants</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">doc_id</span><span class="p">,</span> <span class="n">token_id</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+        <span class="n">A_id</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">doc_id</span><span class="p">,</span> <span class="n">token_id</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">B_id</span> <span class="o">=</span> <span class="n">B</span><span class="p">[</span><span class="n">doc_id</span><span class="p">,</span> <span class="n">token_id</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">variants</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">A_id</span><span class="p">,</span> <span class="n">B_id</span><span class="p">])</span>
+    <span class="n">variants</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">variants</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">variants</span><span class="p">,</span> <span class="n">indices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s run this as well.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">variants</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">find_variant_pairs</span><span class="p">(</span><span class="n">clean</span><span class="p">,</span> <span class="n">corrupted</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Here are the variant pairs. The token IDs are for “.” and “!”, respectively.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">variants</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0],
+        [13,  0]], device=&#39;mps:0&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<p>And here is where these variants appear in the token tensors.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">indices</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([7, 6, 6, 7, 7, 5, 5, 6, 3, 7, 6, 8, 5, 5, 7, 7, 4, 4, 6, 6])
+</pre></div>
+</div>
+</div>
+</div>
+<p>With all this preprocessing done, we can run our tokens through the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clean_logits</span><span class="p">,</span> <span class="n">clean_cache</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run_with_cache</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
+<span class="n">corrupted_logits</span><span class="p">,</span> <span class="n">corrupted_cache</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run_with_cache</span><span class="p">(</span><span class="n">corrupted</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>These caches contain all the different states of the model for our two
+collections of sentence pairs. For example, we can retrieve the activations
+from the attention layer in the fourth block of the model for clean sentences.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_act_name</span><span class="p">(</span><span class="s2">&quot;attn_out&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">clean_cache</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>tensor([[[-0.1166, -0.1288,  0.0125,  ..., -0.1029, -0.1467,  0.0315],
+         [-0.0247, -0.0571,  0.0652,  ..., -0.0111, -0.0649,  0.0713],
+         [-0.2215, -0.0054,  0.0724,  ...,  0.2882,  0.0127, -0.0183],
+         ...,
+         [-0.0654, -0.0105, -0.3846,  ...,  0.0523, -0.0494, -0.1046],
+         [ 0.0518,  0.0813, -0.0703,  ...,  0.4981,  0.4086, -0.2801],
+         [-0.0412,  0.0052,  0.0366,  ...,  0.1360, -0.0798, -0.0084]],
+
+        [[-0.1166, -0.1288,  0.0125,  ..., -0.1029, -0.1467,  0.0315],
+         [-0.0778, -0.2119, -0.0204,  ..., -0.0649, -0.1119, -0.0482],
+         [-0.1889, -0.0829,  0.0945,  ...,  0.1735,  0.1957, -0.4617],
+         ...,
+         [-0.0479, -0.3029, -0.7991,  ...,  0.4246, -0.3518, -0.3563],
+         [-0.1913, -0.0766, -0.0813,  ...,  0.0967, -0.2543, -0.0224],
+         [-0.1572, -0.1454,  0.0420,  ...,  0.0468, -0.2492,  0.0090]],
+
+        [[-0.1166, -0.1288,  0.0125,  ..., -0.1029, -0.1467,  0.0315],
+         [-0.0537, -0.1366, -0.1123,  ..., -0.1409, -0.1183,  0.1687],
+         [ 0.0890,  0.0071, -0.3129,  ...,  0.2306, -0.0070,  0.0504],
+         ...,
+         [ 0.2167, -0.5852, -0.4096,  ...,  0.5976,  0.1160,  0.0307],
+         [-0.1490, -0.1943, -0.0491,  ...,  0.0269, -0.2439,  0.1448],
+         [-0.1525, -0.2478,  0.0478,  ..., -0.0045, -0.2620,  0.1641]],
+
+        ...,
+
+        [[-0.1166, -0.1288,  0.0125,  ..., -0.1029, -0.1467,  0.0315],
+         [-0.0858, -0.2628,  0.0226,  ..., -0.0915, -0.2486,  0.0211],
+         [-0.2779, -0.1652,  0.1446,  ...,  0.3761, -0.2365, -0.1635],
+         ...,
+         [ 0.1280, -0.1301,  0.0611,  ..., -0.0163, -0.5518,  0.0401],
+         [ 0.1193, -0.1609,  0.1135,  ..., -0.0150, -0.5263,  0.0481],
+         [ 0.0961, -0.1978,  0.1456,  ..., -0.0110, -0.4943,  0.0495]],
+
+        [[-0.1166, -0.1288,  0.0125,  ..., -0.1029, -0.1467,  0.0315],
+         [-0.0399, -0.1201, -0.1248,  ..., -0.1075, -0.0380,  0.2397],
+         [-0.2188,  0.1014, -0.4512,  ...,  0.2526,  0.0974,  0.0488],
+         ...,
+         [-0.6468,  0.1615, -0.5001,  ..., -0.0486,  0.5824, -0.0312],
+         [-0.1910, -0.0544,  0.0503,  ...,  0.0421, -0.0614,  0.1683],
+         [-0.1773, -0.1348,  0.1478,  ..., -0.0028, -0.1046,  0.1564]],
+
+        [[-0.1166, -0.1288,  0.0125,  ..., -0.1029, -0.1467,  0.0315],
+         [-0.0247, -0.0571,  0.0652,  ..., -0.0111, -0.0649,  0.0713],
+         [-0.2329,  0.0815, -0.0768,  ...,  0.2692, -0.1761, -0.1231],
+         ...,
+         [-0.0856,  0.1356, -0.3786,  ...,  0.8869,  0.1959, -0.4584],
+         [-0.0957, -0.0528,  0.0960,  ...,  0.1715, -0.1134,  0.0567],
+         [-0.0853, -0.0901,  0.1736,  ...,  0.1104, -0.1394,  0.0684]]],
+       device=&#39;mps:0&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="activation-patching">
+<h3><span class="section-number">9.4.3. </span>Activation patching<a class="headerlink" href="#activation-patching" title="Link to this heading">#</a></h3>
+<p>From here, we’ll study GPT-2 using <strong>activation patching</strong>. This technique
+involves modifying the activations at specific layers and analyzing the effects
+of those modifications. In our case, modifications will involve swapping clean
+tokens with their corrupted variants; we’ll look at every layer. Ideally, there
+should be a noticeable difference between the two tokens reflected in the
+model’s behavior—preferably at one particular layer, or set of layers, more
+than others.</p>
+<p>To quantify this difference, we define a function, <code class="docutils literal notranslate"><span class="pre">logit_diff()</span></code>. This
+function acts like a loss function, indicating how much difference swapping
+clean/corrupted tokens at a specific point makes to the model’s output.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">logit_diff</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">variants</span> <span class="o">=</span> <span class="n">variants</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the difference between two logit tensors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logits : torch.Tensor</span>
+<span class="sd">        Logit tensors from the model</span>
+<span class="sd">    variants : torch.Tensor</span>
+<span class="sd">        A (n_row, 2) tensor of token IDs with the clean and corrupted tokens</span>
+<span class="sd">    indices : torch.Tensor</span>
+<span class="sd">        A (n_row, 1) tensor of locations where tokens differ</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    difference : float</span>
+<span class="sd">        The difference between the clean and corrupted versions of the tensors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># If we are dealing with batched tensors, select the index position for the</span>
+    <span class="c1"># flipped token</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">flipped</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">))</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">logits</span><span class="p">[</span><span class="n">flipped</span><span class="p">,</span> <span class="n">indices</span><span class="p">]</span>
+
+    <span class="c1"># Get the logits for the clean tokens. Note the indexing along the first</span>
+    <span class="c1"># dimension of `variants`. That selects the uncorrupted token IDs</span>
+    <span class="n">correct</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">variants</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Get the logits for the corrupted tokens. This selects corrupted token IDs</span>
+    <span class="c1"># from variants</span>
+    <span class="n">incorrect</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">variants</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># Subtract incorrect logits from the correct ones and take the mean</span>
+    <span class="n">difference</span> <span class="o">=</span> <span class="p">(</span><span class="n">correct</span> <span class="o">-</span> <span class="n">incorrect</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">difference</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Defining two baselines gives us the ability to normalize the output of
+<code class="docutils literal notranslate"><span class="pre">logit_diff()</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CLEAN_BASELINE</span> <span class="o">=</span> <span class="n">logit_diff</span><span class="p">(</span><span class="n">clean_logits</span><span class="p">,</span> <span class="n">variants</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="n">CORRUPT_BASELINE</span> <span class="o">=</span> <span class="n">logit_diff</span><span class="p">(</span><span class="n">corrupted_logits</span><span class="p">,</span> <span class="n">variants</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>With our baselines created, we wrap our loss function in another function,
+<code class="docutils literal notranslate"><span class="pre">metric()</span></code>. All it does is apply normalization to the output from
+<code class="docutils literal notranslate"><span class="pre">logit_diff()</span></code>. The result is what the patching process uses to determine
+whether a permutation at a given layer increases/decreases the likelihood of
+the correct outcome.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">variants</span> <span class="o">=</span> <span class="n">variants</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute logit difference and normalize the results.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    logits : torch.Tensor</span>
+<span class="sd">        Logit tensors from the model</span>
+<span class="sd">    variants : torch.Tensor</span>
+<span class="sd">        A (n_row, 2) tensor of token IDs with the clean and corrupted tokens</span>
+<span class="sd">    indices : torch.Tensor</span>
+<span class="sd">        A (n_row, 1) tensor of locations where tokens differ</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    difference : float</span>
+<span class="sd">        The difference between the clean and corrupted versions of the tensors</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">difference</span> <span class="o">=</span> <span class="n">logit_diff</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">variants</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+    <span class="n">norm_by</span> <span class="o">=</span> <span class="n">CLEAN_BASELINE</span> <span class="o">-</span> <span class="n">CORRUPT_BASELINE</span>
+    <span class="n">difference</span> <span class="o">=</span> <span class="p">(</span><span class="n">difference</span> <span class="o">-</span> <span class="n">CORRUPT_BASELINE</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm_by</span>
+
+    <span class="k">return</span> <span class="n">difference</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Time to run activation patching. Below, we compare the corrupted tokens to the
+clean cache’s attention scores.</p>
+<div class="cell tag_remove-stderr docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">patched</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">patching</span><span class="o">.</span><span class="n">get_act_patch_attn_out</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span> <span class="n">corrupted</span><span class="p">,</span> <span class="n">clean_cache</span><span class="p">,</span> <span class="n">metric</span>
+<span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">patched</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<p>Let’s look at a heatmap of the results. This shows where, at a given position
+in our sentence pairs, making changes in the attention activations for each
+layer block increases the likelihood of the correct outcome, or decreases that
+likelihood. Positive numbers represent increased likelihood, negative numbers
+decreased.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+    <span class="n">results</span><span class="p">,</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;crest&quot;</span><span class="p">,</span>
+    <span class="n">annot</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;.2f&quot;</span><span class="p">,</span>
+    <span class="n">robust</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">results</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Patching outcomes&quot;</span><span class="p">,</span> <span class="n">xlabel</span> <span class="o">=</span> <span class="s2">&quot;Token position&quot;</span><span class="p">,</span> <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;Layer&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/ed2c12967675226d7f71b16ee01fdae11177cdd1c56f2a182a6de79d9c4706bf.png" src="../_images/ed2c12967675226d7f71b16ee01fdae11177cdd1c56f2a182a6de79d9c4706bf.png" />
+</div>
+</div>
+<p>By the looks of this heatmap, activations after attention scoring in the tenth
+layer of the model seem most sensitive to changes between clean and corrupted
+tokens. Might this be the location where the model has learned something about
+the difference between “.” and “!”?</p>
+</section>
+<section id="steering-the-model">
+<h3><span class="section-number">9.4.4. </span>Steering the model<a class="headerlink" href="#steering-the-model" title="Link to this heading">#</a></h3>
+<p>Let’s investigate. Below, we’ll attempt to modify the activations at this layer
+in hopes that we can alter the model’s behavior. If we can <strong>steer</strong> the model
+towards generating text with one token or another, that would be further
+evidence that we’ve been able to isolate where it has learned a relationship
+between “.” and “!”.</p>
+<p>First, let’s move the model back to a CPU. This isn’t strictly necessary, but
+<code class="docutils literal notranslate"><span class="pre">TransformerLens</span></code> defaults to GPUs when it can find them, and not all of the
+following functionality works with that setup.</p>
+<div class="cell tag_output_scroll docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Moving model to device:  cpu
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>HookedTransformer(
+  (embed): Embed()
+  (hook_embed): HookPoint()
+  (pos_embed): PosEmbed()
+  (hook_pos_embed): HookPoint()
+  (blocks): ModuleList(
+    (0-11): 12 x TransformerBlock(
+      (ln1): LayerNormPre(
+        (hook_scale): HookPoint()
+        (hook_normalized): HookPoint()
+      )
+      (ln2): LayerNormPre(
+        (hook_scale): HookPoint()
+        (hook_normalized): HookPoint()
+      )
+      (attn): Attention(
+        (hook_k): HookPoint()
+        (hook_q): HookPoint()
+        (hook_v): HookPoint()
+        (hook_z): HookPoint()
+        (hook_attn_scores): HookPoint()
+        (hook_pattern): HookPoint()
+        (hook_result): HookPoint()
+      )
+      (mlp): MLP(
+        (hook_pre): HookPoint()
+        (hook_post): HookPoint()
+      )
+      (hook_attn_in): HookPoint()
+      (hook_q_input): HookPoint()
+      (hook_k_input): HookPoint()
+      (hook_v_input): HookPoint()
+      (hook_mlp_in): HookPoint()
+      (hook_attn_out): HookPoint()
+      (hook_mlp_out): HookPoint()
+      (hook_resid_pre): HookPoint()
+      (hook_resid_mid): HookPoint()
+      (hook_resid_post): HookPoint()
+    )
+  )
+  (ln_final): LayerNormPre(
+    (hook_scale): HookPoint()
+    (hook_normalized): HookPoint()
+  )
+  (unembed): Unembed()
+)
+</pre></div>
+</div>
+</div>
+</div>
+<p>With this done, we define a function to produce a <strong>steering vector</strong>. The idea
+here is that, at a given point in the network, we access the model’s
+activations for two tokens. Then, using these activations we make a new vector
+that represents the tokens’ relationship. That vector is what we’ll send to the
+model to alter its activations.</p>
+<p>You’ll likely recognize the logic here. It’s the first step in the analogy
+setup we used for static embeddings. Once we get the activations for each
+token, we simply subtract one from the other to define their relationship.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">make_steering_vector</span><span class="p">(</span><span class="n">clean</span><span class="p">,</span> <span class="n">corrupt</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Make a steering vector from two tokens.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    clean : str</span>
+<span class="sd">        Clean token</span>
+<span class="sd">    corrupt : str</span>
+<span class="sd">        Corrupt token</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Name key for the model cache</span>
+<span class="sd">    model : tl.HookedTransformer</span>
+<span class="sd">        A hooked model</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    steering_vector : torch.Tensor</span>
+<span class="sd">        A steering vector of size (1, n_dim)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Generate vectors for each token</span>
+    <span class="n">vectors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">tok</span> <span class="ow">in</span> <span class="p">(</span><span class="n">clean</span><span class="p">,</span> <span class="n">corrupt</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">cache</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">run_with_cache</span><span class="p">(</span><span class="n">tok</span><span class="p">)</span>
+
+        <span class="c1"># Extract the activations at a specified layer</span>
+        <span class="n">vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cache</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+
+    <span class="c1"># Unpack the tokens and subtract the second from the first to define a</span>
+    <span class="c1"># relationship between the two</span>
+    <span class="n">clean</span><span class="p">,</span> <span class="n">corrupt</span> <span class="o">=</span> <span class="n">vectors</span>
+    <span class="n">steering_vector</span> <span class="o">=</span> <span class="n">clean</span> <span class="o">-</span> <span class="n">corrupt</span>
+
+    <span class="c1"># Return the results</span>
+    <span class="k">return</span> <span class="n">steering_vector</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>With this function defined, we isolate the layer we’re interested in and send
+our two tokens as arguments.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">layer_id</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_act_name</span><span class="p">(</span><span class="s2">&quot;attn_out&quot;</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">)</span>
+<span class="n">steering_vector</span> <span class="o">=</span> <span class="n">make_steering_vector</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;!&quot;</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally, we write our own hook. During a forward pass, the model calls this
+function when it reaches the component stored at <code class="docutils literal notranslate"><span class="pre">name</span></code> above. What the
+function does is extremely simple: it adds the steering vector to the model
+activations. Again, this is just the second step in the analogy setup for
+static embeddings.</p>
+<p>We also supply an optional <code class="docutils literal notranslate"><span class="pre">coef</span></code> parameter. As we’ll see below, this helps us
+control the effect our steering vector has on the activations.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">steer</span><span class="p">(</span><span class="n">activations</span><span class="p">,</span> <span class="n">hook</span><span class="p">,</span> <span class="n">steering_vector</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">coef</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modify activations with a steering vector.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    activations : torch.Tensor</span>
+<span class="sd">        Model activations</span>
+<span class="sd">    hook : Any</span>
+<span class="sd">        Required for compatability with PyTorch but unused</span>
+<span class="sd">    steering_vector : torch.Tensor</span>
+<span class="sd">        The steering vector</span>
+<span class="sd">    coef : float</span>
+<span class="sd">        A coefficient for scaling the steering vector</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    steered : torch.Tensor</span>
+<span class="sd">        Steered activations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">steering_vector</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">activations</span>
+
+    <span class="k">return</span> <span class="n">activations</span> <span class="o">+</span> <span class="n">steering_vector</span> <span class="o">*</span> <span class="n">coef</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we define a <strong>partial</strong> function for the hook. All this does is build a
+new function with some default arguments; the only arguments needed now are
+ones for activations and the hook, and the model takes care of both of them
+itself. When we instantiate this partial function, we’ll also modify the
+coefficient argument. Using a negative coefficient will steer the model towards
+corrupted output. If we’ve isolated the relationship between “.” and “!”
+correctly, we’ll see more of the latter tokens.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hook</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">steer</span><span class="p">,</span> <span class="n">steering_vector</span> <span class="o">=</span> <span class="n">steering_vector</span><span class="p">,</span> <span class="n">coef</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Time to generate text. Below, we set up a for loop that covers two routines:
+hooking the model and running it without the hook. That is, we steer it, then
+we don’t. First, we’ll run this without any sampling.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;The sky is blue&quot;</span>
+<span class="k">for</span> <span class="n">do_hook</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># First, reset all hooks. Then, if we&#39;re running with a hook, register it</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">reset_hooks</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">do_hook</span><span class="p">:</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">,</span> <span class="n">hook</span> <span class="o">=</span> <span class="n">hook</span><span class="p">)</span>
+
+    <span class="c1"># Generate text. Note that the hooked model has slightly different</span>
+    <span class="c1"># parameters for its `.generate()` method</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="n">prompt</span><span class="p">,</span>
+        <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">do_sample</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">stop_at_eos</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">eos_token_id</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span><span class="p">,</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span>
+
+    <span class="c1"># What do we get?</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Hooked: </span><span class="si">{</span><span class="n">do_hook</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output: </span><span class="si">{</span><span class="n">outputs</span><span class="si">}</span><span class="se">\n</span><span class="s2">-------&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Hooked: True
+Output: The sky is blue!
+-------
+Hooked: False
+Output: The sky is blue,
+-------
+</pre></div>
+</div>
+</div>
+</div>
+<p>Promising… But what about with sampling?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">reset_hooks</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">,</span> <span class="n">hook</span> <span class="o">=</span> <span class="n">hook</span><span class="p">)</span>
+
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">do_sample</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">temperature</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">,</span>
+    <span class="n">top_p</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">freq_penalty</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">stop_at_eos</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">eos_token_id</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span><span class="p">,</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The sky is blue! The moon is in the clouds!
+
+And you have a friend! So go ahead and try it out. Let&#39;s start with a quick quiz: what&#39;s your favorite color? Well, we&#39;re going to use this as an inspiration for
+</pre></div>
+</div>
+</div>
+</div>
+<p>Even more promising. Let’s crank the effect of the steering vector way up.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hook</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">steer</span><span class="p">,</span> <span class="n">steering_vector</span> <span class="o">=</span> <span class="n">steering_vector</span><span class="p">,</span> <span class="n">coef</span> <span class="o">=</span> <span class="o">-</span><span class="mf">8.5</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">reset_hooks</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add_hook</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">,</span> <span class="n">hook</span> <span class="o">=</span> <span class="n">hook</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>…and conclude with a final prompt.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;I had an okay time&quot;</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="p">,</span>
+    <span class="n">max_new_tokens</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">do_sample</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">temperature</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">,</span>
+    <span class="n">top_p</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">freq_penalty</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">stop_at_eos</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">eos_token_id</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span><span class="p">,</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>I had an okay time with this! I LOVE it! It&#39;s awesome! I just scooped it up and threw on the napkins and a cool little sparkle!! Thats all!!! Thanks again!! :) The car was fantastic!!!!!! I love what you did with
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="08_bert.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><span class="section-number">8. </span>Bidirectional Encoder Representations from Transformers (BERT)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="10_cross-entropy.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><span class="section-number">10. </span>Cross Entropy</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">9.1. Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#text-generation">9.2. Text Generation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sampling-strategies">9.2.1. Sampling strategies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#probable-sequences">9.2.2. Probable sequences</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-candidate-pool">9.3. The Candidate Pool</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#going-forwards">9.3.1. Going forwards</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#going-backwards">9.3.2. Going backwards</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanistic-interpretability">9.4. Mechanistic Interpretability</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#using-a-hooked-model">9.4.1. Using a hooked model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#processing-sentence-pairs">9.4.2. Processing sentence pairs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#activation-patching">9.4.3. Activation patching</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#steering-the-model">9.4.4. Steering the model</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Tyler Shoemaker
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

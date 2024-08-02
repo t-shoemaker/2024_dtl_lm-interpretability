@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>10. Attention in Vector Space &#8212; Introduction to Interpretability for Language Models</title>
+    <title>11. Attention in Vector Space &#8212; Introduction to Interpretability for Language Models</title>
   
   
   
@@ -62,7 +62,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/11_attention-in-vector-space';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="9. Cross Entropy" href="10_cross-entropy.html" />
+    <link rel="prev" title="10. Cross Entropy" href="10_cross-entropy.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -190,11 +190,12 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="07_intro-to-llms.html">7. Large Language Models: An Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="08_bert.html">8. Bidirectional Encoder Representations from Transformers (BERT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_gpt.html">9. Generative Pre-Trained Transformers (GPT)</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendices</span></p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="10_cross-entropy.html">9. Cross Entropy</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">10. Attention in Vector Space</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10_cross-entropy.html">10. Cross Entropy</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">11. Attention in Vector Space</a></li>
 </ul>
 
     </div>
@@ -358,11 +359,11 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">10.1. Preliminaries</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-attention">10.2. Extracting Attention</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-functions">10.3. Plotting Functions</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizing-self-attention">10.4. Visualizing Self-Attention</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vector-projection">10.5. Vector Projection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">11.1. Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-attention">11.2. Extracting Attention</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-functions">11.3. Plotting Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizing-self-attention">11.4. Visualizing Self-Attention</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vector-projection">11.5. Vector Projection</a></li>
 </ul>
             </nav>
         </div>
@@ -375,10 +376,10 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="attention-in-vector-space">
-<h1><span class="section-number">10. </span>Attention in Vector Space<a class="headerlink" href="#attention-in-vector-space" title="Link to this heading">#</a></h1>
+<h1><span class="section-number">11. </span>Attention in Vector Space<a class="headerlink" href="#attention-in-vector-space" title="Link to this heading">#</a></h1>
 <p>This chapter demonstrates attention in terms of vector space operations.</p>
 <section id="preliminaries">
-<h2><span class="section-number">10.1. </span>Preliminaries<a class="headerlink" href="#preliminaries" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">11.1. </span>Preliminaries<a class="headerlink" href="#preliminaries" title="Link to this heading">#</a></h2>
 <p>We need the following libraries.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -389,7 +390,6 @@ document.write(`
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModel</span>
 <span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="n">rcParams</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 </pre></div>
 </div>
@@ -407,7 +407,7 @@ document.write(`
 </div>
 </section>
 <section id="extracting-attention">
-<h2><span class="section-number">10.2. </span>Extracting Attention<a class="headerlink" href="#extracting-attention" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">11.2. </span>Extracting Attention<a class="headerlink" href="#extracting-attention" title="Link to this heading">#</a></h2>
 <p>With the model loaded, we process a sentence.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -439,7 +439,7 @@ document.write(`
 </div>
 </section>
 <section id="plotting-functions">
-<h2><span class="section-number">10.3. </span>Plotting Functions<a class="headerlink" href="#plotting-functions" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">11.3. </span>Plotting Functions<a class="headerlink" href="#plotting-functions" title="Link to this heading">#</a></h2>
 <p>We need to define two functions for visualizing attention in vector space. The
 first one transforms attention embeddings into two-dimensional vectors.</p>
 <div class="cell docutils container">
@@ -567,7 +567,7 @@ first one transforms attention embeddings into two-dimensional vectors.</p>
 </div>
 </section>
 <section id="visualizing-self-attention">
-<h2><span class="section-number">10.4. </span>Visualizing Self-Attention<a class="headerlink" href="#visualizing-self-attention" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">11.4. </span>Visualizing Self-Attention<a class="headerlink" href="#visualizing-self-attention" title="Link to this heading">#</a></h2>
 <p>With all of the above defined, we can now plot our attention scores in a
 two-dimensional vector space. Remember: in this space, proximity means
 similarity. During our vector space semantics session we derived this
@@ -668,7 +668,7 @@ that information to the value matrix as a weighting.</p>
 </div>
 </section>
 <section id="vector-projection">
-<h2><span class="section-number">10.5. </span>Vector Projection<a class="headerlink" href="#vector-projection" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">11.5. </span>Vector Projection<a class="headerlink" href="#vector-projection" title="Link to this heading">#</a></h2>
 <p>Using the dot product, we can take two vectors, <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">B</span></code>, and create a third
 “projection” vector, which shows how much of <code class="docutils literal notranslate"><span class="pre">A</span></code> sits along the direction of
 <code class="docutils literal notranslate"><span class="pre">B</span></code>. Attention is capturing this kind of information as it runs, but it’s
@@ -821,7 +821,7 @@ vectors when it calculates attention.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">9. </span>Cross Entropy</p>
+        <p class="prev-next-title"><span class="section-number">10. </span>Cross Entropy</p>
       </div>
     </a>
 </div>
@@ -840,11 +840,11 @@ vectors when it calculates attention.</p>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">10.1. Preliminaries</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-attention">10.2. Extracting Attention</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-functions">10.3. Plotting Functions</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizing-self-attention">10.4. Visualizing Self-Attention</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vector-projection">10.5. Vector Projection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">11.1. Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracting-attention">11.2. Extracting Attention</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-functions">11.3. Plotting Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizing-self-attention">11.4. Visualizing Self-Attention</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vector-projection">11.5. Vector Projection</a></li>
 </ul>
   </nav></div>
 

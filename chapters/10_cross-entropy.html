@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>9. Cross Entropy &#8212; Introduction to Interpretability for Language Models</title>
+    <title>10. Cross Entropy &#8212; Introduction to Interpretability for Language Models</title>
   
   
   
@@ -60,8 +60,8 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/10_cross-entropy';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="10. Attention in Vector Space" href="11_attention-in-vector-space.html" />
-    <link rel="prev" title="8. Bidirectional Encoder Representations from Transformers (BERT)" href="08_bert.html" />
+    <link rel="next" title="11. Attention in Vector Space" href="11_attention-in-vector-space.html" />
+    <link rel="prev" title="9. Generative Pre-Trained Transformers (GPT)" href="09_gpt.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -189,11 +189,12 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="07_intro-to-llms.html">7. Large Language Models: An Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="08_bert.html">8. Bidirectional Encoder Representations from Transformers (BERT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_gpt.html">9. Generative Pre-Trained Transformers (GPT)</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendices</span></p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">9. Cross Entropy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="11_attention-in-vector-space.html">10. Attention in Vector Space</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">10. Cross Entropy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11_attention-in-vector-space.html">11. Attention in Vector Space</a></li>
 </ul>
 
     </div>
@@ -357,10 +358,10 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">9.1. Preliminaries</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-generation">9.2. Data Generation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-probabilities">9.3. Using Probabilities</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">9.4. Cross Entropy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">10.1. Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-generation">10.2. Data Generation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-probabilities">10.3. Using Probabilities</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">10.4. Cross Entropy</a></li>
 </ul>
             </nav>
         </div>
@@ -373,11 +374,11 @@ document.write(`
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="cross-entropy">
-<h1><span class="section-number">9. </span>Cross Entropy<a class="headerlink" href="#cross-entropy" title="Link to this heading">#</a></h1>
+<h1><span class="section-number">10. </span>Cross Entropy<a class="headerlink" href="#cross-entropy" title="Link to this heading">#</a></h1>
 <p>This chapter uses toy data to demonstrate how machine learners use cross
 entropy as a metric for evaluating model fit.</p>
 <section id="preliminaries">
-<h2><span class="section-number">9.1. </span>Preliminaries<a class="headerlink" href="#preliminaries" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">10.1. </span>Preliminaries<a class="headerlink" href="#preliminaries" title="Link to this heading">#</a></h2>
 <p>We need the following libraries.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -391,7 +392,7 @@ entropy as a metric for evaluating model fit.</p>
 </div>
 </section>
 <section id="data-generation">
-<h2><span class="section-number">9.2. </span>Data Generation<a class="headerlink" href="#data-generation" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">10.2. </span>Data Generation<a class="headerlink" href="#data-generation" title="Link to this heading">#</a></h2>
 <p>We’re using toy data for this chapter. Below, we randomly sample 100 values
 from three distributions with different means (<code class="docutils literal notranslate"><span class="pre">loc</span></code>) and standard deviations
 (<code class="docutils literal notranslate"><span class="pre">scale</span></code>). We’ll use these values to simulate bigram transitions in text data.</p>
@@ -434,12 +435,12 @@ from three distributions with different means (<code class="docutils literal not
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/7a3d2b09e3be5f71582fdb867a1a076db0bc0b533f8ca24a2a348077256b243f.png" src="../_images/7a3d2b09e3be5f71582fdb867a1a076db0bc0b533f8ca24a2a348077256b243f.png" />
+<img alt="../_images/55c07c015faf0db50c3d8335acb0b8c3394a0dce33e4a8279fae4b3289102110.png" src="../_images/55c07c015faf0db50c3d8335acb0b8c3394a0dce33e4a8279fae4b3289102110.png" />
 </div>
 </div>
 </section>
 <section id="using-probabilities">
-<h2><span class="section-number">9.3. </span>Using Probabilities<a class="headerlink" href="#using-probabilities" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">10.3. </span>Using Probabilities<a class="headerlink" href="#using-probabilities" title="Link to this heading">#</a></h2>
 <p>Now, we’ll convert these raw values into probabilities. The above values are
 <strong>continuous</strong>, which means they are decimal values. We will “bin” those values
 so that ones that are close together are counted together in our probability
@@ -524,63 +525,63 @@ models.</p>
   <tbody>
     <tr>
       <th>bigram-0</th>
-      <td>0.07</td>
+      <td>0.04</td>
       <td>0.01</td>
       <td>0.02</td>
     </tr>
     <tr>
       <th>bigram-1</th>
-      <td>0.07</td>
-      <td>0.07</td>
-      <td>0.03</td>
+      <td>0.01</td>
+      <td>0.02</td>
+      <td>0.02</td>
     </tr>
     <tr>
       <th>bigram-2</th>
-      <td>0.16</td>
-      <td>0.19</td>
-      <td>0.03</td>
+      <td>0.10</td>
+      <td>0.11</td>
+      <td>0.07</td>
     </tr>
     <tr>
       <th>bigram-3</th>
-      <td>0.17</td>
-      <td>0.13</td>
-      <td>0.10</td>
+      <td>0.16</td>
+      <td>0.15</td>
+      <td>0.09</td>
     </tr>
     <tr>
       <th>bigram-4</th>
-      <td>0.10</td>
-      <td>0.20</td>
-      <td>0.26</td>
+      <td>0.17</td>
+      <td>0.25</td>
+      <td>0.19</td>
     </tr>
     <tr>
       <th>bigram-5</th>
-      <td>0.14</td>
-      <td>0.21</td>
-      <td>0.26</td>
+      <td>0.17</td>
+      <td>0.20</td>
+      <td>0.19</td>
     </tr>
     <tr>
       <th>bigram-6</th>
-      <td>0.12</td>
-      <td>0.06</td>
       <td>0.15</td>
+      <td>0.15</td>
+      <td>0.14</td>
     </tr>
     <tr>
       <th>bigram-7</th>
-      <td>0.08</td>
+      <td>0.15</td>
       <td>0.07</td>
-      <td>0.08</td>
+      <td>0.18</td>
     </tr>
     <tr>
       <th>bigram-8</th>
-      <td>0.06</td>
-      <td>0.04</td>
-      <td>0.05</td>
+      <td>0.03</td>
+      <td>0.02</td>
+      <td>0.09</td>
     </tr>
     <tr>
       <th>bigram-9</th>
-      <td>0.03</td>
       <td>0.02</td>
       <td>0.02</td>
+      <td>0.01</td>
     </tr>
   </tbody>
 </table>
@@ -618,12 +619,12 @@ either <code class="docutils literal notranslate"><span class="pre">A</span></co
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/6d8f1948a7ee9e95b5e58ffd5299a24bc99817990771b1b4790c2ea8516913c4.png" src="../_images/6d8f1948a7ee9e95b5e58ffd5299a24bc99817990771b1b4790c2ea8516913c4.png" />
+<img alt="../_images/812d1865d37e9ede14c99d4df309c91860c409c96e1960a86e36818b5c59e75c.png" src="../_images/812d1865d37e9ede14c99d4df309c91860c409c96e1960a86e36818b5c59e75c.png" />
 </div>
 </div>
 </section>
 <section id="id1">
-<h2><span class="section-number">9.4. </span>Cross Entropy<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<h2><span class="section-number">10.4. </span>Cross Entropy<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <p>But how can we know for sure whether one model is better than another? That’s
 where cross entropy comes in. It will tell us how well <code class="docutils literal notranslate"><span class="pre">A</span></code> or <code class="docutils literal notranslate"><span class="pre">B</span></code> fit <code class="docutils literal notranslate"><span class="pre">corpus</span></code>
 by providing a <strong>loss</strong> metric. When language models train, they try to
@@ -671,8 +672,8 @@ process.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A: 2.361342454166666
-B: 2.521904384391591
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A: 2.135926366442903
+B: 2.1279255263173775
 </pre></div>
 </div>
 </div>
@@ -687,7 +688,7 @@ B: 2.521904384391591
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>B
 </pre></div>
 </div>
 </div>
@@ -726,12 +727,12 @@ B: 2.521904384391591
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="08_bert.html"
+       href="09_gpt.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title"><span class="section-number">8. </span>Bidirectional Encoder Representations from Transformers (BERT)</p>
+        <p class="prev-next-title"><span class="section-number">9. </span>Generative Pre-Trained Transformers (GPT)</p>
       </div>
     </a>
     <a class="right-next"
@@ -739,7 +740,7 @@ B: 2.521904384391591
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title"><span class="section-number">10. </span>Attention in Vector Space</p>
+        <p class="prev-next-title"><span class="section-number">11. </span>Attention in Vector Space</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -759,10 +760,10 @@ B: 2.521904384391591
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">9.1. Preliminaries</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-generation">9.2. Data Generation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-probabilities">9.3. Using Probabilities</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">9.4. Cross Entropy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preliminaries">10.1. Preliminaries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-generation">10.2. Data Generation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-probabilities">10.3. Using Probabilities</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">10.4. Cross Entropy</a></li>
 </ul>
   </nav></div>
 

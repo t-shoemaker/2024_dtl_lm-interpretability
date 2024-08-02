@@ -39,7 +39,6 @@ import pandas as pd
 from transformers import AutoTokenizer, AutoModel
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import rcParams
 import seaborn as sns
 ```
 
