@@ -420,12 +420,12 @@ the model to draw many-to-many relationships between tokens. During training,
 attention helps the model form strong (or weak) relationships between certain
 tokens, which in turn allows it to focus on different parts of input sequences
 dynamically. When fed an input sequence, the model learns to privilege
-relationships between certain parts of the input over others, and in doing so,
+relationships between certain parts of the input over others, and in doing so
 it captures complex patterns, local contexts, and long-range dependencies among
 the tokens.
 
 You will often see different forms of attention described in the context of
-Transformers. We will walk through the three main ones. At score, however,
+Transformers. We will walk through the three main ones. At core, however,
 attention is expressed as the following:
 
 $$
@@ -691,7 +691,7 @@ activated = activation_layer(dropped)
 
 This is a lot of information and a lot of steps. Luckily, all of the above will
 happen in a single call. But first, let's move our model to a device (like a
-GPU, represented below with `0`). The `transformers` library is pretty good at
+GPU, represented as `0` below). The `transformers` library is pretty good at
 doing this for us, but we can always do so explicitly:
 
 ```{code-cell}
